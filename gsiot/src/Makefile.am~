@@ -1,0 +1,61 @@
+## Process this file with automake to produce Makefile.in
+
+## Created by Anjuta
+
+AM_CPPFLAGS = \
+	-DPACKAGE_LOCALE_DIR=\""$(localedir)"\" \
+	-DPACKAGE_SRC_DIR=\""$(srcdir). \
+	$(SQLITE3_CFLAGS)"\" \
+	-DPACKAGE_DATA_DIR=\""$(pkgdatadir)"\"
+
+AM_CFLAGS =\
+	 -Wall\
+	 -g
+
+bin_PROGRAMS = gsiot \
+	gsiot
+
+gsiot_SOURCES = \
+	AddressManager.cpp \
+	AddressManager.h \
+	common.cpp \
+	common.h \
+	ControlBase.h \
+	DeviceAddress.cpp \
+	DeviceAddress.h \
+	EditAttrMgr.cpp \
+	EditAttrMgr.h \
+	GSIOTClient.cpp \
+	GSIOTClient.h \
+	GSIOTControl.cpp \
+	GSIOTControl.h \
+	GSIOTDevice.cpp \
+	GSIOTDevice.h \
+	GSIOTDeviceInfo.cpp \
+	GSIOTDeviceInfo.h \
+	GSIOTInfo.cpp \
+	GSIOTInfo.h \
+	GSIOTObjBase.h \
+	GSObjLocker.h \
+	typedef.h \
+	XmppGSResult.cpp \
+	XmppGSResult.h \
+	gsiot.cc \
+	GSIOTUserMgr.cpp \
+	GSIOTUserMgr.h \
+	GSIOTUser.cpp \
+	GSIOTUser.h \
+	Makefile.am \
+	RunCode.cpp \
+	RunCode.h \
+	SQLiteHelper.cpp \
+	SQLiteHelper.h
+
+gsiot_LDFLAGS = 
+
+gsiot_LDADD = \
+	-lgloox \
+	-lpthread \
+	$(SQLITE3_LIBS)
+
+

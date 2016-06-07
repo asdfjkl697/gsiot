@@ -1,0 +1,28 @@
+[Anjuta]
+Geometry=1301x716+65+24
+
+[File Loader]
+Files=../../src/XmppGSAuth.h#21%%%../../src/XmppGSAuth.cpp#81%%%../../src/common.cpp#19%%%../../src/typedef.h#52%%%../../src/GSIOTClient.h#45%%%../../src/XmppGSMessage.cpp#5%%%../../src/GSIOTDevice.h#36%%%../../src/DataStoreMgr.h#11%%%../../src/DataStoreMgr.cpp#2677%%%../../src/RunCode.cpp#881%%%../../src/RunCode.h#260%%%../../src/GSIOTClient.cpp#287%%%../../src/GSIOTHeartbeat.cpp#11%%%../../src/GSIOTHeartbeat.h#12%%%../../src/XmppGSState.h#10%%%../../src/XmppGSState.cpp#276%%%../../src/XmppGSManager.cpp#1%%%../../src/XmppGSManager.h#10%%%../../src/DeviceAddress.h#1%%%../../src/DeviceConnection.h#18%%%../../src/DeviceConnection.cpp#2677%%%../../src/TriggerControl.cpp#13%%%../../src/TriggerControl.h#18%%%../../src/ControlEvent.h#4%%%../../src/ControlEvent.cpp#2%%%../../src/IDeviceHandler.h#9%%%../../src/ICANDeviceHandler.h#14%%%../../src/CANDeviceControl.h#1%%%../../src/CANDeviceControl.cpp#9%%%../../src/DeviceManager.h#10%%%../../src/DeviceManager.cpp#1142%%%../../src/PresetManager.h#20%%%../../src/PresetManager.cpp#147%%%../../src/CommLinkManager.h#1%%%../../src/CommLinkManager.cpp#11%%%../../src/IGSMessageHandler.h#88%%%../../src/rs232.h#61%%%../../src/rs232.cpp#1%%%../../src/RFDevice.h#20%%%../../src/RFSignalDefine.h#4%%%../../src/GSIOTDevice.cpp#1%%%../../src/common.h#1%%%../../src/IGSMessageHandler.cpp#65%%%../../src/XmppGSEvent.h#10%%%../../src/XmppGSRelation.h#4%%%../../src/XmppGSPreset.h#4%%%../../src/XmppGSVObj.h#4%%%../../src/CommLink.h#210
+
+[Document Manager]
+bookmarks=<?xml version="1.0" encoding="UTF-8"?>\n<bookmarks/>\n
+
+[Execution]
+Program uri=../../Debug/src/gsiot
+Run in terminal=2
+Working directories=../../../gsiot
+
+[Project Manager]
+Shortcut=gsiot//src//gsiot
+Expand=gsiot%%%gsiot//src%%%gsiot//src//gsiot
+
+[Build]
+Configuration list=1:Default:%%%1:Debug:Debug%%%1:Profiling:Profiling%%%1:Optimized:Optimized%%%1:MinGW32:MinGW32
+Selected Configuration=Debug
+BuildArgs/Default=--enable-maintainer-mode
+BuildArgs/Debug=--enable-maintainer-mode 'CFLAGS=-g -O0' 'CXXFLAGS=-g -O0' 'JFLAGS=-g -O0' 'FFLAGS=-g -O0'
+BuildArgs/Profiling=--enable-maintainer-mode 'CFLAGS=-g -pg' 'CXXFLAGS=-g -pg' 'JFLAGS=-g -pg' 'FFLAGS=-g -pg'
+BuildArgs/Optimized=--enable-maintainer-mode 'CFLAGS=-O2' 'CXXFLAGS=-O2' 'JFLAGS=-O2' 'FFLAGS=-O2'
+
+[Debugger]
+Stop at beginning=2
