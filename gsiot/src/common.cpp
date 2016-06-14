@@ -580,6 +580,8 @@ std::string ASCIIToUTF8(const std::string& str)
 	delete []utf8_char;
 	return outstr;
 	*/
+
+	return str;
 }
 
 std::string UTF8ToASCII(const std::string& str)
@@ -601,6 +603,7 @@ std::string UTF8ToASCII(const std::string& str)
 	delete []ascii_char;
 	return outstr;
 	*/
+	return str;
 }
 
 int getMacAddress(std::string& mac){

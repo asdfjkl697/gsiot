@@ -166,7 +166,7 @@ bool GSIOTClient::handleIq( const IQ& iq )
 				GSIOTUser *pUser = m_cfg->m_UserMgr.check_GetUser( iq.from().bare() );
 				this->m_cfg->FixOwnerAuth(pUser);
 
-				/*XmppGSAuth_User *pExXmppGSAuth_User = (XmppGSAuth_User*)iq.findExtension(ExtIotAuthority_User);
+				XmppGSAuth_User *pExXmppGSAuth_User = (XmppGSAuth_User*)iq.findExtension(ExtIotAuthority_User);
 				if( pExXmppGSAuth_User )
 				{
 					handleIq_Get_XmppGSAuth_User( pExXmppGSAuth_User, iq, pUser );
@@ -180,7 +180,7 @@ bool GSIOTClient::handleIq( const IQ& iq )
 					return true;
 				}
 #endif
-				defGSReturn ret = m_cfg->m_UserMgr.check_User(pUser);
+				/*defGSReturn ret = m_cfg->m_UserMgr.check_User(pUser);
 				if( macGSFailed(ret) )
 				{
 					//LOGMSGEX( defLOGNAME, defLOG_INFO, "(%s)IQ::Get: Not found userinfo. no auth.", iq.from().bare().c_str() );
@@ -193,12 +193,25 @@ bool GSIOTClient::handleIq( const IQ& iq )
 				
 				GSIOTInfo *iotInfo = (GSIOTInfo *)iq.findExtension(ExtIot);
 				if(iotInfo){
-										
-					GSIOTDevice *iotdevice;
+					
+					//GSIOTDevice *iotdevice = new GSIOTDevice (23,"testdev23",IOT_DEVICE_RS485,"","","",NULL);
+					GSIOTDevice *iotdevice = new GSIOTDevice ();
+					iotdevice->setControl (NULL);
+					iotdevice->setId ( 27 );
+					iotdevice->setName ( "testdev29" );
+					iotdevice->setType (IOT_DEVICE_RS485);
+					iotdevice->setVer ("v1.0");
+
 					IotDeviceList.push_back(iotdevice); //20160606 test
+					GSIOTDevice *iotdevice2 = new GSIOTDevice (27,"testdev27",IOT_DEVICE_Remote,"","","",NULL);
+					IotDeviceList.push_back(iotdevice2); //20160606 test
+														
 					std::list<GSIOTDevice *> tempDevGetList;
+					//tempDevGetList.push_back(iotdevice); //20160612 test
 					std::list<GSIOTDevice *>::const_iterator	it = IotDeviceList.begin();
-					//printf("it=%l start=%l end=%l\n",it,IotDeviceList.begin(),IotDeviceList.end());
+							
+					//printf("it=%d start=%d end=%d\n",it,IotDeviceList.begin(),IotDeviceList.end());
+					
 					for(;it!=IotDeviceList.end();it++)
 					{
 						GSIOTDevice *pTempDev = (*it);
@@ -216,28 +229,33 @@ bool GSIOTClient::handleIq( const IQ& iq )
 							continue;
 						}
 
-						//20160604
+						/*/20160604
 						defUserAuth curAuth = m_cfg->m_UserMgr.check_Auth( pUser, pTempDev->getType(), pTempDev->getId() );
 
 						if( GSIOTUser::JudgeAuth( curAuth, defUserAuth_RO ) )
 						{
 							tempDevGetList.push_back(pTempDev);
-						}
+						}*/
+						tempDevGetList.push_back(pTempDev); //20160608 test
 					}
+					
 
+					
 					IQ re( IQ::Result, iq.from(), iq.id());
 					re.addExtension(new GSIOTInfo(tempDevGetList));
-
+					//re.addExtension(new GSIOTInfo(IotDeviceList,true)); //20160614
+						
 					XmppClientSend(re,"handleIq Send(Get ExtIot ACK)");
-					printf("test112\n");
 
 					tempDevGetList.clear();
 					return true;
 				}
-				printf("test12\n");
+				
+				
+				printf("test21\n");
 				GSIOTDeviceInfo *deviceInfo = (GSIOTDeviceInfo *)iq.findExtension(ExtIotDeviceInfo);
 				if(deviceInfo){
-					printf("test13\n");
+					printf("test211\n");
 					GSIOTDevice *device = deviceInfo->GetDevice();
 					if(device){
 						std::list<GSIOTDevice *>::const_iterator it = IotDeviceList.begin();
@@ -274,7 +292,7 @@ bool GSIOTClient::handleIq( const IQ& iq )
 								IQ re( IQ::Result, iq.from(), iq.id());
 								re.addExtension(new GSIOTDeviceInfo(*it, curAuth, deviceInfo->isShare()?defRunCodeVal_Spec_Enable:0) );
 								XmppClientSend(re,"handleIq Send(Get ExtIotDeviceInfo ACK)");
-								printf("test19\n");
+								printf("test219\n");
 								return true;
 							}
 						}
@@ -283,657 +301,11 @@ bool GSIOTClient::handleIq( const IQ& iq )
 				}
 				break;
 			}
-case IQ::Set:
+		case IQ::Set:
 			{
-				GSIOTUser *pUser = m_cfg->m_UserMgr.check_GetUser( iq.from().bare() );
 
-				this->m_cfg->FixOwnerAuth(pUser);
-
-				defGSReturn ret = m_cfg->m_UserMgr.check_User(pUser);
-				if( macGSFailed(ret) )
-				{
-					//LOGMSGEX( defLOGNAME, defLOG_INFO, "(%s)IQ::Set: Not found userinfo. no auth.", iq.from().bare().c_str() );
-
-					IQ re( IQ::Result, iq.from(), iq.id());
-					re.addExtension( new XmppGSResult( "all", defGSReturn_NoAuth ) );
-					XmppClientSend(re,"handleIq Send(all Set ACK)");
-					return true;
-				}
-
-				GSIOTHeartbeat *heartbeat = (GSIOTHeartbeat *)iq.findExtension(ExtIotHeartbeat);
-				if(heartbeat){
-
-					return true;
-				}
-
-				XmppGSState *pExXmppGSState = (XmppGSState*)iq.findExtension(ExtIotState);
-				if( pExXmppGSState )
-				{
-					switch( pExXmppGSState->get_cmd() )
-					{
-					case XmppGSState::defStateCmd_events:
-						{
-							defUserAuth curAuth = m_cfg->m_UserMgr.check_Auth( pUser, IOT_Module_system, defAuth_ModuleDefaultID );
-							if( !GSIOTUser::JudgeAuth( curAuth, defUserAuth_WO ) )
-							{
-								IQ re( IQ::Result, iq.from(), iq.id());
-								re.addExtension( new XmppGSResult( XMLNS_GSIOT_STATE, defGSReturn_NoAuth ) );
-								XmppClientSend(re,"handleIq Send(Get ExtIotState ACK)");
-								return true;
-							}
-
-#if 1
-							SetAlarmGuardGlobalFlag( pExXmppGSState->get_state_events() ); // this->SetAllEventsState( pExXmppGSState->get_state_events(), "from xmpp", false );
-#else
-							AutoEventthing aEvt;
-							aEvt.SetAllDevice();
-							aEvt.SetRunState( pExXmppGSState->get_state_events() );
-
-							DoControlEvent_Eventthing( &aEvt, &aEvt, "Set ExtIotState", false );
-#endif
-
-							// ack
-							IQ re( IQ::Result, iq.from(), iq.id());
-							re.addExtension( new XmppGSResult( XMLNS_GSIOT_STATE, defGSReturn_Success ) );
-							XmppClientSend(re,"handleIq Send(Get ExtIotState ACK)");
-						}
-						break;
-						
-					case XmppGSState::defStateCmd_alarmguard:
-						{
-							defUserAuth curAuth = m_cfg->m_UserMgr.check_Auth( pUser, IOT_Module_system, defAuth_ModuleDefaultID );
-							if( !GSIOTUser::JudgeAuth( curAuth, defUserAuth_WO ) )
-							{
-								IQ re( IQ::Result, iq.from(), iq.id());
-								re.addExtension( new XmppGSResult( XMLNS_GSIOT_STATE, defGSReturn_NoAuth ) );
-								XmppClientSend(re,"handleIq Send(Get ExtIotState ACK)");
-								return true;
-							}
-
-							const std::map<int,XmppGSState::struAGTime> &mapagTimeRef = pExXmppGSState->get_mapagTime();
-							for( std::map<int,XmppGSState::struAGTime>::const_iterator it=mapagTimeRef.begin(); it!=mapagTimeRef.end(); ++it )
-							{
-								const int vecagt_size = it->second.vecagTime.size();
-								const int agtime1 = vecagt_size>0 ? it->second.vecagTime[0]:0;
-								const int agtime2 = vecagt_size>1 ? it->second.vecagTime[1]:0;
-								const int agtime3 = vecagt_size>2 ? it->second.vecagTime[2]:0;
-
-								int allday = it->second.allday;
-
-								this->m_RunCodeMgr.SetCodeAndSaveDb( g_AlarmGuardTimeWNum2Index(it->first), allday, agtime1, agtime2, agtime3, true, true, true, true );
-							}
-
-							// ack
-							IQ re( IQ::Result, iq.from(), iq.id());
-							re.addExtension( new XmppGSResult( XMLNS_GSIOT_STATE, defGSReturn_Success ) );
-							XmppClientSend(re,"handleIq Send(Set ExtIotState ACK)");
-						}
-						break;
-						
-					case XmppGSState::defStateCmd_exitlearnmod:
-						{
-							defUserAuth curAuth = m_cfg->m_UserMgr.check_Auth( pUser, IOT_Module_system, defAuth_ModuleDefaultID );
-							if( !GSIOTUser::JudgeAuth( curAuth, defUserAuth_WO ) )
-							{
-								IQ re( IQ::Result, iq.from(), iq.id());
-								re.addExtension( new XmppGSResult( XMLNS_GSIOT_STATE, defGSReturn_NoAuth ) );
-								XmppClientSend(re,"handleIq Send(Set ExtIotState ACK)");
-								return true;
-							}
-
-							this->deviceClient->SendMOD_set( defMODSysSet_IR_TXCtl_TX, defLinkID_All );
-						}
-						break;
-
-					case XmppGSState::defStateCmd_reboot:
-						{
-							defUserAuth curAuth = m_cfg->m_UserMgr.check_Auth( pUser, IOT_Module_reboot, defAuth_ModuleDefaultID );
-							if( !GSIOTUser::JudgeAuth( curAuth, defUserAuth_WO ) )
-							{
-								IQ re( IQ::Result, iq.from(), iq.id());
-								re.addExtension( new XmppGSResult( XMLNS_GSIOT_STATE, defGSReturn_NoAuth ) );
-								XmppClientSend(re,"handleIq Send(Set ExtIotState ACK)");
-								return true;
-							}
-
-							sys_reset( iq.from().full().c_str(), 1 );
-						}
-						break;
-					}
-
-					return true;
-				}
-
-				XmppGSAuth *pExXmppGSAuth = (XmppGSAuth*)iq.findExtension(ExtIotAuthority);
-				if( pExXmppGSAuth )
-				{
-					defUserAuth curAuth = m_cfg->m_UserMgr.check_Auth( pUser, IOT_Module_authority, defAuth_ModuleDefaultID );
-					if( !GSIOTUser::JudgeAuth( curAuth, defUserAuth_WO ) )
-					{
-						IQ re( IQ::Result, iq.from(), iq.id());
-						re.addExtension( new XmppGSResult( XMLNS_GSIOT_AUTHORITY, defGSReturn_NoAuth ) );
-						XmppClientSend(re,"handleIq Send(Get ExtIotAuthority ACK)");
-						return true;
-					}
-
-					this->AddGSMessage( new GSMessage(defGSMsgType_Notify, iq.from(), iq.id(), pExXmppGSAuth->clone() ) );
-					return true;
-				}
-
-				XmppGSManager *pExXmppGSManager = (XmppGSManager*)iq.findExtension(ExtIotManager);
-				if( pExXmppGSManager )
-				{
-					defUserAuth curAuth = m_cfg->m_UserMgr.check_Auth( pUser, IOT_Module_manager, defAuth_ModuleDefaultID );
-					if( !GSIOTUser::JudgeAuth( curAuth, defUserAuth_WO ) )
-					{
-						IQ re( IQ::Result, iq.from(), iq.id());
-						re.addExtension( new XmppGSResult( XMLNS_GSIOT_MANAGER, defGSReturn_NoAuth ) );
-						XmppClientSend(re,"handleIq Send(Get ExtIotManager ACK)");
-						return true;
-					}
-
-					this->AddGSMessage( new GSMessage(defGSMsgType_Notify, iq.from(), iq.id(), pExXmppGSManager->clone() ) );
-					return true;
-				}
-				
-				XmppGSEvent *pExXmppGSEvent = (XmppGSEvent*)iq.findExtension(ExtIotEvent);
-				if( pExXmppGSEvent )
-				{
-					defUserAuth curAuth = m_cfg->m_UserMgr.check_Auth( pUser, IOT_Module_event, defAuth_ModuleDefaultID );
-					if( !GSIOTUser::JudgeAuth( curAuth, defUserAuth_WO ) )
-					{
-						IQ re( IQ::Result, iq.from(), iq.id());
-						re.addExtension( new XmppGSResult( XMLNS_GSIOT_EVENT, defGSReturn_NoAuth ) );
-						XmppClientSend(re,"handleIq Send(Get ExtIotEvent ACK)");
-						return true;
-					}
-
-					this->AddGSMessage( new GSMessage(defGSMsgType_Notify, iq.from(), iq.id(), pExXmppGSEvent->clone() ) );
-					return true;
-				}
-
-				XmppGSTalk *pExXmppGSTalk = (XmppGSTalk*)iq.findExtension(ExtIotTalk);
-				if( pExXmppGSTalk )
-				{
-					handleIq_Set_XmppGSTalk( pExXmppGSTalk, iq, pUser );
-					return true;
-				}
-
-				XmppGSRelation *pExXmppGSRelation = (XmppGSRelation*)iq.findExtension(ExtIotRelation);
-				if( pExXmppGSRelation )
-				{
-					defUserAuth curAuth = m_cfg->m_UserMgr.check_Auth( pUser, IOT_Module_manager, defAuth_ModuleDefaultID );
-					if( !GSIOTUser::JudgeAuth( curAuth, defUserAuth_WO ) )
-					{
-						IQ re( IQ::Result, iq.from(), iq.id());
-						re.addExtension( new XmppGSResult( XMLNS_GSIOT_RELATION, defGSReturn_NoAuth ) );
-						XmppClientSend(re,"handleIq Send(Set ExtIotRelation ACK)");
-						return true;
-					}
-
-					curAuth = m_cfg->m_UserMgr.check_Auth( pUser, pExXmppGSRelation->get_device_type(), pExXmppGSRelation->get_device_id() );
-					if( !GSIOTUser::JudgeAuth( curAuth, defUserAuth_WO ) )
-					{
-						IQ re( IQ::Result, iq.from(), iq.id());
-						re.addExtension( new XmppGSResult( XMLNS_GSIOT_RELATION, defGSReturn_NoAuth ) );
-						XmppClientSend(re,"handleIq Send(Set ExtIotRelation ACK)");
-						return true;
-					}
-
-					this->AddGSMessage( new GSMessage(defGSMsgType_Notify, iq.from(), iq.id(), pExXmppGSRelation->clone() ) );
-					return true;
-				}
-
-				XmppGSPreset *pExXmppGSPreset = (XmppGSPreset*)iq.findExtension(ExtIotPreset);
-				if( pExXmppGSPreset )
-				{
-					if( XmppGSPreset::defPSMethod_goto == pExXmppGSPreset->GetMethod() )
-					{
-						defGSReturn result = defGSReturn_Success;
-
-						if( IOT_DEVICE_Camera == pExXmppGSPreset->get_device_type() )
-						{
-							const CPresetObj *pPresetIn = pExXmppGSPreset->GetFristPreset();
-							if( pPresetIn )
-							{
-								const defUserAuth curAuth = m_cfg->m_UserMgr.check_Auth( pUser, pExXmppGSPreset->get_device_type(), pExXmppGSPreset->get_device_id() );
-
-								if( GSIOTUser::JudgeAuth( curAuth, defUserAuth_RW ) )
-								{
-									const GSIOTDevice *device = this->GetIOTDevice( pExXmppGSPreset->get_device_type(), pExXmppGSPreset->get_device_id() );
-									if( device )
-									{
-										IPCameraBase *ctl = (IPCameraBase*)device->getControl();
-
-										if( ctl->GetAdvAttr().get_AdvAttr( defCamAdvAttr_PTZ_Preset ) )
-										{
-											const CPresetObj *pPresetLocal = ctl->GetPreset(pPresetIn->GetId());
-											if( pPresetLocal )
-											{
-												if( !ctl->SendPTZ( GSPTZ_Goto_Preset, pPresetLocal->GetIndex() ) )
-												{
-													result = defGSReturn_Err;
-												}
-											}
-											else
-											{
-												result = defGSReturn_NoExist;
-											}
-										}
-										else
-										{
-											result = defGSReturn_FunDisable;
-										}
-									}
-									else
-									{
-										result = defGSReturn_NoExist;
-									}
-								}
-								else
-								{
-									result = defGSReturn_NoAuth;
-								}
-							}
-							else
-							{
-								result = defGSReturn_ErrParam;
-							}
-						}
-						else
-						{
-							result = defGSReturn_UnSupport;
-						}
-
-						IQ re( IQ::Result, iq.from(), iq.id() );
-						re.addExtension( new XmppGSPreset(struTagParam(true,true), pExXmppGSPreset->GetSrcMethod(), pExXmppGSPreset->get_device_type(), pExXmppGSPreset->get_device_id(), defPresetQueue(), result ) );
-						XmppClientSend(re,"handleIq Send(Set ExtIotPreset ACK)");
-						return true;
-					}
-
-					defUserAuth curAuth = m_cfg->m_UserMgr.check_Auth( pUser, IOT_Module_manager, defAuth_ModuleDefaultID );
-					if( !GSIOTUser::JudgeAuth( curAuth, defUserAuth_WO ) )
-					{
-						// ack
-						IQ re( IQ::Result, iq.from(), iq.id());
-						re.addExtension( new XmppGSPreset(struTagParam(true,true), pExXmppGSPreset->GetSrcMethod(), pExXmppGSPreset->get_device_type(), pExXmppGSPreset->get_device_id(), defPresetQueue(), defGSReturn_NoAuth ) );
-						XmppClientSend(re,"handleIq Send(Set ExtIotPreset ACK)");
-						return true;
-					}
-
-					this->AddGSMessage( new GSMessage(defGSMsgType_Notify, iq.from(), iq.id(), pExXmppGSPreset->clone() ) );
-					return true;
-				}
-
-				XmppGSVObj *pExXmppGSVObj = (XmppGSVObj*)iq.findExtension(ExtIotVObj);
-				if( pExXmppGSVObj )
-				{
-					defUserAuth curAuth = m_cfg->m_UserMgr.check_Auth( pUser, IOT_Module_manager, defAuth_ModuleDefaultID );
-					if( !GSIOTUser::JudgeAuth( curAuth, defUserAuth_WO ) )
-					{
-						// ack
-						IQ re( IQ::Result, iq.from(), iq.id());
-						re.addExtension( new XmppGSVObj(struTagParam(true,true), pExXmppGSVObj->GetSrcMethod(), defmapVObjConfig(), defGSReturn_NoAuth ) );
-						XmppClientSend(re,"handleIq Send(Set ExtIotVObj ACK)");
-						return true;
-					}
-
-					this->AddGSMessage( new GSMessage(defGSMsgType_Notify, iq.from(), iq.id(), pExXmppGSVObj->clone() ) );
-					return true;
-				}
-
-				XmppGSUpdate *pExXmppGSUpdate = (XmppGSUpdate*)iq.findExtension(ExtIotUpdate);
-				if( pExXmppGSUpdate )
-				{
-					handleIq_Set_XmppGSUpdate( pExXmppGSUpdate, iq, pUser );
-					return true;
-				}
-
-				GSIOTControl *iotControl = (GSIOTControl *)iq.findExtension(ExtIotControl);
-				if(iotControl){
-					GSIOTDevice *device = iotControl->getDevice();
-					if(device){
-
-						GSIOTDevice *pLocalDevice = NULL;
-						if( 0 != device->getId() )
-						{
-							pLocalDevice = this->GetIOTDevice( device->getType(), device->getId() );
-							if( !pLocalDevice )
-							{
-								//LOGMSGEX( defLOGNAME, defLOG_INFO, "(%s)IQ::Set: dev not found, devType=%d, devID=%d", iq.from().bare().c_str(), device->getType(), device->getId() );
-								return true;
-							}
-
-							if( !pLocalDevice->getControl() )
-							{
-								//LOGMSGEX( defLOGNAME, defLOG_ERROR, "(%s)IQ::Set: dev ctl err, devType=%d, devID=%d", iq.from().bare().c_str(), device->getType(), device->getId() );
-								return true;
-							}
-
-							if( !pLocalDevice->GetEnable() )
-							{
-								//LOGMSGEX( defLOGNAME, defLOG_INFO, "(%s)IQ::Set: dev disabled, devType=%d, devID=%d", iq.from().bare().c_str(), device->getType(), device->getId() );
-								return true;
-							}
-
-							if( pLocalDevice )
-							{
-								if( device->GetLinkID() != pLocalDevice->GetLinkID() )
-								{
-									device->SetLinkID( pLocalDevice->GetLinkID() );
-								}
-							}
-						}
-
-						defUserAuth curAuth = m_cfg->m_UserMgr.check_Auth( pUser, device->getType(), device->getId() );
-
-						if( defUserAuth_Null == curAuth )
-						{
-							if( iotControl->getNeedRet() )
-							{
-								IQ re( IQ::Result, iq.from(), iq.id());
-								re.addExtension( new XmppGSResult( XMLNS_GSIOT_CONTROL, defGSReturn_NoAuth ) );
-								XmppClientSend(re,"handleIq Send(Set iotControl NoAuth ACK)");
-							}
-
-							//LOGMSGEX( defLOGNAME, defLOG_INFO, "(%s)IQ::Set: no auth., curAuth=%d, devType=%d, devID=%d", iq.from().bare().c_str(), curAuth, device->getType(), device->getId() );
-							return true;
-						}
-
-						if(device->getControl()){
-							switch(device->getType())
-							{
-							case IOT_DEVICE_Camera:
-								{
-									
-								}
-							case IOT_DEVICE_RFDevice:
-								{
-									return true;
-								}
-							case IOT_DEVICE_CANDevice:
-								{
-									return true;
-								}
-
-							case IOT_DEVICE_RS485:
-								{
-									RS485DevControl *ctl = (RS485DevControl *)device->getControl();
-
-									if( !GSIOTUser::JudgeAuth( curAuth, RS485DevControl::IsReadCmd( ctl->GetCommand() )?defUserAuth_RO:defUserAuth_WO ) )
-									{
-										if( iotControl->getNeedRet() )
-										{
-											IQ re( IQ::Result, iq.from(), iq.id());
-											re.addExtension( new XmppGSResult( XMLNS_GSIOT_CONTROL, defGSReturn_NoAuth ) );
-											XmppClientSend(re,"handleIq Send(Set RS485DevControl NoAuth ACK)");
-										}
-
-										//LOGMSGEX( defLOGNAME, defLOG_INFO, "(%s)IQ::Set RS485: no auth., curAuth=%d, devType=%d, devID=%d, cmd=%d", iq.from().bare().c_str(), curAuth, device->getType(), device->getId(), ctl->GetCommand() );
-
-										return true;
-									}
-
-									RS485DevControl *pLocalCtl = (RS485DevControl*)pLocalDevice->getControl();
-
-									const defAddressQueue &AddrQue = ctl->GetAddressList();
-									defAddressQueue::const_iterator itAddrQue = AddrQue.begin();
-									for( ; itAddrQue!=AddrQue.end(); ++itAddrQue )
-									{
-										DeviceAddress *pCurOneAddr = *itAddrQue; 
-										if( !pCurOneAddr )
-											continue;
-
-										DeviceAddress *pLocalAddr = pLocalCtl->GetAddress( pCurOneAddr->GetAddress() );
-										if( !pLocalAddr )
-										{
-											LOGMSG( "(%s)IQ::Set RS485: notfound addr=%d, devType=%d, devID=%d", iq.from().bare().c_str(), pCurOneAddr->GetAddress(), device->getType(), device->getId() );
-											continue;
-										}
-#if 1
-									if( RS485DevControl::IsReadCmd( ctl->GetCommand() ) )
-									{
-										if( pLocalAddr )
-										{
-											bool isOld = false;
-											uint32_t noUpdateTime = 0;
-
-											std::string strCurValue = pLocalAddr->GetCurValue( &isOld, &noUpdateTime );
-
-											if( !isOld )
-											{
-												device->SetCurValue( pLocalAddr );
-
-												IQ re( IQ::Result, iq.from(), iq.id() );
-												re.addExtension( new GSIOTControl( pLocalDevice ) );
-												XmppClientSend( re,"handleIq Send(RS485 Read fasttime<<<<<)" );
-												return true;
-											}
-										}
-									}
-#endif
-									GSIOTDevice *sendDev = pLocalDevice->clone(false);
-									if( !sendDev )
-										continue;
-
-									RS485DevControl *sendCtl = (RS485DevControl*)sendDev->getControl();
-									if( sendCtl )
-									{
-										DeviceAddress *sendAddr = sendCtl->GetAddress(pLocalAddr->GetAddress());
-										if( sendAddr )
-										{
-											uint32_t nextInterval = 1;
-
-											sendCtl->SetCommand( ctl->GetCommand() );
-
-											const bool IsWriteCmd = RS485DevControl::IsWriteCmd( sendCtl->GetCommand() );
-											if( IsWriteCmd )
-											{
-												pLocalDevice->ResetUpdateState( pCurOneAddr->GetAddress() );
-												sendAddr->SetCurValue( pCurOneAddr->GetCurValue() );
-
-												// 
-												if( pLocalAddr->GetAttrObj().get_AdvAttr(DeviceAddressAttr::defAttr_IsReSwitch)
-													|| pLocalAddr->GetAttrObj().get_AdvAttr(DeviceAddressAttr::defAttr_IsAutoBackSwitch)
-													)
-												{
-													const std::string ReSwitchValue = pLocalAddr->GetCurValue()=="1"?"0":"1";
-													pLocalAddr->SetCurValue( ReSwitchValue );
-													sendAddr->SetCurValue( ReSwitchValue );
-												}
-											}
-
-											if( RS485DevControl::IsReadCmd( sendCtl->GetCommand() )
-												&& !this->CheckControlMesssageQueue(sendDev,sendAddr,iq.from(),iq.id()) )
-											{
-												GSIOTDevice *dev = sendDev->clone(false);
-												RS485DevControl *msgctl = (RS485DevControl *)dev->getControl();
-												msgctl->AddressQueueChangeToOneAddr( sendAddr->GetAddress() );
-												PushControlMesssageQueue( new ControlMessage( iq.from(), iq.id(), dev, msgctl->GetAddress(sendAddr->GetAddress()) ) );
-											}
-
-											if( pLocalAddr->GetAttrObj().get_AdvAttr(DeviceAddressAttr::defAttr_IsAutoBackSwitch) )
-											{
-												nextInterval = 300;
-											}
-
-											this->SendControl( device->getType(), sendDev, sendAddr, defNormSendCtlOvertime, defNormMsgOvertime, nextInterval );
-
-											if( IsWriteCmd )
-											{
-												if( iotControl->getNeedRet() )
-												{
-													IQ re( IQ::Result, iq.from(), iq.id());
-													re.addExtension( new XmppGSResult( XMLNS_GSIOT_CONTROL, defGSReturn_SuccExecuted ) );
-													XmppClientSend(re,"handleIq Send(Set RS485DevControl executed ACK)");
-												}
-											}
-
-											if( pLocalAddr->GetAttrObj().get_AdvAttr(DeviceAddressAttr::defAttr_IsAutoBackSwitch) )
-											{
-												const bool IsWriteCmd = RS485DevControl::IsWriteCmd( sendCtl->GetCommand() );
-												if( IsWriteCmd )
-												{
-													const std::string AutoBackSwitchValue = sendAddr->GetCurValue()=="1"?"0":"1";
-													pLocalAddr->SetCurValue( AutoBackSwitchValue );
-													sendAddr->SetCurValue( AutoBackSwitchValue );
-													this->SendControl( device->getType(), sendDev, sendAddr );
-												}
-											}
-
-										}
-									}
-
-									macCheckAndDel_Obj(sendDev);
-									}
-									return true;
-								}
-
-							case IOT_DEVICE_Remote:
-								{
-									const RFRemoteControl *ctl = (RFRemoteControl *)device->getControl();
-									const RFRemoteControl *localctl = (RFRemoteControl *)pLocalDevice->getControl();
-
-									if( !GSIOTUser::JudgeAuth( curAuth, defUserAuth_WO ) )
-									{
-										if( iotControl->getNeedRet() )
-										{
-											IQ re( IQ::Result, iq.from(), iq.id() );
-											re.addExtension( new XmppGSResult( XMLNS_GSIOT_CONTROL, defGSReturn_NoAuth ) );
-											XmppClientSend( re, "handleIq Send(Set RFRemoteControl NoAuth ACK)" );
-										}
-
-										//LOGMSGEX( defLOGNAME, defLOG_INFO, "(%s)IQ::Set remote: no auth., curAuth=%d, devType=%d, devID=%d", iq.from().bare().c_str(), curAuth, device->getType(), device->getId() );
-										return true;
-									}
-
-									switch( localctl->GetExType() )
-									{
-									case IOTDevice_AC_Ctl:
-										{
-											const defUserAuth curAuth_acctl = m_cfg->m_UserMgr.check_Auth( pUser, IOT_Module_acctl, defAuth_ModuleDefaultID );
-											if( !GSIOTUser::JudgeAuth( curAuth_acctl, g_IsReadOnlyCmd( ctl->GetCmd() )?defUserAuth_RO:defUserAuth_WO ) )
-											{
-												IQ re( IQ::Result, iq.from(), iq.id() );
-												re.addExtension( new XmppGSResult( XMLNS_GSIOT_CONTROL, defGSReturn_NoAuth ) );
-												XmppClientSend( re, "handleIq Send(Set AC_Ctl ACK)" );
-												return true;
-											}
-										}
-										break;
-									default:
-										break;
-									}
-
-									const defButtonQueue &que = ctl->GetButtonList();
-									defButtonQueue::const_iterator it = que.begin();
-									defButtonQueue::const_iterator itEnd = que.end();
-									for( ; it!=itEnd; ++it )
-									{
-										RemoteButton *pCurButton = *it;
-										const RemoteButton *pLocalButton = localctl->GetButton( pCurButton->GetId() );
-
-										if( pLocalButton )
-										{
-											if( IsRUNCODEEnable(defCodeIndex_TEST_Develop_NewFunc) )
-											{
-												const int testid = atoi(pLocalDevice->getVer().c_str());
-												if( pLocalDevice->getVer().find("presetDEBUGDEVELOP")!=std::string::npos )
-												{
-													ipcamClient->SendPTZ( testid, GSPTZ_Goto_Preset, pLocalButton->GetSignalSafe().original[0] );
-													continue;
-												}
-												else
-												{
-													const bool is_ptzctlDEBUGDEVELOP = ( pLocalDevice->getVer().find("ptzctlDEBUGDEVELOP")!=std::string::npos );
-													if( is_ptzctlDEBUGDEVELOP )
-													{
-														const GSPTZ_CtrlCmd ctlcmd = (GSPTZ_CtrlCmd)pLocalButton->GetSignalSafe().original[0];
-														int sleeptime = pLocalButton->GetSignalSafe().original[1];
-														int speedlevel = pLocalButton->GetSignalSafe().original[2];
-
-														if( sleeptime < 50 || sleeptime > 5000 )
-														{
-															sleeptime = 255;
-														}
-
-														if( speedlevel < 1 || speedlevel > 100 ) // 7?
-														{
-															speedlevel = 7;
-														}
-
-														if( ctlcmd<120 )
-														{
-															ipcamClient->SendPTZ( testid, ctlcmd, 0, 0, speedlevel );
-															Sleep( sleeptime );
-															ipcamClient->SendPTZ( testid, GSPTZ_STOPAll, 0 );
-														}
-
-														continue;
-													}
-												}
-											}
-
-											switch( localctl->GetExType() )
-											{
-											case IOTDevice_AC_Ctl:
-											{
-												GSIOTDevice *sendDev = pLocalDevice->clone( false );
-												RFRemoteControl *sendctl = (RFRemoteControl*)sendDev->getControl();
-												sendctl->ButtonQueueChangeToOne( pCurButton->GetId() );
-												
-												if( defCmd_Null == ctl->GetCmd() )
-												{
-													sendctl->SetCmd( defCmd_Default );
-												}
-
-												PushControlMesssageQueue( new ControlMessage( iq.from(), iq.id(), sendDev, sendctl->GetButton( pCurButton->GetId() ) ) );
-												return true;
-											}
-											break;
-
-											default:
-												break;
-											}
-
-											GSIOTDevice *sendDev = pLocalDevice->clone( false );
-											RFRemoteControl *sendctl = (RFRemoteControl*)sendDev->getControl();
-											sendctl->ButtonQueueChangeToOne( pCurButton->GetId() );
-
-											this->SendControl( device->getType(), sendDev, NULL );
-
-											macCheckAndDel_Obj(sendctl);
-
-											if( iotControl->getNeedRet() )
-											{
-												IQ re( IQ::Result, iq.from(), iq.id() );
-												re.addExtension( new XmppGSResult( XMLNS_GSIOT_CONTROL, defGSReturn_SuccExecuted ) );
-												XmppClientSend( re, "handleIq Send(Set RFRemoteControl executed ACK)" );
-											}
-										}
-										else
-										{
-											if( iotControl->getNeedRet() )
-											{
-												IQ re( IQ::Result, iq.from(), iq.id() );
-												re.addExtension( new XmppGSResult( XMLNS_GSIOT_CONTROL, defGSReturn_NoExist ) );
-												XmppClientSend( re, "handleIq Send(Set RFRemoteControl NoExist ACK)" );
-											}
-
-											//LOGMSGEX( defLOGNAME, defLOG_INFO, "(%s)IQ::Set remote: button not found, devType=%d, devID=%d, btnid=%d", iq.from().bare().c_str(), device->getType(), device->getId(), pCurButton->GetId() );
-										}
-									}
-
-									return true;
-								}
-								break;
-							}
-						}
-					}
-					return true;
-				}
-				break;
 			}
+			break;
 
 		case IQ::Result:
 			{
@@ -956,9 +328,9 @@ case IQ::Set:
 
 void GSIOTClient::handleSubscription( const Subscription& subscription )
 {
-	//if(subscription.subtype() == Subscription::Subscribe){
-	//	xmppClient->rosterManager()->ackSubscriptionRequest(subscription.from(),true);
-	//}
+	if(subscription.subtype() == Subscription::Subscribe){
+		//xmppClient->rosterManager()->ackSubscriptionRequest(subscription.from(),true);
+	}
 }
 
 void GSIOTClient::handleTag( Tag* tag )
@@ -1227,7 +599,7 @@ void GSIOTClient::XmppPrint( const Message& msg, const char *callinfo )
 
 void GSIOTClient::XmppPrint( const IQ& iq, const char *callinfo )
 {
-	XmppPrint( iq.tag(), callinfo, NULL );
+	XmppPrint( iq.tag(), callinfo, NULL, false); //20160612 add false
 }
 
 void GSIOTClient::XmppPrint( const Tag *ptag, const char *callinfo, const Stanza *stanza, bool dodel )
@@ -1245,7 +617,7 @@ void GSIOTClient::XmppPrint( const Tag *ptag, const char *callinfo, const Stanza
 	printf( "GSIOT %s from=\"%s\", xml=\"%s\"\r\n", callinfo?callinfo:"", stanza?stanza->from().full().c_str():"NULL", strxml.c_str() );
 	if( ptag && dodel )
 	{
-		delete ptag;
+		delete ptag; //20160608
 	}
 }
 
@@ -1344,7 +716,7 @@ void GSIOTClient::handleIq_Get_XmppGSAuth_User( const XmppGSAuth_User *pExXmppGS
 
 void GSIOTClient::EventNoticeMsg_Remove( const std::string &id )
 {
-	/*20160606
+	/*
 	gloox::util::MutexGuard mutexguard( m_mutex_lstEventNoticeMsg );
 
 	std::map<std::string,struEventNoticeMsg*>::iterator it = m_lstEventNoticeMsg.find( id );

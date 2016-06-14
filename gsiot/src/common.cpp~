@@ -580,6 +580,8 @@ std::string ASCIIToUTF8(const std::string& str)
 	delete []utf8_char;
 	return outstr;
 	*/
+
+	return str;
 }
 
 std::string UTF8ToASCII(const std::string& str)
@@ -649,7 +651,6 @@ std::string getAppPath()
 {
 	CHAR sPath[MAX_PATH]; 
     //GetModuleFileNameA(NULL, sPath, MAX_PATH); 
-	printf("test111\n");
 	char *strPath = sPath;
 	std::string retPath = strPath;
     return retPath.substr(0,retPath.find_last_of("\\"));

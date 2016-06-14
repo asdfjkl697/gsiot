@@ -166,7 +166,7 @@ bool GSIOTClient::handleIq( const IQ& iq )
 				GSIOTUser *pUser = m_cfg->m_UserMgr.check_GetUser( iq.from().bare() );
 				this->m_cfg->FixOwnerAuth(pUser);
 
-				/*XmppGSAuth_User *pExXmppGSAuth_User = (XmppGSAuth_User*)iq.findExtension(ExtIotAuthority_User);
+				XmppGSAuth_User *pExXmppGSAuth_User = (XmppGSAuth_User*)iq.findExtension(ExtIotAuthority_User);
 				if( pExXmppGSAuth_User )
 				{
 					handleIq_Get_XmppGSAuth_User( pExXmppGSAuth_User, iq, pUser );
@@ -180,7 +180,7 @@ bool GSIOTClient::handleIq( const IQ& iq )
 					return true;
 				}
 #endif
-				defGSReturn ret = m_cfg->m_UserMgr.check_User(pUser);
+				/*defGSReturn ret = m_cfg->m_UserMgr.check_User(pUser);
 				if( macGSFailed(ret) )
 				{
 					//LOGMSGEX( defLOGNAME, defLOG_INFO, "(%s)IQ::Get: Not found userinfo. no auth.", iq.from().bare().c_str() );
@@ -193,12 +193,23 @@ bool GSIOTClient::handleIq( const IQ& iq )
 				
 				GSIOTInfo *iotInfo = (GSIOTInfo *)iq.findExtension(ExtIot);
 				if(iotInfo){
-										
-					GSIOTDevice *iotdevice;
+					
+					//GSIOTDevice *iotdevice = new GSIOTDevice (23,"testdev23",IOT_DEVICE_RS485,"","","",NULL);
+					GSIOTDevice *iotdevice = new GSIOTDevice ();
+					iotdevice->setControl (NULL);
+					iotdevice->setId ( 27 );
+					iotdevice->setName ( "testdev29" );
+					iotdevice->setType (IOT_DEVICE_RS485);
+					iotdevice->setVer ("v1.0");
+
 					IotDeviceList.push_back(iotdevice); //20160606 test
+					GSIOTDevice *iotdevice2 = new GSIOTDevice (27,"testdev27",IOT_DEVICE_Remote,"","","",NULL);
+					IotDeviceList.push_back(iotdevice2); //20160606 test
+														
 					std::list<GSIOTDevice *> tempDevGetList;
+					//tempDevGetList.push_back(iotdevice); //20160612 test
 					std::list<GSIOTDevice *>::const_iterator	it = IotDeviceList.begin();
-					//printf("it=%l start=%l end=%l\n",it,IotDeviceList.begin(),IotDeviceList.end());
+							
 					for(;it!=IotDeviceList.end();it++)
 					{
 						GSIOTDevice *pTempDev = (*it);
@@ -216,28 +227,33 @@ bool GSIOTClient::handleIq( const IQ& iq )
 							continue;
 						}
 
-						//20160604
+						/*/20160604
 						defUserAuth curAuth = m_cfg->m_UserMgr.check_Auth( pUser, pTempDev->getType(), pTempDev->getId() );
 
 						if( GSIOTUser::JudgeAuth( curAuth, defUserAuth_RO ) )
 						{
 							tempDevGetList.push_back(pTempDev);
-						}
+						}*/
+						tempDevGetList.push_back(pTempDev); //20160608 test
 					}
+					
 
+					
 					IQ re( IQ::Result, iq.from(), iq.id());
 					re.addExtension(new GSIOTInfo(tempDevGetList));
-
+					//re.addExtension(new GSIOTInfo(IotDeviceList,true)); //20160614
+						
 					XmppClientSend(re,"handleIq Send(Get ExtIot ACK)");
-					printf("test112\n");
 
 					tempDevGetList.clear();
 					return true;
 				}
-				printf("test12\n");
+				
+				
+				printf("test21\n");
 				GSIOTDeviceInfo *deviceInfo = (GSIOTDeviceInfo *)iq.findExtension(ExtIotDeviceInfo);
 				if(deviceInfo){
-					printf("test13\n");
+					printf("test211\n");
 					GSIOTDevice *device = deviceInfo->GetDevice();
 					if(device){
 						std::list<GSIOTDevice *>::const_iterator it = IotDeviceList.begin();
@@ -274,7 +290,7 @@ bool GSIOTClient::handleIq( const IQ& iq )
 								IQ re( IQ::Result, iq.from(), iq.id());
 								re.addExtension(new GSIOTDeviceInfo(*it, curAuth, deviceInfo->isShare()?defRunCodeVal_Spec_Enable:0) );
 								XmppClientSend(re,"handleIq Send(Get ExtIotDeviceInfo ACK)");
-								printf("test19\n");
+								printf("test219\n");
 								return true;
 							}
 						}
@@ -310,9 +326,9 @@ bool GSIOTClient::handleIq( const IQ& iq )
 
 void GSIOTClient::handleSubscription( const Subscription& subscription )
 {
-	//if(subscription.subtype() == Subscription::Subscribe){
-	//	xmppClient->rosterManager()->ackSubscriptionRequest(subscription.from(),true);
-	//}
+	if(subscription.subtype() == Subscription::Subscribe){
+		//xmppClient->rosterManager()->ackSubscriptionRequest(subscription.from(),true);
+	}
 }
 
 void GSIOTClient::handleTag( Tag* tag )
@@ -581,7 +597,7 @@ void GSIOTClient::XmppPrint( const Message& msg, const char *callinfo )
 
 void GSIOTClient::XmppPrint( const IQ& iq, const char *callinfo )
 {
-	XmppPrint( iq.tag(), callinfo, NULL );
+	XmppPrint( iq.tag(), callinfo, NULL, false); //20160612 add false
 }
 
 void GSIOTClient::XmppPrint( const Tag *ptag, const char *callinfo, const Stanza *stanza, bool dodel )
@@ -599,7 +615,7 @@ void GSIOTClient::XmppPrint( const Tag *ptag, const char *callinfo, const Stanza
 	printf( "GSIOT %s from=\"%s\", xml=\"%s\"\r\n", callinfo?callinfo:"", stanza?stanza->from().full().c_str():"NULL", strxml.c_str() );
 	if( ptag && dodel )
 	{
-		delete ptag;
+		delete ptag; //20160608
 	}
 }
 
@@ -698,7 +714,7 @@ void GSIOTClient::handleIq_Get_XmppGSAuth_User( const XmppGSAuth_User *pExXmppGS
 
 void GSIOTClient::EventNoticeMsg_Remove( const std::string &id )
 {
-	/*20160606
+	/*
 	gloox::util::MutexGuard mutexguard( m_mutex_lstEventNoticeMsg );
 
 	std::map<std::string,struEventNoticeMsg*>::iterator it = m_lstEventNoticeMsg.find( id );
