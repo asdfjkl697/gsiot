@@ -97,6 +97,7 @@ ControlEvent.o: /home/chen/projects/gsiot/src/ControlEvent.cpp \
  /usr/local/include/gloox/stanzaextension.h \
  /home/chen/projects/gsiot/src/EditAttrMgr.h \
  /home/chen/projects/gsiot/src/common.h \
+ /home/chen/projects/gsiot/src/memmacro.h \
  /home/chen/projects/gsiot/src/RunCode.h \
  /home/chen/projects/gsiot/src/SQLiteHelper.h \
  /home/chen/projects/gsiot/src/SQLiteC++.h \
@@ -376,6 +377,8 @@ ControlEvent.o: /home/chen/projects/gsiot/src/ControlEvent.cpp \
 /home/chen/projects/gsiot/src/EditAttrMgr.h:
 
 /home/chen/projects/gsiot/src/common.h:
+
+/home/chen/projects/gsiot/src/memmacro.h:
 
 /home/chen/projects/gsiot/src/RunCode.h:
 

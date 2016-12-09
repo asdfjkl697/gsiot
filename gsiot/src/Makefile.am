@@ -84,7 +84,6 @@ gsiot_SOURCES = \
 	ControlEvent.h \
 	IDeviceHandler.h \
 	ICANDeviceHandler.h \
-	IDeviceHandler.h \
 	IGSMessageHandler.cpp \
 	IGSMessageHandler.h \
 	IRFReadHandler.h \
@@ -99,7 +98,68 @@ gsiot_SOURCES = \
 	CommLinkManager.cpp \
 	CommLinkManager.h \
 	rs232.cpp \
-	rs232.h
+	rs232.h \
+	RS485DevControl.cpp \
+	RS485DevControl.h \
+	ModbusProc.cpp \
+	ModbusProc.h \
+	RFRemoteControl.cpp \
+	RFRemoteControl.h \
+	RemoteButtonManager.cpp \
+	RemoteButtonManager.h \
+	RemoteButtonClass.cpp \
+	RemoteButtonClass.h \
+	ControlMessage.cpp \
+	ControlMessage.h \
+	GSIOTEvent.cpp \
+	GSIOTEvent.h \
+	AutoCallEvent.cpp \
+	AutoCallEvent.h \
+	AutoControlEvent.cpp \
+	AutoControlEvent.h \
+	AutoEventthing.cpp \
+	AutoEventthing.h \
+	AutoNoticeEvent.cpp \
+	AutoNoticeEvent.h \
+	AutoSendSMSEvent.cpp \
+	AutoSendSMSEvent.h \
+	XmppRegister.cpp \
+	XmppRegister.h \
+	SerialDataBuffer.cpp \
+	SerialDataBuffer.h \
+	SerialMessage.cpp \
+	SerialMessage.h \
+	memmacro.h \
+	HeartbeatMon.cpp \
+	HeartbeatMon.h \
+	CommLink.cpp \
+	CommLink.h \
+	NetBaseClient.cpp \
+	NetBaseClient.h \
+	NetMan.cpp \
+	NetMan.h \
+	NetModule.cpp \
+	NetModule.h \
+	NetTcpClient.cpp \
+	NetTcpClient.h \
+	NetUdpClient.cpp \
+	NetUdpClient.h \
+	RFDeviceControl.cpp \
+	RFDeviceControl.h \
+	RFDevice.cpp \
+	RFDevice.h \
+	XmppGSChange.cpp \
+	XmppGSChange.h \
+	XmppGSEvent.cpp \
+	XmppGSEvent.h \
+	TimerManager.cpp \
+	TimerManager.h \
+	RFSignalDefine.cpp \
+	RFSignalDefine.h \
+	XmppGSRelation.cpp \
+	XmppGSRelation.h \
+	XmppGSReport.cpp \
+	XmppGSReport.h
 
 gsiot_LDFLAGS = 
 

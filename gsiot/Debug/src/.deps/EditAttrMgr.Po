@@ -93,6 +93,7 @@ EditAttrMgr.o: /home/chen/projects/gsiot/src/EditAttrMgr.cpp \
  /usr/include/i386-linux-gnu/c++/4.8/bits/atomic_word.h \
  /usr/include/c++/4.8/bits/basic_string.tcc \
  /home/chen/projects/gsiot/src/common.h \
+ /home/chen/projects/gsiot/src/memmacro.h \
  /home/chen/projects/gsiot/src/RunCode.h \
  /home/chen/projects/gsiot/src/SQLiteHelper.h \
  /home/chen/projects/gsiot/src/SQLiteC++.h \
@@ -358,6 +359,8 @@ EditAttrMgr.o: /home/chen/projects/gsiot/src/EditAttrMgr.cpp \
 /usr/include/c++/4.8/bits/basic_string.tcc:
 
 /home/chen/projects/gsiot/src/common.h:
+
+/home/chen/projects/gsiot/src/memmacro.h:
 
 /home/chen/projects/gsiot/src/RunCode.h:
 

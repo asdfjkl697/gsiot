@@ -1,6 +1,7 @@
 GSIOTConfig.o: /home/chen/projects/gsiot/src/GSIOTConfig.cpp \
  /usr/include/stdc-predef.h /home/chen/projects/gsiot/src/GSIOTConfig.h \
  /home/chen/projects/gsiot/src/common.h \
+ /home/chen/projects/gsiot/src/memmacro.h \
  /home/chen/projects/gsiot/src/typedef.h /usr/include/unistd.h \
  /usr/include/features.h /usr/include/i386-linux-gnu/sys/cdefs.h \
  /usr/include/i386-linux-gnu/bits/wordsize.h \
@@ -126,6 +127,8 @@ GSIOTConfig.o: /home/chen/projects/gsiot/src/GSIOTConfig.cpp \
 /home/chen/projects/gsiot/src/GSIOTConfig.h:
 
 /home/chen/projects/gsiot/src/common.h:
+
+/home/chen/projects/gsiot/src/memmacro.h:
 
 /home/chen/projects/gsiot/src/typedef.h:
 

@@ -50,8 +50,10 @@ void RemoteButtonManager::DeleteButtonQueue_Spec( defButtonQueue &que )
 
 bool RemoteButtonManager::DeleteButton_Spec( defButtonQueue &que, uint32_t buttonid )
 {
-	defButtonQueue::const_iterator it = que.begin();
-	defButtonQueue::const_iterator itEnd = que.end();
+	//defButtonQueue::const_iterator it = que.begin();
+	//defButtonQueue::const_iterator itEnd = que.end();
+	defButtonQueue::iterator it = que.begin();
+	defButtonQueue::iterator itEnd = que.end();
 	for( ; it!=itEnd; ++it )
 	{
 		RemoteButton *button = (*it);

@@ -125,11 +125,11 @@ defGSReturn GSIOTUserMgr::check_User( const GSIOTUser *pUser )
 defUserAuth GSIOTUserMgr::check_Auth( const GSIOTUser *pUser, const IOTDeviceType type, const int id )
 {
 	//  «∑Ò∆¡±Œ»®œﬁ
-	if( IsRUNCODEEnable(defCodeIndex_Debug_DisableAuth) )
+	/*if( IsRUNCODEEnable(defCodeIndex_Debug_DisableAuth) )
 	{
 		//LOGMSGEX( defLOGNAME, defLOG_WORN, "__TEST__: <Debug_DisableAuth> check_Auth" );
 		return defUserAuth_RW;
-	}
+	}*/
 
 	if( !pUser )
 	{
@@ -446,7 +446,7 @@ defGSReturn GSIOTUserMgr::Delete_User( const std::string &jid, const bool Failed
 		this->OnNotify( defNotify_Delete, it->second );
 
 		delete (it->second);
-		//m_mapUser.erase(it);
+		m_mapUser.erase(it++);
 		return defGSReturn_Success;
 	}
 

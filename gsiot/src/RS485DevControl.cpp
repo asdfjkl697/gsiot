@@ -1,7 +1,8 @@
 #include "RS485DevControl.h"
 #include "common.h"
-#include "util.h"
-#include <Windows.h>
+#include "gloox/util.h"
+//#include <Windows.h>
+
 
 #define defValueRange_Temperature_Min	(-40)
 #define defValueRange_Temperature_Max	(100)
@@ -222,10 +223,10 @@ RS485DevControl* RS485DevControl::CreateRS485DevControl_ModifyDevAddr( IOTDevice
 		return NULL;
 
 	char chID[32] = {0};
-	sprintf_s( chID, sizeof(chID), "%d", newDevID );
+	snprintf( chID, sizeof(chID), "%d", newDevID );
 
 	RS485DevControl *prs485 = new RS485DevControl( oldDevID, defModbusCmd_Write, defProtocol_Unknown, ver );
-	prs485->AddSpecAddr( DeviceAddress( address, "", DeviceType, IOT_Byte, IOT_WRITE, chID ) );
+	//prs485->AddSpecAddr( DeviceAddress( address, "", DeviceType, IOT_Byte, IOT_WRITE, chID ) ); //20160614
 
 	return prs485;
 }
@@ -250,7 +251,7 @@ bool RS485DevControl::AddSpecAddr( DeviceAddress &Addrobj, uint16_t addressStart
 		if( SNoStart>0 )
 		{
 			char chname[256] = {0};
-			sprintf_s( chname, sizeof(chname), "%s-%d", Addrobj.GetName().c_str(), SNoStart++ );
+			snprintf( chname, sizeof(chname), "%s-%d", Addrobj.GetName().c_str(), SNoStart++ );
 			paddr->SetName( std::string(chname) );
 		}
 
@@ -364,7 +365,11 @@ ControlBase* RS485DevControl::clone( bool CreateLock ) const
 
 std::string RS485DevControl::Print( const char *info, bool doPrint, DeviceAddress *const pSpecAddr ) const
 {
-	const int thisThreadId = ::GetCurrentThreadId();
+	/**/
+		//jyc20160824
+	//const int thisThreadId = ::GetCurrentThreadId();
+	//pthread_t pthread_self();
+	const int thisThreadId = ::pthread_self(); //jyc20160825add get threadid must test later
 
 	char buf[256] = {0};
 	DeviceAddress *addr = NULL;
@@ -393,15 +398,16 @@ std::string RS485DevControl::Print( const char *info, bool doPrint, DeviceAddres
 			strvalues += pOneAddr->GetCurValue();
 		}
 	}
-
-	sprintf_s( buf, sizeof(buf), "RS485Ctl(%s) cnt=%d, 485id=%d, cmd=%d, addr=%d, val=(%s) -ThId%d", info?info:"", this->GetAddressList().size(), this->m_deviceID, this->m_command, addr?addr->GetAddress():0, strvalues.c_str(), thisThreadId );
-
+	
+	snprintf( buf, sizeof(buf), "RS485Ctl(%s) cnt=%d, 485id=%d, cmd=%d, addr=%d, val=(%s) -ThId%d\n", info?info:"", this->GetAddressList().size(), this->m_deviceID, this->m_command, addr?addr->GetAddress():0, strvalues.c_str(), thisThreadId );
+	
 	if( doPrint )
 	{
 		LOGMSG( buf );
 	}
 
 	return std::string(buf);
+	//*/
 }
 
 bool RS485DevControl::GetBtachReadParam( uint16_t &addressStart, uint16_t &addressCount, uint16_t &addressEnableCount ) const
@@ -467,7 +473,7 @@ bool RS485DevControl::Encode( defRS485MsgQue &que, DeviceAddress *const pSpecAdd
 	
 	if( defProtocol_Modbus != protocol )
 	{
-		LOGMSGEX( defLOGNAME, defLOG_ERROR, "RS485DevControl::Encode protocol failed!!! protocol=%d\r\n", m_protocol );
+		//LOGMSGEX( defLOGNAME, defLOG_ERROR, "RS485DevControl::Encode protocol failed!!! protocol=%d\r\n", m_protocol );
 		return false;
 	}
 
@@ -481,9 +487,6 @@ bool RS485DevControl::Encode( defRS485MsgQue &que, DeviceAddress *const pSpecAdd
 
 		if( pSpecAddr )
 		{
-			//if( pSpecAddr->GetAddress() != pAddr->GetAddress() )
-			//	continue;
-
 			pAddr = pSpecAddr;
 		}
 
@@ -590,7 +593,7 @@ bool RS485DevControl::Encode( defRS485MsgQue &que, DeviceAddress *const pSpecAdd
 		}
 		else
 		{
-			LOGMSGEX( defLOGNAME, defLOG_ERROR, "RS485DevControl::Encode cmd failed!!! protocol=%d, cmd=%d\r\n", m_protocol, m_command );
+			//LOGMSGEX( defLOGNAME, defLOG_ERROR, "RS485DevControl::Encode cmd failed!!! protocol=%d, cmd=%d\r\n", m_protocol, m_command );
 			return false;
 		}
 
@@ -602,7 +605,7 @@ bool RS485DevControl::Encode( defRS485MsgQue &que, DeviceAddress *const pSpecAdd
 		}
 		else
 		{
-			LOGMSGEX( defLOGNAME, defLOG_ERROR, "RS485Ctrl addr encode failed(%s)! devid=%d, cmd=%d, addr=%d, type=%d\r\n", strErr.c_str(), this->m_deviceID, this->m_command, pAddr->GetAddress(), pAddr->GetType() );
+			//LOGMSGEX( defLOGNAME, defLOG_ERROR, "RS485Ctrl addr encode failed(%s)! devid=%d, cmd=%d, addr=%d, type=%d\r\n", strErr.c_str(), this->m_deviceID, this->m_command, pAddr->GetAddress(), pAddr->GetType() );
 		}
 
 		break; // only one

@@ -17,7 +17,7 @@ private:
 
 private:
 	//uint8_t *RFDevice::GetDataToStr(DataType type,uint8_t *data,std::string& val);
-	uint8_t GetDataToStr(DataType type,uint8_t *data,std::string& val);
+	uint8_t *GetDataToStr(DataType type,uint8_t *data,std::string& val);
 
 public:
 	RFDevice(void){};

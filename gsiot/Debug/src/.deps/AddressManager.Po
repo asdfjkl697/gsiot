@@ -100,6 +100,7 @@ AddressManager.o: /home/chen/projects/gsiot/src/AddressManager.cpp \
  /usr/local/include/gloox/mutexguard.h /usr/local/include/gloox/mutex.h \
  /home/chen/projects/gsiot/src/EditAttrMgr.h \
  /home/chen/projects/gsiot/src/common.h \
+ /home/chen/projects/gsiot/src/memmacro.h \
  /home/chen/projects/gsiot/src/RunCode.h \
  /home/chen/projects/gsiot/src/SQLiteHelper.h \
  /home/chen/projects/gsiot/src/SQLiteC++.h \
@@ -370,6 +371,8 @@ AddressManager.o: /home/chen/projects/gsiot/src/AddressManager.cpp \
 /home/chen/projects/gsiot/src/EditAttrMgr.h:
 
 /home/chen/projects/gsiot/src/common.h:
+
+/home/chen/projects/gsiot/src/memmacro.h:
 
 /home/chen/projects/gsiot/src/RunCode.h:
 

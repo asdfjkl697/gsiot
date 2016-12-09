@@ -1,6 +1,6 @@
 #include "RFRemoteControl.h"
-#include "logFileExFunc.h"
-#include "util.h"
+//#include "logFileExFunc.h"
+#include "gloox/util.h"
 
 // 通用参数
 #define defParamNm_Remote_ExType	"ex"
@@ -61,7 +61,7 @@ std::string RFRemoteControl::Print( const char *info, bool doPrint, RemoteButton
 	else
 		pButton = this->GetFristButton();
 
-	sprintf_s( buf, sizeof(buf), "RFRemoteCtrl(%s) RemoteButton=%d", info?info:"", pButton?pButton->GetId():0 );
+	snprintf( buf, sizeof(buf), "RFRemoteCtrl(%s) RemoteButton=%d", info?info:"", pButton?pButton->GetId():0 );
 
 	if( doPrint )
 	{
@@ -97,9 +97,11 @@ std::string GSRemoteCtl_AC::Save_RefreshToSave()
 {
 	char buf[64] = {0};
 
-	std::vector<std::pair<std::string,std::string>> lstval;
+	std::vector<std::pair<std::string,std::string> > lstval;
 	m_param.sParam.size = sizeof(m_param.sParam);
-	lstval.push_back( std::make_pair(defParamNm_Remote_ExType,itoa( this->GetExType(), buf, 10 )) );
+	//lstval.push_back( std::make_pair(defParamNm_Remote_ExType,itoa( this->GetExType(), buf, 10 )) );
+	//jyc20160919 trouble
+	//lstval.push_back( std::make_pair(defParamNm_Remote_ExType,snprintf(buf,sizeof(buf),"%d", this->GetExType())) );
 	lstval.push_back( std::make_pair(defParamNm_Remote_ip,m_param.ip) );
 	lstval.push_back( std::make_pair(defParamNm_Remote_pwd,m_param.pwd) );
 	lstval.push_back( std::make_pair(defParamNm_Remote_pam,g_BufferToString( (unsigned char*)&m_param.sParam, sizeof(m_param.sParam), false )) );
@@ -136,7 +138,8 @@ std::string GSRemoteCtl_AC::GetCfgDesc() const
 
 	str = m_param.ip;
 	str += ":";
-	str += itoa( m_param.sParam.port, buf, 10 );
+	//str += itoa( m_param.sParam.port, buf, 10 );
+	str += snprintf(buf, sizeof(buf), "%d", m_param.sParam.port);
 
 	return str;
 }
@@ -222,9 +225,9 @@ std::string GSRemoteCtl_Combo_Ctl::Save_RefreshToSave()
 {
 	char buf[64] = {0};
 
-	std::vector<std::pair<std::string,std::string>> lstval;
-	lstval.push_back( std::make_pair(defParamNm_Remote_ExType,itoa( this->GetExType(), buf, 10 )) );
-
+	std::vector<std::pair<std::string,std::string> > lstval;
+	//lstval.push_back( std::make_pair(defParamNm_Remote_ExType,itoa( this->GetExType(), buf, 10 )) );
+	//lstval.push_back( std::make_pair(defParamNm_Remote_ExType,snprintf(buf,sizeof(buf),"%d",this->GetExType())) );
 	return g_lstval2str( lstval );
 }
 

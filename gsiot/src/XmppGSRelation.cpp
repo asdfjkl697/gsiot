@@ -1,6 +1,6 @@
 #include "XmppGSRelation.h"
 #include "GSIOTClient.h"
-#include "util.h"
+#include "gloox/util.h"
 
 
 XmppGSRelation::XmppGSRelation( const struTagParam &TagParam, IOTDeviceType device_type, int device_id, const deflstRelationChild &ChildList, defGSReturn result )

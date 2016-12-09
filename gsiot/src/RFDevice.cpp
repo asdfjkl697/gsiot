@@ -1,6 +1,6 @@
 #include "RFDevice.h"
 #include "common.h"
-#include "util.h"
+#include "gloox/util.h"
 #include <sstream>
 #include <iostream>
 

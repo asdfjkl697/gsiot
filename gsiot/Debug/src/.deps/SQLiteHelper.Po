@@ -66,6 +66,7 @@ SQLiteHelper.o: /home/chen/projects/gsiot/src/SQLiteHelper.cpp \
  /home/chen/projects/gsiot/src/Statement.h \
  /home/chen/projects/gsiot/src/Transaction.h \
  /home/chen/projects/gsiot/src/common.h \
+ /home/chen/projects/gsiot/src/memmacro.h \
  /home/chen/projects/gsiot/src/typedef.h /usr/include/unistd.h \
  /usr/include/i386-linux-gnu/bits/posix_opt.h \
  /usr/include/i386-linux-gnu/bits/environments.h \
@@ -270,6 +271,8 @@ SQLiteHelper.o: /home/chen/projects/gsiot/src/SQLiteHelper.cpp \
 /home/chen/projects/gsiot/src/Transaction.h:
 
 /home/chen/projects/gsiot/src/common.h:
+
+/home/chen/projects/gsiot/src/memmacro.h:
 
 /home/chen/projects/gsiot/src/typedef.h:
 

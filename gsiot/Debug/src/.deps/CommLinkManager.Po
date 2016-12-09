@@ -69,6 +69,7 @@ CommLinkManager.o: /home/chen/projects/gsiot/src/CommLinkManager.cpp \
  /home/chen/projects/gsiot/src/Transaction.h \
  /home/chen/projects/gsiot/src/CommLink.h \
  /home/chen/projects/gsiot/src/common.h \
+ /home/chen/projects/gsiot/src/memmacro.h \
  /home/chen/projects/gsiot/src/typedef.h /usr/include/unistd.h \
  /usr/include/i386-linux-gnu/bits/posix_opt.h \
  /usr/include/i386-linux-gnu/bits/environments.h \
@@ -289,6 +290,8 @@ CommLinkManager.o: /home/chen/projects/gsiot/src/CommLinkManager.cpp \
 /home/chen/projects/gsiot/src/CommLink.h:
 
 /home/chen/projects/gsiot/src/common.h:
+
+/home/chen/projects/gsiot/src/memmacro.h:
 
 /home/chen/projects/gsiot/src/typedef.h:
 

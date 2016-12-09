@@ -108,7 +108,8 @@ GSIOTUser.o: /home/chen/projects/gsiot/src/GSIOTUser.cpp \
  /home/chen/projects/gsiot/src/DeviceAddress.h \
  /usr/local/include/gloox/mutexguard.h /usr/local/include/gloox/mutex.h \
  /home/chen/projects/gsiot/src/EditAttrMgr.h \
- /home/chen/projects/gsiot/src/common.h /usr/include/string.h \
+ /home/chen/projects/gsiot/src/common.h \
+ /home/chen/projects/gsiot/src/memmacro.h /usr/include/string.h \
  /home/chen/projects/gsiot/src/GSIOTObjBase.h \
  /home/chen/projects/gsiot/src/RemoteButtonClass.h \
  /home/chen/projects/gsiot/src/RFSignalDefine.h \
@@ -413,6 +414,8 @@ GSIOTUser.o: /home/chen/projects/gsiot/src/GSIOTUser.cpp \
 /home/chen/projects/gsiot/src/EditAttrMgr.h:
 
 /home/chen/projects/gsiot/src/common.h:
+
+/home/chen/projects/gsiot/src/memmacro.h:
 
 /usr/include/string.h:
 

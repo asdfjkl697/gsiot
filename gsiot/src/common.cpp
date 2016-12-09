@@ -28,6 +28,18 @@
 //#include <regex>  // regular expression 正则表达式
 #include "gloox/md5.h"
 
+void GetLocalTime(SYSTEMTIME *st)
+{
+    if(st)
+    {
+        struct tm *pst = NULL;
+        time_t t = time(NULL);
+        pst = localtime(&t);
+        memcpy(st,pst,sizeof(SYSTEMTIME));
+        st->wYear += 1900;
+    }
+}
+
 unsigned int timeGetTime()  
 {  
 	unsigned int uptime = 0;  
@@ -35,8 +47,7 @@ unsigned int timeGetTime()
         if(clock_gettime(CLOCK_MONOTONIC, &on) == 0)  
 	        uptime = on.tv_sec*1000 + on.tv_nsec/1000000;  
 	return uptime;  
-}  
-
+} 
 
 unsigned long GetTickCount()
 {
@@ -196,7 +207,7 @@ void g_Changed( const defCfgOprt_ oprt, const IOTDeviceType DevType, const uint3
 
 	//定时检测写库
 
-	//if( !IsRUNCODEEnable(defCodeIndex_Dis_ChangeSaveDB) )
+	if( !IsRUNCODEEnable(defCodeIndex_Dis_ChangeSaveDB) )
 	{
 		static uint32_t s_lastChanged = GetTickCount();
 
@@ -204,7 +215,7 @@ void g_Changed( const defCfgOprt_ oprt, const IOTDeviceType DevType, const uint3
 		{
 			if( g_pRefGSIOTClient )
 			{
-				//g_pRefGSIOTClient->get_RunCodeMgr().SetCodeAndSaveDb( defCodeIndex_SYS_Change_Global, RUNCODE_Get(defCodeIndex_SYS_Change_Global)+1, GetTickCount(), 0,0, true,true );
+				g_pRefGSIOTClient->get_RunCodeMgr().SetCodeAndSaveDb( defCodeIndex_SYS_Change_Global, RUNCODE_Get(defCodeIndex_SYS_Change_Global)+1, GetTickCount(), 0,0, true,true );
 				s_lastChanged = GetTickCount();
 			}
 
@@ -212,15 +223,15 @@ void g_Changed( const defCfgOprt_ oprt, const IOTDeviceType DevType, const uint3
 		}
 	}
 
-	//RUNCODE_Set( defCodeIndex_SYS_Change_Global, RUNCODE_Get(defCodeIndex_SYS_Change_Global)+1, GetTickCount(), 0,0, true,true );
+	RUNCODE_Set( defCodeIndex_SYS_Change_Global, RUNCODE_Get(defCodeIndex_SYS_Change_Global)+1, GetTickCount(), 0,0, true,true );
 }
 
-/*20160604
+/*jyc20160826 
 int sys_reset( const char* strdesc, int bFlag )
 {
 	//LOGMSGEX( defLOGWatch, defLOG_SYS, "系统重启，reason=%s\r\n", strdesc?strdesc:"" );
 	//LOGMSGEX( defLOGNAME, defLOG_SYS, "sys_reset. reason=%s\r\n", strdesc?strdesc:"" );
-	sleep( 700 );
+	usleep( 700000 );
 
 #if defined(_DEBUG)
 	LOGMSG( "debug... no sys_reset" );
@@ -470,7 +481,7 @@ int g_WindSpeedLevel( const float WindSpeed, const bool trymerge )
 	}
 	else if( WindSpeed < 1.6 )	// 0.3-1.5x
 	{
-		//if( trymerge && IsRUNCODEEnable(defCodeIndex_SYS_MergeWindLevel) )
+		if( trymerge && IsRUNCODEEnable(defCodeIndex_SYS_MergeWindLevel) )
 		{
 			return 1;
 		}
@@ -479,7 +490,7 @@ int g_WindSpeedLevel( const float WindSpeed, const bool trymerge )
 	}
 	else if( WindSpeed < 3.4 )	// 1.6-3.3x
 	{
-		//if( trymerge && IsRUNCODEEnable(defCodeIndex_SYS_MergeWindLevel) )
+		if( trymerge && IsRUNCODEEnable(defCodeIndex_SYS_MergeWindLevel) )
 		{
 			return 1;
 		}
@@ -554,9 +565,9 @@ int g_WindSpeedLevel( const float WindSpeed, const bool trymerge )
 
 uint32_t g_GetComPortWriteTime( const uint32_t len )
 {
-	//const uint32_t COM_baudrate = RUNCODE_Get(defCodeIndex_SYS_COM_baudrate);
+	const uint32_t COM_baudrate = RUNCODE_Get(defCodeIndex_SYS_COM_baudrate);
 	
-	//return (uint32_t)(((float)len*12/COM_baudrate)*1000+100);
+	return (uint32_t)(((float)len*12/COM_baudrate)*1000+100);
 	//return (len*12/COM_baudrate+1)*1000;
 }
 
@@ -637,21 +648,11 @@ int getMacAddress(std::string& mac){
 	return 0;
 }
 
-//char *UnicodeToANSI( const wchar_t* str )
-//{
-//     char* result;
-//     int textlen;
-//     textlen = WideCharToMultiByte( CP_ACP, 0, str, -1, NULL, 0, NULL, NULL );
-//     result =(char *)malloc((textlen+1)*sizeof(char));
-//     memset( result, 0, sizeof(char) * ( textlen + 1 ) );
-//     WideCharToMultiByte( CP_ACP, 0, str, -1, result, textlen, NULL, NULL );
-//     return result;
-//}
 
 std::string getAppPath()
 {
 	CHAR sPath[MAX_PATH]; 
-    //GetModuleFileNameA(NULL, sPath, MAX_PATH); 
+    //GetModuleFileNameA(NULL, sPath, MAX_PATH); //jyc20160922
 	char *strPath = sPath;
 	std::string retPath = strPath;
     return retPath.substr(0,retPath.find_last_of("\\"));
@@ -803,7 +804,8 @@ uint16_t crc16_verify( uint8_t *buf, uint16_t len )
 		uchCRCHi = auchCRCLo[uIndex] ; 
 	} 
 
-	return ( (uchCRCHi << 8)| uchCRCLo );
+	return ( (uchCRCHi << 8)| uchCRCLo );  //jyc20160918 big_end or small_end notice
+	//return ( (uchCRCLo << 8)| uchCRCHi );
 }
 
 uint32_t g_StringToBuffer( const std::string &str, uint8_t *buf, uint32_t len, bool hasspace )
@@ -881,7 +883,7 @@ void g_PrintfByte( unsigned char *buf,int len, const char *pinfo, defLinkID Link
 	}
 	else
 	{
-		//snprintf( msg, PrintBufferLength, "Link%d(%s) %s(len=%d) : -ThId%d\n", LinkID, pLinkName?pLinkName:"", pinfo?pinfo:"", (int)len, ::GetCurrentThreadId() );
+		snprintf( msg, PrintBufferLength, "Link%d(%s) %s(len=%d) : -ThId%d\n", LinkID, pLinkName?pLinkName:"", pinfo?pinfo:"", (int)len, ::pthread_self() );
 	}
 
 	if (len > 0) 
@@ -899,7 +901,7 @@ void g_PrintfByte( unsigned char *buf,int len, const char *pinfo, defLinkID Link
 			}
 		}
 		str.append(";;;\r\n");
-		LOGMSG( str.c_str() );
+		printf( str.c_str() );
 	}
 }
 
@@ -1029,7 +1031,7 @@ void Copy_x264_nal_t( x264_nal_t **pdest, int &destsize, const x264_nal_t *psrc,
 
 void Delete_x264_nal_t( x264_nal_t &src )
 {
-	//macCheckAndDel_Array(src.p_payload);
+	macCheckAndDel_Array(src.p_payload);
 	src.i_payload = 0;
 }
 
@@ -1043,7 +1045,7 @@ void Delete_x264_nal_t( x264_nal_t **psrc, int &srcsize )
 		Delete_x264_nal_t( (*psrc)[i] );
 	}
 
-	//macCheckAndDel_Array(*psrc);
+	macCheckAndDel_Array(*psrc);
 	srcsize = 0;
 }
 
@@ -1122,7 +1124,7 @@ void g_GetLocalIP( std::list<std::string> &LocalIPList, std::list<std::string> &
 	char szHostName[128];
 	if (gethostname(szHostName, 128) == 0)
 	{
-		/*
+		/* jyc20160922
 		hostent * ent = gethostbyname(szHostName); 
 		int i = 0;
 		for (; ent!= NULL && ent->h_addr_list[i]!= NULL; i++ )  
@@ -1171,7 +1173,7 @@ bool IsDisableModule( const uint8_t ModuleIndex, bool isRecv )
 	case RXB8_315:
 	case RXB8_433:
 		{
-			//if( isRecv && IsRUNCODEEnable(defCodeIndex_Disable_Recv_RF) )
+			if( isRecv && IsRUNCODEEnable(defCodeIndex_Disable_Recv_RF) )
 			{
 				return true;
 			}
@@ -1181,7 +1183,7 @@ bool IsDisableModule( const uint8_t ModuleIndex, bool isRecv )
 	case RXB8_315_TX:
 	case RXB8_433_TX:
 		{
-			//if( !isRecv && IsRUNCODEEnable(defCodeIndex_Disable_Send_RF_TX) )
+			if( !isRecv && IsRUNCODEEnable(defCodeIndex_Disable_Send_RF_TX) )
 			{
 				return true;
 			}
@@ -1190,14 +1192,14 @@ bool IsDisableModule( const uint8_t ModuleIndex, bool isRecv )
 
 	case Module_RS485:
 		{
-			//return isRecv ? IsRUNCODEEnable(defCodeIndex_Disable_Recv_RS485) : IsRUNCODEEnable(defCodeIndex_Disable_Send_RS485);
+			return isRecv ? IsRUNCODEEnable(defCodeIndex_Disable_Recv_RS485) : IsRUNCODEEnable(defCodeIndex_Disable_Send_RS485);
 		}
 		break;
 
 	case RXB8_315_original:
 	case RXB8_433_original:
 		{
-			//return isRecv ? IsRUNCODEEnable(defCodeIndex_Disable_Recv_RF_original) : IsRUNCODEEnable(defCodeIndex_Disable_Send_RF_original);
+			return isRecv ? IsRUNCODEEnable(defCodeIndex_Disable_Recv_RF_original) : IsRUNCODEEnable(defCodeIndex_Disable_Send_RF_original);
 		}
 		break;
 	}
@@ -1359,12 +1361,13 @@ bool g_UTCTime_To_struGSTime( const time_t utctime, struGSTime &dest )
 
 #if 1
 	struct tm p;
-	/*
-	if( 0 != localtime_s( &p, &utctime ) )
+	
+	//if( 0 != localtime_s( &p, &utctime ) ) //jyc20160922
+	if( 0 != localtime_r( &utctime, &p ) )
 	{
 		memset( &dest, 0, sizeof(struGSTime) );
 		return false;
-	}*/
+	}
 
 	g_tm_To_struGSTime( p, dest );
 
@@ -1446,7 +1449,7 @@ void g_struGSTime_To_tm( const struGSTime &src, tm &dest )
 void g_struGSTime_GetCurTime( struGSTime &dt )
 {
 	memset( &dt, 0, sizeof(struGSTime) );
-	/*
+	
 	SYSTEMTIME st;
 	memset( &st, 0, sizeof(st) );
 	::GetLocalTime(&st);
@@ -1456,7 +1459,7 @@ void g_struGSTime_GetCurTime( struGSTime &dt )
 	dt.Day = (unsigned char)st.wDay;
 	dt.Hour = (unsigned char)st.wHour;
 	dt.Minute = (unsigned char)st.wMinute;
-	dt.Second = (unsigned char)st.wSecond;*/
+	dt.Second = (unsigned char)st.wSecond;
 }
 
 void g_reget_struGSTime_GetCurTime( struGSTime &dt, uint32_t &last_gettime, const uint32_t cur_time )
@@ -1906,7 +1909,6 @@ void g_GetAlarmGuardTime( defCodeIndex_ dayOfWeek, std::vector<uint32_t> &vecFla
 	}
 	
 	// 禁用布防时间功能，布防总是有效
-	/*
 	if( defCodeIndex_Unknown==dayOfWeek || IsRUNCODEEnable(defCodeIndex_TEST_DisableAlarmGuard) )
 	{
 		for( int i=0; i<defAlarmGuard_AGTimeCount; ++i )
@@ -1917,9 +1919,9 @@ void g_GetAlarmGuardTime( defCodeIndex_ dayOfWeek, std::vector<uint32_t> &vecFla
 		}
 
 		return ;
-	}*/
+	}
 
-	/*const struRunCode &rcode = RUNCODE_Ref( dayOfWeek );
+	const struRunCode &rcode = RUNCODE_Ref( dayOfWeek );
 
 	const int agTimeArray[defAlarmGuard_AGTimeCount] = 
 	{
@@ -1948,7 +1950,7 @@ void g_GetAlarmGuardTime( defCodeIndex_ dayOfWeek, std::vector<uint32_t> &vecFla
 			vecBegin.push_back( agTime_Begin );
 			vecEnd.push_back( agTime_End );
 		}
-	}*/
+	}
 }
 
 std::string g_Trans_GSAGCurState( GSAGCurState_ state )
@@ -2084,7 +2086,6 @@ time_t g_TransToTimePoint( const time_t utctime, const IOTDeviceType type, const
 
 float g_SYS_VChgRng( const IOTDeviceType type )
 {
-	/*
 	float rng = (float)RUNCODE_Get(defCodeIndex_SYS_VChgRng_Default);
 	switch( type )
 	{
@@ -2108,7 +2109,6 @@ float g_SYS_VChgRng( const IOTDeviceType type )
 	}
 
 	return ( rng / 1000.0f ); // 1000倍设置
-	*/
 }
 
 // 值的基本单位
@@ -2179,7 +2179,7 @@ bool g_IsRTMFP_url( const std::string &strurl )
 
 BOOL g_DeleteFileEx( const char *filename )
 {
-	/*20160604
+	/*jyc20160604
 	DWORD attributes = GetFileAttributesA( filename );
 	if( INVALID_FILE_ATTRIBUTES != attributes )
 	{
@@ -2194,7 +2194,7 @@ BOOL g_DeleteFileEx( const char *filename )
 }
 
 // 文件大小
-int g_FileSize( const std::string &filename )
+int g_FileSize( const std::string &filename ) //jyc20160922
 {
 	FILE *fd = NULL;
 	//fopen( &fd, filename.c_str(), "rb+" );

@@ -8,6 +8,7 @@
 #include "logFileExFunc.h"
 #include "RunCode.h"*/
 
+#include "memmacro.h"
 #include "typedef.h"
 #include <stdio.h>
 //#include <io.h> //20150526
@@ -15,13 +16,61 @@
 //#include "logFileExFunc.h" //20150526
 #include "RunCode.h"
 
-#include <string.h> //20160526
+#include <string.h> //jyc20160526
 #include <time.h>
 #define BOOL int
 #define BYTE unsigned char
 #define DWORD unsigned long int
 #define CHAR char
 #define LOGMSG printf
+
+//jyc20160824 modify 
+#define SOCKET int
+#define SOCKADDR_IN sockaddr_in
+#define SOCKADDR sockaddr
+#define INVALID_SOCKET -1
+#define SOCKET_ERROR -1
+
+#define LPSTR char *  //jyc20160824
+#define LPCSTR char*
+
+#define __stdcall //jyc20160826
+#define LPVOID void*
+#define LPCVOID const void*
+
+class nullptr_tt
+{
+public:
+    template<class _Tx> operator _Tx*() const { return 0; }
+    template<class _Tx, class _Ty> operator _Ty _Tx::*() const{ return 0; }
+private:
+    void operator& () const; //not allowed address
+};
+const nullptr_tt nullptr;  //jyc20160824 add nullptr
+
+
+typedef struct  //jyc20160919 for time
+{
+  int wSecond;			/* Seconds.	[0-60] (1 leap second) */
+  int wMinute;			/* Minutes.	[0-59] */
+  int wHour;			/* Hours.	[0-23] */
+  int wDay;			   /* Day.		[1-31] */
+  int wMonth;			/* Month.	[0-11] */
+  int wYear;			/* Year	- 1900.  */
+  int wDayOfWeek;		/* Day of week.	[0-6] */
+  int tm_yday;			/* Days in year.[0-365]	*/
+  int tm_isdst;			/* DST.		[-1/0/1]*/
+#ifdef	__USE_BSD
+  long int tm_gmtoff;		/* Seconds east of UTC.  */
+  __const char *tm_zone;	/* Timezone abbreviation.  */
+#else
+  long int __tm_gmtoff;		/* Seconds east of UTC.  */
+  __const char *__tm_zone;	/* Timezone abbreviation.  */
+#endif
+}SYSTEMTIME;
+
+void GetLocalTime(SYSTEMTIME *st);
+
 
 unsigned int timeGetTime();
 
@@ -54,10 +103,9 @@ enum defTimeToStrFmt_
 
 #define defFileRenameFix	".tempold"						// 重命名临时文件后缀
 
-// 小于比较符重载时使用的比较
+
 #define macOperator_Less( A, B, v ) if( A.v != B.v ) { return (A.v < B.v); }
 
-// 虚拟对象原始信息结构
 struct stru_vobj_config
 {
 	int id;
@@ -66,8 +114,8 @@ struct stru_vobj_config
 	int vobj_flag;
 	std::string name;
 	std::string ver;
-	int param[6];					// 原始参数数组，意义在具体类型里
-	std::string param_str[2];		// 原始参数数组，意义在具体类型里
+	int param[6];					
+	std::string param_str[2];		
 
 	stru_vobj_config(
 		int in_id=0,
@@ -91,7 +139,7 @@ public:
 	~IGSClientExFunc(void){};
 
 public:
-	//virtual CRunCodeMgr& get_RunCodeMgr()=0; //20160526
+	virtual CRunCodeMgr& get_RunCodeMgr()=0; //20160526
 	virtual void OnTimeOverForCmdRecv( const defLinkID LinkID, const IOTDeviceType DevType, const uint32_t DevID, const uint32_t addr )=0;
 	virtual defUseable get_all_useable_state_ForLinkID( defLinkID LinkID )=0;
 };

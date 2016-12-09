@@ -86,7 +86,7 @@ bool _sdatabuffer::IsSameOnlyDev(
 
 	if( other_DevType != DevType )
 		return false;
-
+	//jyc20160824
 	if( !GSIOTClient::Compare_Control( other_ctl, ctl ) )
 		return false;
 
@@ -135,13 +135,14 @@ bool _sdatabuffer::IsSame(
 
 	if( address || other_address ) // 只要有一个address有值则进行address比较
 	{
-		if( !GSIOTClient::Compare_ControlAndAddress( other_ctl, other_address, ctl, address ) )
-			return false;
+		//jyc20160824
+		//if( !GSIOTClient::Compare_ControlAndAddress( other_ctl, other_address, ctl, address ) )
+		//	return false;
 	}
 	else // address都为空
 	{
-		if( !GSIOTClient::Compare_Control( other_ctl, ctl ) )
-			return false;
+		//if( !GSIOTClient::Compare_Control( other_ctl, ctl ) )
+		//	return false;
 
 		switch( ctl->GetType() )
 		{
@@ -224,7 +225,7 @@ std::string CMsgCurCmd::FormatShowForTS( const std::string &strver, const uint32
 		else if( tsspan > 1 )
 		{
 			char buf[64] = {0};
-			sprintf_s( buf, sizeof(buf), " (<%ds)", tsspan );
+			snprintf( buf, sizeof(buf), " (<%ds)", tsspan );
 			return ( strver + std::string(buf) );
 		}
 		else

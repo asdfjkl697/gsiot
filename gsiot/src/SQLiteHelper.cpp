@@ -5,7 +5,9 @@ SQLite::Database* SQLiteHelper::db = NULL;
 SQLiteHelper::SQLiteHelper(void)
 {
 	//path = getAppPath();
-	path.append("\\gsiot.db");
+	path.append("/home/chen/gsiot.db");
+	//path.append("/root/gsiot.db");
+	//printf("path=%s\n",path.c_str()); //jyc2016823 test
 
 	try
 	{
@@ -18,6 +20,7 @@ SQLiteHelper::SQLiteHelper(void)
 	{
 		db = NULL;
 		//LOGMSGEX( defLOGNAME, defLOG_ERROR, "Open DB failed!" );
+		printf("Open DB failed!\n");
 	}
 }
 

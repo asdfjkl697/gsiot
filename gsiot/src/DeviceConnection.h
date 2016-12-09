@@ -14,7 +14,7 @@
 //#include "GSMProcess.h"
 #include "CommLinkManager.h"
 #include "IGSMessageHandler.h"
-//#include "HeartbeatMon.h"
+#include "HeartbeatMon.h"
 
 enum defMODSysSet
 {
@@ -44,7 +44,7 @@ private:
 	ICommLinkNotifyHandler *m_ICommLinkNotifyHandler;
 	bool isRunning;
 	int m_port;
-	//XmlDevice *devXml;
+
 	DeviceManager *devManager;
 	//20160607 GSMProcess m_GSM;
 
@@ -61,7 +61,6 @@ private:
 	int m_CommLinkThread_allowConnectNum; // 链路线程运行中已经允许进行连接的数量
 
 protected:
-	/*
 	void DecodeRxb8Data( CHeartbeatGuard *phbGuard, CCommLinkRun *CommLink, defFreq freq, uint8_t* const srcbuf, const uint32_t srcbufsize );
 	void DecodeCC1101Data(CCommLinkRun *CommLink, uint8_t *buf,uint32_t size);
 	void DecodeCANData(CCommLinkRun *CommLink, uint8_t *buf,uint32_t size);
@@ -73,7 +72,7 @@ protected:
 	void Decode_MOD_SYS_get( CHeartbeatGuard *phbGuard, CCommLinkRun *CommLink, uint8_t* const srcbuf, const uint32_t srcbufsize );
 
 	void OnDeviceData_RFSignal( CHeartbeatGuard *phbGuard, CCommLinkRun *CommLink, const RFSignal &signal );
-	*/
+	
 public:
 	DeviceConnection(IDeviceHandler *handler);
 	~DeviceConnection(void);
@@ -155,7 +154,7 @@ public:
 	void SendTransparentData( defLinkID LinkID, uint8_t *data, uint32_t size, uint32_t overtime=defNormSendCtlOvertime, uint32_t QueueOverTime=defNormMsgOvertime );
 	void SendTransparentData( defLinkID LinkID, const std::string strdata, uint32_t overtime=defNormSendCtlOvertime, uint32_t QueueOverTime=defNormMsgOvertime );
 	int SendData(CCommLinkRun *CommLink, unsigned char *sendbuf,int sendsize);
-	//void OnDataReceived( CHeartbeatGuard *phbGuard, CCommLinkRun *CommLink, uint8_t* const srcbuf, const uint32_t srcbufsize );
+	void OnDataReceived( CHeartbeatGuard *phbGuard, CCommLinkRun *CommLink, uint8_t* const srcbuf, const uint32_t srcbufsize );
 	int RecvData(CCommLinkRun *CommLink, unsigned char *buf,int size);
 	void Run(int port);
 	void AddCommLinkThread( int CommLinkCount );
@@ -190,7 +189,7 @@ public:
 	}
 
 	void LoadDevice();
-	//void LoadDeviceXml();
+	void LoadDeviceXml();
 	int AddController(ControlBase *ctl, const std::string &ver=c_DefaultVer, uint32_t enable=1, GSIOTDevice **outNewDev=NULL);
 	void DeviceSaveToFile();
 	bool DeleteDevice( GSIOTDevice *iotdevice );
@@ -201,7 +200,7 @@ public:
 	GSIOTDevice* GetIOTDevice( IOTDeviceType deviceType, uint32_t deviceId ) const;
 	
 	void Check();
-	//void OnTimer( CHeartbeatGuard *phbGuard, CCommLinkRun *CommLink, int TimerID );
+	void OnTimer( CHeartbeatGuard *phbGuard, CCommLinkRun *CommLink, int TimerID );
 
 	void AddRFHandler(IRFReadHandler *handler);
 	void RemoveRFHandler(IRFReadHandler *handler);

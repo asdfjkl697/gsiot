@@ -33,19 +33,17 @@ void SerialMessage::doMessage( defLinkID LinkID, uint8_t *data, uint32_t size, c
 {
 	if( LinkID<0 )
 	{
-		LOGMSGEX( defLOGNAME, defLOG_WORN, "doMessage:LinkID=%d error!!!\r\n", LinkID );
+		//LOGMSGEX( defLOGNAME, defLOG_WORN, "doMessage:LinkID=%d error!!!\r\n", LinkID );
 		return;
 	}
 
 	uint8_t ModuleIndex = data[4];
 	if( IsDisableModule( ModuleIndex, false ) )
 	{
-		LOGMSGEX( defLOGNAME, defLOG_WORN, "__TEST__: no send. <IsDisableModule(%d)>!!!\r\n", ModuleIndex );
+		//LOGMSGEX( defLOGNAME, defLOG_WORN, "__TEST__: no send. <IsDisableModule(%d)>!!!\r\n", ModuleIndex );
 		return;
 	}
 
-	//if(m_queue_state){
-		
 		m_queue_mutex.lock();
 
 		if( !m_buffer_queue.empty() )
@@ -56,7 +54,7 @@ void SerialMessage::doMessage( defLinkID LinkID, uint8_t *data, uint32_t size, c
 			{
 				SERIALDATABUFFER *curbuffer = (*it);
 
-				// 完全相同的已存在
+				// same is exist
 				if( curbuffer->IsSame( LinkID, data, size, DevType, DevID, ctl, address, overtime, QueueOverTime, nextInterval ) )
 				{
 					curbuffer->SetNowTime();
@@ -72,7 +70,7 @@ void SerialMessage::doMessage( defLinkID LinkID, uint8_t *data, uint32_t size, c
 
 		SERIALDATABUFFER *buffer = new SERIALDATABUFFER();
 		buffer->LinkID = LinkID;
-		//buffer->data = (uint8_t *)malloc(size);
+
 		buffer->data = new uint8_t[size];
 		buffer->size = size;
 		memcpy(buffer->data,data,size);
@@ -82,6 +80,7 @@ void SerialMessage::doMessage( defLinkID LinkID, uint8_t *data, uint32_t size, c
 		buffer->nextInterval = nextInterval;
 		buffer->DevType = DevType;
 		buffer->DevID = DevID;
+		//jyc20160824
 		buffer->ctl = GSIOTClient::CloneControl( ctl, false );
 
 		if( address )
@@ -92,10 +91,6 @@ void SerialMessage::doMessage( defLinkID LinkID, uint8_t *data, uint32_t size, c
 		m_buffer_queue.push_back(buffer);
 
 		m_queue_mutex.unlock();
-	//}else{
-	//	m_queue_state = true;
-	//	m_handler->SendData(data,size);
-	//}
 }
 
 void SerialMessage::Check()
@@ -134,11 +129,6 @@ void SerialMessage::onTimer( CHeartbeatGuard *phbGuard, CCommLinkRun *CommLink )
 	SERIALDATABUFFER *buffer = NULL;
 
 	m_queue_mutex.lock();
-	//if(m_buffer_queue.size()>0)
-	//{
-	//	buffer = m_buffer_queue.front();
-	//	m_buffer_queue.pop_front();
-	//}
 
 	CMsgCurCmd *pMsgCurCmd = CommLink ? &CommLink->GetMsgCurCmdObj() : &m_MsgCurCmd;
 	const defLinkID curLinkID = CommLink ? CommLink->get_cfg().id : defLinkID_Local;
@@ -149,7 +139,7 @@ void SerialMessage::onTimer( CHeartbeatGuard *phbGuard, CCommLinkRun *CommLink )
 	{
 		buffer = (*it);
 
-		// 已超时的不发送，直接删除
+		// overtime delete
 		if( buffer->IsQueueOverTime() )
 		{
 			buffer->Print( "SerialMsg buf IsQueueOverTime" );
@@ -171,7 +161,6 @@ void SerialMessage::onTimer( CHeartbeatGuard *phbGuard, CCommLinkRun *CommLink )
 				continue;
 			}
 		}
-
 		if( curLinkID != buffer->LinkID )
 		{
 			buffer = NULL;
@@ -208,21 +197,6 @@ void SerialMessage::onTimer( CHeartbeatGuard *phbGuard, CCommLinkRun *CommLink )
 		bool doSend = true;
 
 		char chRe[64] = {0};
-		//if( buffer->ctl )
-		//{
-		//	switch( buffer->ctl->GetType() )
-		//	{
-		//	case IOT_DEVICE_RS485:
-		//		{
-		//			if(  )
-		//			{
-		//				doSend = false;
-		//				strcpy( chRe, "Disable_Send_RS485" );
-		//			}
-		//		}
-		//		break;
-		//	}
-		//}
 
 		macHeartbeatGuard_step(130200);
 
@@ -235,14 +209,14 @@ void SerialMessage::onTimer( CHeartbeatGuard *phbGuard, CCommLinkRun *CommLink )
 
 			LOGMSG( "SendSleep=%d, lastprevInterval=%d, needprevInterval=%d", needSleep, lastprevInterval, needprevInterval );
 
-			Sleep( needSleep );
+			usleep( needSleep * 1000 );
 		}
 
 		if( doSend )
 		{
 			macHeartbeatGuard_step(130300);
 
-			m_handler->SendData( CommLink, buffer->data,buffer->size);
+			m_handler->SendData( CommLink, buffer->data,buffer->size); //jyc20160901 send mark
 
 			pMsgCurCmd->m_ts_lastSend = timeGetTime();
 
@@ -260,7 +234,7 @@ void SerialMessage::onTimer( CHeartbeatGuard *phbGuard, CCommLinkRun *CommLink )
 		}
 		else
 		{
-			LOGMSGEX( defLOGNAME, defLOG_WORN,  "__TEST__: no send. <%s>!", chRe );
+			//LOGMSGEX( defLOGNAME, defLOG_WORN,  "__TEST__: no send. <%s>!", chRe );
 		}
 
 		if( !isSet )

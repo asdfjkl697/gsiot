@@ -108,7 +108,21 @@ am_gsiot_OBJECTS = AddressManager.$(OBJEXT) common.$(OBJEXT) \
 	ControlEvent.$(OBJEXT) IGSMessageHandler.$(OBJEXT) \
 	CANDeviceControl.$(OBJEXT) DeviceManager.$(OBJEXT) \
 	PresetManager.$(OBJEXT) CommLinkManager.$(OBJEXT) \
-	rs232.$(OBJEXT)
+	rs232.$(OBJEXT) RS485DevControl.$(OBJEXT) ModbusProc.$(OBJEXT) \
+	RFRemoteControl.$(OBJEXT) RemoteButtonManager.$(OBJEXT) \
+	RemoteButtonClass.$(OBJEXT) ControlMessage.$(OBJEXT) \
+	GSIOTEvent.$(OBJEXT) AutoCallEvent.$(OBJEXT) \
+	AutoControlEvent.$(OBJEXT) AutoEventthing.$(OBJEXT) \
+	AutoNoticeEvent.$(OBJEXT) AutoSendSMSEvent.$(OBJEXT) \
+	XmppRegister.$(OBJEXT) SerialDataBuffer.$(OBJEXT) \
+	SerialMessage.$(OBJEXT) HeartbeatMon.$(OBJEXT) \
+	CommLink.$(OBJEXT) NetBaseClient.$(OBJEXT) NetMan.$(OBJEXT) \
+	NetModule.$(OBJEXT) NetTcpClient.$(OBJEXT) \
+	NetUdpClient.$(OBJEXT) RFDeviceControl.$(OBJEXT) \
+	RFDevice.$(OBJEXT) XmppGSChange.$(OBJEXT) \
+	XmppGSEvent.$(OBJEXT) TimerManager.$(OBJEXT) \
+	RFSignalDefine.$(OBJEXT) XmppGSRelation.$(OBJEXT) \
+	XmppGSReport.$(OBJEXT)
 gsiot_OBJECTS = $(am_gsiot_OBJECTS)
 gsiot_DEPENDENCIES =
 AM_V_lt = $(am__v_lt_@AM_V@)
@@ -431,7 +445,6 @@ gsiot_SOURCES = \
 	ControlEvent.h \
 	IDeviceHandler.h \
 	ICANDeviceHandler.h \
-	IDeviceHandler.h \
 	IGSMessageHandler.cpp \
 	IGSMessageHandler.h \
 	IRFReadHandler.h \
@@ -446,7 +459,68 @@ gsiot_SOURCES = \
 	CommLinkManager.cpp \
 	CommLinkManager.h \
 	rs232.cpp \
-	rs232.h
+	rs232.h \
+	RS485DevControl.cpp \
+	RS485DevControl.h \
+	ModbusProc.cpp \
+	ModbusProc.h \
+	RFRemoteControl.cpp \
+	RFRemoteControl.h \
+	RemoteButtonManager.cpp \
+	RemoteButtonManager.h \
+	RemoteButtonClass.cpp \
+	RemoteButtonClass.h \
+	ControlMessage.cpp \
+	ControlMessage.h \
+	GSIOTEvent.cpp \
+	GSIOTEvent.h \
+	AutoCallEvent.cpp \
+	AutoCallEvent.h \
+	AutoControlEvent.cpp \
+	AutoControlEvent.h \
+	AutoEventthing.cpp \
+	AutoEventthing.h \
+	AutoNoticeEvent.cpp \
+	AutoNoticeEvent.h \
+	AutoSendSMSEvent.cpp \
+	AutoSendSMSEvent.h \
+	XmppRegister.cpp \
+	XmppRegister.h \
+	SerialDataBuffer.cpp \
+	SerialDataBuffer.h \
+	SerialMessage.cpp \
+	SerialMessage.h \
+	memmacro.h \
+	HeartbeatMon.cpp \
+	HeartbeatMon.h \
+	CommLink.cpp \
+	CommLink.h \
+	NetBaseClient.cpp \
+	NetBaseClient.h \
+	NetMan.cpp \
+	NetMan.h \
+	NetModule.cpp \
+	NetModule.h \
+	NetTcpClient.cpp \
+	NetTcpClient.h \
+	NetUdpClient.cpp \
+	NetUdpClient.h \
+	RFDeviceControl.cpp \
+	RFDeviceControl.h \
+	RFDevice.cpp \
+	RFDevice.h \
+	XmppGSChange.cpp \
+	XmppGSChange.h \
+	XmppGSEvent.cpp \
+	XmppGSEvent.h \
+	TimerManager.cpp \
+	TimerManager.h \
+	RFSignalDefine.cpp \
+	RFSignalDefine.h \
+	XmppGSRelation.cpp \
+	XmppGSRelation.h \
+	XmppGSReport.cpp \
+	XmppGSReport.h
 
 gsiot_LDFLAGS = 
 gsiot_LDADD = \
@@ -549,10 +623,17 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AddressManager.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AutoCallEvent.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AutoControlEvent.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AutoEventthing.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AutoNoticeEvent.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AutoSendSMSEvent.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CANDeviceControl.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Column.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CommLink.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CommLinkManager.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ControlEvent.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ControlMessage.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DBUpdate.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DataStoreMgr.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Database.Po@am__quote@
@@ -565,22 +646,45 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/GSIOTControl.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/GSIOTDevice.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/GSIOTDeviceInfo.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/GSIOTEvent.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/GSIOTHeartbeat.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/GSIOTInfo.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/GSIOTUser.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/GSIOTUserMgr.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/HeartbeatMon.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/IGSMessageHandler.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ModbusProc.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/NetBaseClient.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/NetMan.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/NetModule.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/NetTcpClient.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/NetUdpClient.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/PresetManager.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/RFDevice.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/RFDeviceControl.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/RFRemoteControl.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/RFSignalDefine.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/RS485DevControl.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/RemoteButtonClass.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/RemoteButtonManager.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/RunCode.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SQLiteHelper.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SerialDataBuffer.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SerialMessage.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Statement.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TimerManager.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Transaction.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TriggerControl.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/XmppGSAuth.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/XmppGSChange.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/XmppGSEvent.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/XmppGSManager.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/XmppGSMessage.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/XmppGSRelation.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/XmppGSReport.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/XmppGSResult.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/XmppGSState.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/XmppRegister.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/common.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gsiot.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rs232.Po@am__quote@

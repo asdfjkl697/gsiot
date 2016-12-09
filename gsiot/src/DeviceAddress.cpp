@@ -63,7 +63,7 @@ DeviceAddress::DeviceAddress(const Tag* tag)
 
 DeviceAddress::~DeviceAddress(void)
 {
-	//macCheckAndDel_Array(m_dataObject); //20160603
+	macCheckAndDel_Array(m_dataObject);
 
 	if( m_pmutex_addr )
 	{
@@ -156,7 +156,7 @@ uint8_t *DeviceAddress::GetObjectData(uint8_t *data)
 
 void DeviceAddress::SetObjectData(uint8_t *data,uint32_t len)
 {
-	//macCheckAndDel_Array(m_dataObject); //20160603
+	macCheckAndDel_Array(m_dataObject);
 
 	if(len>0){
 		//this->m_dataObject = (uint8_t *)malloc(len);
@@ -178,7 +178,7 @@ Tag* DeviceAddress::tag(const struTagParam &TagParam)
 
 		return i;
 	}
-	/*20160603
+
 	if( 1==TagParam.fmt )
 	{
 		i->addAttribute("cur_value",this->GetCurValue());
@@ -200,7 +200,7 @@ Tag* DeviceAddress::tag(const struTagParam &TagParam)
 	else if( this->GetAttrObj().get_AdvAttr( DeviceAddressAttr::defAttr_IsAutoBackSwitch ) )
 		attr = DeviceAddressAttr::defAttr_IsAutoBackSwitch;
 
-	if( attr ) { i->addAttribute( "attr", attr ); }*/
+	if( attr ) { i->addAttribute( "attr", attr ); }
 
 	return i;
 }
@@ -251,7 +251,7 @@ void DeviceAddress::NowSampTick()
 	}
 }
 
-/*20160603
+
 std::string DeviceAddress::GetCurValue( bool *isOld, uint32_t *noUpdateTime, const uint32_t oldtimeSpan, bool *isLowSampTime, const bool curisTimePoint,
 	time_t *timecurValue, time_t *timecurMaxValue,	time_t *timecurMinValue )
 {
@@ -297,7 +297,8 @@ std::string DeviceAddress::GetCurValue( bool *isOld, uint32_t *noUpdateTime, con
 
 	return this->m_curValue;
 }
-*/
+
+
 std::string DeviceAddress::GetCurMaxValue( time_t *timecurMaxValue )
 {
 	gloox::util::MutexGuard( this->m_pmutex_addr );
@@ -393,7 +394,6 @@ bool DeviceAddress::SetCurValue( const std::string& newValue, const time_t newVa
 // 温湿度等常规监测量是发生变化存储，判断门限参考SYS_VChgRng_***。
 // 风速这种按照窗口化处理后判断变化存储，门限参考SYS_WinTime_Wind，并对小值做合并处理参考SYS_MergeWindLevel/g_WindSpeedLevel()等。
 // 存储时间点的判断，在时间点之前2分钟以内已经存储的，认为这个存储已经接近时间点，算作时间点存储，算完成了时间点存储。从时间点整点开始记，一个时间范围内都算作时间点存储。相关参考g_isTimePoint、g_TransToTimePoint等。
-/*20160603
 void DeviceAddress::DataAnalyse( const std::string& newValue, const time_t newValTime, bool *doSave, time_t *SaveTime, std::string *SaveValue, defDataFlag_* dataflag, std::string *strlog )
 {
 	gloox::util::MutexGuard( this->m_pmutex_addr );
@@ -532,7 +532,7 @@ void DeviceAddress::DataAnalyse( const std::string& newValue, const time_t newVa
 //		}
 //#endif
 	}
-}*/
+}
 
 // 最后一次存储值
 void DeviceAddress::SetLastSave( const time_t lastSaveTime, const std::string lastSaveValue )
@@ -565,7 +565,6 @@ DeviceAddress* DeviceAddress::clone() const
 }
 
 //
-/*20160603
 bool DeviceAddress::ValueWindow( const std::string& newValue, const time_t newValTime, std::string& WindowFinishValue, uint32_t WindowTime, uint32_t WindowTimeMin )
 {
 	const uint32_t curts = timeGetTime();
@@ -600,4 +599,4 @@ bool DeviceAddress::ValueWindow( const std::string& newValue, const time_t newVa
 	}
 
 	return false;
-}*/
+}

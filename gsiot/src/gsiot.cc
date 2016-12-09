@@ -39,14 +39,14 @@ int main( int /*argc*/, char** /*argv*/ )
 	//LOGMSG( "GSIOT v%s\r\nbuild %s\r\n\r\n", g_IOTGetVersion().c_str(), g_IOTGetBuildInfo().c_str() );
 	printf("gsiot start\n");
 
-	GSIOTClient *client = new GSIOTClient( "" );
+	GSIOTClient *client = new GSIOTClient(nullptr, "" );
 
 	if( !client->GetPreInitState() )
 	{
 		//LOGMSG( "PreInit Failed!" );
 		//Sleep( 2000 );
 		printf("PreInit Failed!\n");
-		sleep(2000);
+		sleep(2);
 		return -1;
 	}
 

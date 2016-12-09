@@ -2,10 +2,10 @@
 #include "gloox/tag.h"
 //#include "MediaControl.h"
 //#include "IPCameraBase.h"
-//#include "RFDeviceControl.h"
+#include "RFDeviceControl.h"
 //#include "CANDeviceControl.h"
 #include "RS485DevControl.h"
-//#include "RFRemoteControl.h"
+#include "RFRemoteControl.h"
 #include "common.h"
 
 #include <stdlib.h>
@@ -45,17 +45,11 @@ GSIOTDevice::GSIOTDevice( const Tag* tag)
 	if(tag->hasAttribute("type"))
 		this->m_type= (IOTDeviceType)atoi(tag->findAttribute("type").c_str());
 
-	//if(tag->hasAttribute("serialno"))
-	//	this->m_serialno= tag->findAttribute("serialno");
-
-	//if(tag->hasAttribute("factoryno"))
-	//	this->m_factoryno= tag->findAttribute("factoryno");
-
 	if(tag->hasAttribute("ver"))
 		this->m_ver= tag->findAttribute("ver");
 
 	this->UntagEditAttr( tag );
-	/*20160527
+	/*/20160527
 	Tag *t = tag->findChild(defDeviceTypeTag_media);
 	if(t){
 	    	this->m_control = new MediaControl(t); //20160527
@@ -78,34 +72,40 @@ GSIOTDevice::GSIOTDevice( const Tag* tag)
 	if(t){
 	    	this->m_control = new CANDeviceControl(t);
 		return;
-	}
+	}*/
 
-	t = tag->findChild(defDeviceTypeTag_rs485device);
+
+	Tag *t = tag->findChild(defDeviceTypeTag_rs485device);
+	//t = tag->findChild(defDeviceTypeTag_rs485device);
 	if(t){
 	    	this->m_control = new RS485DevControl(t);
 		return;
 	}
-	
+
+	t = tag->findChild(defDeviceTypeTag_rfdevice);
+	if(t){
+	    	this->m_control = new RFDeviceControl(t);
+		return;
+	}
+
 	t = tag->findChild(defDeviceTypeTag_rfremote);
 	if(t){
 		this->m_control = new RFRemoteControl(t);
 		return;
-	}*/
+	}
 
 	if( m_control )
 	{
 		if(  this->m_type != m_control->GetType() )
 		{
-			//LOGMSGEX( defLOGNAME, defLOG_ERROR, "GSIOTDevice() error, dev_type=%d, ctl_type=%d!\r\n", m_type, m_control->GetType() );
-			printf("GSIOTDevice() error\n");
+			printf( "GSIOTDevice() error, dev_type=%d, ctl_type=%d!\r\n", m_type, m_control->GetType() );
 			delete m_control;
 			m_control = NULL;
 		}
 	}
 	else
 	{
-		//LOGMSGEX( defLOGNAME, defLOG_WORN, "GSIOTDevice() ctl null, dev_type=%d, ctl_type unknown!\r\n", m_type );
-		printf("GSIOTDevice() ctl null\n");
+		printf( "GSIOTDevice() ctl null, dev_type=%d, ctl_type unknown!\r\n", m_type );
 	}
 
 	if( this->m_control )
@@ -233,6 +233,18 @@ bool GSIOTDevice::doEditAttrFromAttrMgr_All()
 
 	case IOT_DEVICE_Remote:
 		{
+			RFRemoteControl *ctl = (RFRemoteControl*)this->m_control;
+
+			// get list
+			const defButtonQueue &que = ctl->GetButtonList();
+			defButtonQueue::const_iterator it = que.begin();
+			defButtonQueue::const_iterator itEnd = que.end();
+			for( ; it!=itEnd; ++it )
+			{
+				RemoteButton *pSrcButton = *it;
+
+				doUpdate |= pSrcButton->doEditAttrFromAttrMgr( *pSrcButton );
+			}
 
 		}
 		break;
@@ -255,8 +267,6 @@ Tag* GSIOTDevice::tag(const struTagParam &TagParam) const
 	else
 	{
 		i->addAttribute("name",ASCIIToUTF8(this->m_name));
-		//i->addAttribute("serialno",this->m_serialno);
-		//i->addAttribute("factoryno",this->m_factoryno);
 		if( !this->m_ver.empty() && this->m_ver!="1.0" ) i->addAttribute("ver",this->m_ver);
 		i->addAttribute("readtype",this->getReadType());
 
@@ -286,11 +296,8 @@ GSIOTDevice* GSIOTDevice::clone( bool CreateLock ) const
     return dev;
 }
 
-/*20160527
 std::string GSIOTDevice::GetStrAlmBody( const bool isAlarm, const struGSTime &dt, const std::string alarmstr, const std::string suffix ) const
 {
-	//std::string almstrf = TypeToString(this->getType());
-	//almstrf += ":";
 	std::string almstrf;
 
 	if( IsRUNCODEEnable(defCodeIndex_SYS_AutoNotiContAddIOTName) )
@@ -326,7 +333,7 @@ std::string GSIOTDevice::GetStrAlmBody( const bool isAlarm, const struGSTime &dt
 	}
 
 	return almstrf;
-}*/
+}
 
 std::string GSIOTDevice::GetStrAlmSubject( const bool isAlarm ) const
 {
@@ -376,7 +383,7 @@ bool GSIOTDevice::SetCurValue( DeviceAddress *addr )
 
 				if( curaddr )
 				{
-					//20160603 curaddr->SetCurValue( addr->GetCurValue() );
+					curaddr->SetCurValue( addr->GetCurValue() );
 				}
 				else
 				{
@@ -400,24 +407,22 @@ bool GSIOTDevice::AddAddressObj( const uint32_t address, const std::string &addr
 	{
 	case IOT_DEVICE_RS485:
 		{
-			/*20160603
 			DeviceAddress *pnew = new DeviceAddress((Tag*)NULL);
 			pnew->SetAddress( address );
 			pnew->SetName( address_name );
 			pnew->SetCurValue( value );
 			
-			return this->AddAddress( pnew );*/
+			return this->AddAddress( pnew );
 		}
 		break;
 
 	case IOT_DEVICE_Remote:
 		{
-			/*20160603
 			RemoteButton *pnew = new RemoteButton(NULL);
 			pnew->SetId( address );
 			pnew->SetName( address_name );
 
-			return this->AddButton( pnew );*/
+			return this->AddButton( pnew );
 		}
 		break;
 
@@ -439,7 +444,7 @@ bool GSIOTDevice::AddAddress( DeviceAddress *addr )
 		{
 			if( !this->m_control )
 			{
-				//20160603 this->m_control = new RS485DevControl(NULL);
+				this->m_control = new RS485DevControl(NULL);
 			}
 
 			if( this->m_control )
@@ -467,7 +472,16 @@ bool GSIOTDevice::AddButton( RemoteButton *btn )
 	{
 	case IOT_DEVICE_Remote:
 		{
+			if( !this->m_control )
+			{
+				this->m_control = new RFRemoteControl(NULL);
+			}
 
+			if( this->m_control )
+			{
+				((RFRemoteControl*)this->m_control)->AddButton( btn );
+				return true;
+			}
 		}
 		break;
 
@@ -498,7 +512,13 @@ bool GSIOTDevice::hasChild() const
 
 	case IOT_DEVICE_Remote:
 		{
-
+		{
+			const RFRemoteControl *ctl = (RFRemoteControl*)this->m_control;
+			if( !ctl->GetButtonList().empty() )
+			{
+				return true;
+			}
+		}
 		}
 		break;
 
@@ -581,12 +601,19 @@ defUseable GSIOTDevice::get_all_useable_state() const
 
 	case IOT_DEVICE_Remote:
 		{
+			RFRemoteControl *ctl = (RFRemoteControl*)this->getControl();
+			if( ctl )
+			{
+				const defUseable NetUseable = ctl->get_NetUseable();
 
+				if( defUseable_OK != NetUseable )
+					return NetUseable;
+			}
 		}
 		break;
 
 	case IOT_DEVICE_RS485:
-		{/*20160603
+		{
 			RS485DevControl *ctl = (RS485DevControl*)this->getControl();
 			if( ctl )
 			{
@@ -594,16 +621,16 @@ defUseable GSIOTDevice::get_all_useable_state() const
 
 				if( defUseable_OK != NetUseable )
 					return NetUseable;
-			}*/
+			}
 		}
 		break;
 	}
-	/*20160603
+
 	IGSClientExFunc *client = g_SYS_GetGSIOTClient();
 	if( client )
 	{
 		return client->get_all_useable_state_ForLinkID( this->GetLinkID() );
-	}*/
+	}
 
 	return defUseable_OK;
 }
@@ -652,16 +679,23 @@ bool GSIOTDevice::isDevSelfAndIncludeAddr( const IOTDeviceType deviceType, const
 
 			if( 0==address )
 			{
-				//return ctl->GetFristAddress(); //20160527
+				return ctl->GetFristAddress(); //20160527
 			}
 
-			//return ctl->GetAddress(address); //20160527
+			return ctl->GetAddress(address); //20160527
 		}
 		break;
 
 	case IOT_DEVICE_Remote:
 		{
+			RFRemoteControl *ctl = (RFRemoteControl*)this->m_control;
 
+			if( 0==address )
+			{
+				return ctl->GetFristButton();
+			}
+
+			return ctl->GetButton(address);
 		}
 		break;
 	}

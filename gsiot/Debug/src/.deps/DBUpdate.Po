@@ -95,6 +95,7 @@ DBUpdate.o: /home/chen/projects/gsiot/src/DBUpdate.cpp \
  /usr/include/c++/4.8/bits/stl_construct.h \
  /usr/include/c++/4.8/ext/alloc_traits.h \
  /home/chen/projects/gsiot/src/common.h \
+ /home/chen/projects/gsiot/src/memmacro.h \
  /home/chen/projects/gsiot/src/typedef.h /usr/include/unistd.h \
  /usr/include/i386-linux-gnu/bits/posix_opt.h \
  /usr/include/i386-linux-gnu/bits/environments.h \
@@ -362,6 +363,8 @@ DBUpdate.o: /home/chen/projects/gsiot/src/DBUpdate.cpp \
 /usr/include/c++/4.8/ext/alloc_traits.h:
 
 /home/chen/projects/gsiot/src/common.h:
+
+/home/chen/projects/gsiot/src/memmacro.h:
 
 /home/chen/projects/gsiot/src/typedef.h:
 

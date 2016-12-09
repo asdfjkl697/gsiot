@@ -101,6 +101,7 @@ DataStoreMgr.o: /home/chen/projects/gsiot/src/DataStoreMgr.cpp \
  /usr/local/include/gloox/macros.h /usr/local/include/gloox/mutexguard.h \
  /usr/local/include/gloox/mutex.h /usr/include/string.h \
  /home/chen/projects/gsiot/src/common.h \
+ /home/chen/projects/gsiot/src/memmacro.h \
  /home/chen/projects/gsiot/src/RunCode.h /usr/local/include/gloox/util.h \
  /usr/local/include/gloox/gloox.h /usr/include/c++/4.8/cmath \
  /usr/include/math.h /usr/include/i386-linux-gnu/bits/huge_val.h \
@@ -386,6 +387,8 @@ DataStoreMgr.o: /home/chen/projects/gsiot/src/DataStoreMgr.cpp \
 /usr/include/string.h:
 
 /home/chen/projects/gsiot/src/common.h:
+
+/home/chen/projects/gsiot/src/memmacro.h:
 
 /home/chen/projects/gsiot/src/RunCode.h:
 

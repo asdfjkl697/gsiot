@@ -207,7 +207,7 @@ public:
 		{
 			if( m_refcfg && m_refcfg->lastCfgTs!=m_cfg.lastCfgTs )
 			{
-				//resetTsState();
+				resetTsState();
 
 				if( IsNeedReconnectForCfgChanged( m_refcfg, &m_cfg ) )
 				{

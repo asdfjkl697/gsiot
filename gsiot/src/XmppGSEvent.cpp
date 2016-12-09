@@ -1,6 +1,6 @@
 #include "XmppGSEvent.h"
 #include "GSIOTClient.h"
-#include "util.h"
+#include "gloox/util.h"
 #include "AutoControlEvent.h"
 #include "AutoNoticeEvent.h"
 #include "AutoSendSMSEvent.h"

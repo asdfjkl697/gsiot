@@ -137,15 +137,17 @@ void CPresetManager::DeletePresetQueue_Spec( defPresetQueue &que )
 
 bool CPresetManager::DeletePreset_Spec( defPresetQueue &que, uint32_t PresetID )
 {
-	defPresetQueue::const_iterator it = que.begin();
-	defPresetQueue::const_iterator itEnd = que.end();
+	//defPresetQueue::const_iterator it = que.begin();
+	//defPresetQueue::const_iterator itEnd = que.end();
+	defPresetQueue::iterator it = que.begin();  //jyc20160922
+	defPresetQueue::iterator itEnd = que.end();
 	for( ; it!=itEnd; ++it )
 	{
 		CPresetObj *pPreset = (*it);
 		if( pPreset->GetId() == PresetID )
 		{
 			delete(pPreset);
-			//que.erase(it);
+			que.erase(it);
 			return true;
 		}
 	}

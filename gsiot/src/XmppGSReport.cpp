@@ -1,5 +1,5 @@
 #include "XmppGSReport.h"
-#include "util.h"
+#include "gloox/util.h"
 #include "GSIOTClient.h"
 
 static bool g_getAddrObjKey( Tag *t, GSIOTAddrObjKey &AddrObjKey )

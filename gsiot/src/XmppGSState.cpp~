@@ -268,10 +268,12 @@ Tag* XmppGSState::tag() const
 				{
 				case IOT_DEVICE_Trigger:
 					{
+						/*jyc20160607*/
 						TriggerControl *ctl = (TriggerControl*)(*it)->getControl();
 
 						id = (*it)->getId();
 						AGRunStateFinalST = ctl->GetAGRunStateFinalST();
+						//*/
 					}
 					break;
 

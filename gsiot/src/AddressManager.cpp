@@ -49,7 +49,7 @@ bool AddressManager::DeleteAddress_Spec( defAddressQueue &que, uint32_t address 
 		if( addr->GetAddress() == address )
 		{
 			delete(addr);
-			//que.erase(it); //20160603
+			//que.erase(it); //jyc20160603
 			return true;
 		}
 	}

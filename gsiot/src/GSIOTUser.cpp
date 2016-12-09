@@ -10,8 +10,8 @@
 
 static char *s_defUserFlag_names[] =
 {
-	"是否加入默认通知组",
-	""
+	//"is added to notice group",
+	//""
 };
 
 bool operator< ( const struAuth_key &key1, const struAuth_key &key2 )
@@ -32,7 +32,7 @@ std::string struAuth::Print( const char *info, bool doPrint ) const
 
 	if( doPrint )
 	{
-		LOGMSG( buf );
+		//LOGMSG( buf );
 	}
 
 	return std::string(buf);

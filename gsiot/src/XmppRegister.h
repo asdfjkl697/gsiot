@@ -2,9 +2,9 @@
 #define XMPPREGISTER_H_
 
 #include "common.h"
-#include "client.h"
-#include "connectionlistener.h"
-#include "registration.h"
+#include "gloox/client.h"
+#include "gloox/connectionlistener.h"
+#include "gloox/registration.h"
 
 using namespace gloox;
 

@@ -1,6 +1,9 @@
 [Anjuta]
 Geometry=1301x716+65+24
 
+[File Loader]
+Files=../../src/DeviceConnection.cpp#106%%%../../src/CommLinkManager.h#106%%%../../src/CommLinkManager.cpp#545%%%../../src/CommLink.h#190%%%../../src/NetModule.cpp#121%%%../../src/CommLink.cpp#499%%%../../src/DeviceConnection.h#168%%%../../src/ControlBase.h#15%%%../../src/GSIOTConfig.h#67%%%../../src/GSIOTDevice.cpp#629%%%../../src/GSIOTConfig.cpp#81%%%../../src/NetTcpClient.cpp#136%%%../../src/HeartbeatMon.h#72%%%../../src/HeartbeatMon.cpp#322%%%../../src/NetMan.cpp#261%%%../../src/GSIOTClient.cpp#207%%%../../Debug/Makefile#1%%%../../src/gsiot.cc#50%%%../../src/common.cpp#1356%%%../../src/common.h#50%%%../../src/SQLiteC++.h#1%%%../../src/SQLiteHelper.cpp#14%%%../../src/DeviceManager.cpp#921%%%../../src/SerialMessage.cpp#94%%%../../src/IDeviceHandler.h#19%%%../../src/GSIOTUserMgr.h#41%%%../../src/RunCode.cpp#518%%%../../src/GSIOTUserMgr.cpp#76%%%../../src/DeviceAddress.h#275%%%../../src/GSIOTClient.h#282%%%../../src/RFRemoteControl.cpp#15%%%../../src/RFDeviceControl.cpp#13%%%../../src/RFDevice.cpp#269%%%../../src/TriggerControl.cpp#39%%%../../src/RFRemoteControl.h#95%%%../../src/RemoteButtonManager.h#18%%%../../src/GSIOTDeviceInfo.h#35%%%../../src/RFDeviceControl.h#1%%%../../src/GSIOTDeviceInfo.cpp#45%%%../../src/RemoteButtonClass.cpp#65%%%../../src/RFSignalDefine.cpp#15%%%../../src/DeviceManager.h#69%%%../../src/TriggerControl.h#1%%%../../src/RunCode.h#235%%%../../src/GSIOTDevice.h#135%%%../../src/XmppGSState.cpp#152%%%../../src/DataStoreMgr.cpp#2782%%%../../src/XmppGSReport.cpp#1%%%../../NEWS#1%%%../../src/Makefile.am#168%%%../../src/XmppGSEvent.cpp#41%%%../../src/XmppGSEvent.h#27%%%../../src/IGSMessageHandler.cpp#12%%%../../src/GSIOTUser.cpp#475%%%../../src/DataStoreMgr.h#386%%%../../src/Database.cpp#35%%%../../src/RS485DevControl.cpp#18%%%../../src/memmacro.h#5%%%../../src/AddressManager.cpp#14%%%../../src/AutoCallEvent.cpp#1%%%../../src/AutoControlEvent.cpp#79
+
 [Document Manager]
 bookmarks=<?xml version="1.0" encoding="UTF-8"?>\n<bookmarks/>\n
 
@@ -14,8 +17,8 @@ Shortcut=gsiot//src//gsiot
 Expand=gsiot%%%gsiot//src%%%gsiot//src//gsiot
 
 [Debugger]
-Watch=\sXmppPrint
-Breakpoint=1:../../src/GSIOTClient.cpp:266:0:
+Watch=\sXmppPrint%%%iter%%%m_linkDevice%%%iter%%%m_RunList
+Breakpoint=1:../../src/DataStoreMgr.cpp:2678:0:%%%1:../../src/DataStoreMgr.cpp:2696:0:%%%1:../../src/DataStoreMgr.cpp:2692:0:
 Stop at beginning=2
 
 [Build]

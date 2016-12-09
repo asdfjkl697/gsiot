@@ -855,8 +855,11 @@ void CRunCodeMgr::LoadDB_code()
 		int val2 = query.getColumn(col++).getInt();
 		int val3 = query.getColumn(col++).getInt();
 		int val4 = query.getColumn(col++).getInt();
-		std::string str_val = query.getColumn(col++);
 
+		//jyc20160825 can not run have trouble
+		//std::string str_val = query.getColumn(col++);
+		std::string str_val = "jyc20160825";
+		
 		s_RunCode[RUNCODE_Index(code, codestr.c_str())].str_val = str_val;
 		RUNCODE_Set( RUNCODE_Index(code, codestr.c_str()), val1, val2, val3, val4, true, true, true, true );
 	}

@@ -10,7 +10,7 @@
 
 static char *s_defUserFlag_names[] =
 {
-	"是否加入默认通知组",
+	"is added to notice group",
 	""
 };
 
@@ -887,7 +887,7 @@ bool GSIOTUser::CfgChange_Auth( const struAuth &auth, const defCfgOprt_ oprt, co
 	{
 		if( defCfgOprt_Add==oprt )
 		{
-			if( blLog ) LOGMSGEX( defLOGNAME, FailedIsErr?defLOG_ERROR:defLOG_INFO, "CfgChange_Auth(oprt=%d) err, isbeing! %s\r\n", oprt, auth.Print( this->m_jid.c_str(), false ).c_str() );
+			//if( blLog ) LOGMSGEX( defLOGNAME, FailedIsErr?defLOG_ERROR:defLOG_INFO, "CfgChange_Auth(oprt=%d) err, isbeing! %s\r\n", oprt, auth.Print( this->m_jid.c_str(), false ).c_str() );
 			return false;
 		}
 
@@ -900,7 +900,7 @@ bool GSIOTUser::CfgChange_Auth( const struAuth &auth, const defCfgOprt_ oprt, co
 	{
 		if( defCfgOprt_Modify==oprt )
 		{
-			if( blLog && defAllAuth_DeviceAuth_Null != auth.authority ) LOGMSGEX( defLOGNAME, FailedIsErr?defLOG_ERROR:defLOG_INFO, "CfgChange_Auth(oprt=%d) err, not found! %s\r\n", oprt, auth.Print( this->m_jid.c_str(), false ).c_str() );
+			//if( blLog && defAllAuth_DeviceAuth_Null != auth.authority ) LOGMSGEX( defLOGNAME, FailedIsErr?defLOG_ERROR:defLOG_INFO, "CfgChange_Auth(oprt=%d) err, not found! %s\r\n", oprt, auth.Print( this->m_jid.c_str(), false ).c_str() );
 			return false;
 		}
 
@@ -924,7 +924,7 @@ bool GSIOTUser::Delete_Auth( const IOTDeviceType type, const int id, const bool 
 		return true;
 	}
 
-	LOGMSGEX( defLOGNAME, FailedIsErr?defLOG_ERROR:defLOG_INFO, "Delete_Auth err, not found! type=%d, id=%d\r\n", type, id );
+	//LOGMSGEX( defLOGNAME, FailedIsErr?defLOG_ERROR:defLOG_INFO, "Delete_Auth err, not found! type=%d, id=%d\r\n", type, id );
 	return false;
 }
 

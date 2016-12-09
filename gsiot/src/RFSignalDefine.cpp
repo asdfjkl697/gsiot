@@ -1,7 +1,7 @@
 #include "common.h"
 #include "RFSignalDefine.h"
-#include "logFileExFunc.h"
-#include "windows.h"
+//#include "logFileExFunc.h"
+//#include "windows.h"
 
 std::string RFSignal::Trans_Type2Str( const defRFSignalType signal_type )
 {
@@ -254,32 +254,32 @@ SerialPortModule RFSignal::GetModuleIndex( bool isSend )
 
 std::string RFSignal::Print( const char *info, bool doPrint ) const
 {
-	const int thisThreadId = ::GetCurrentThreadId();
-
 	char buf[1024] = {0};
+	/*jyc20160824
+	const int thisThreadId = ::GetCurrentThreadId();
 
 	switch( signal_type )
 	{
 	case defRFSignalType_code:
 		{
-			sprintf_s( buf, sizeof( buf ), "RFSignal(%s) type=%d, freq=%d, code=%d, codeValidLen=%d, headlen=%d, taillen=%d -ThId%d\r\n", info?info:"", this->signal_type, this->freq, this->code, this->codeValidLen, this->headlen, this->taillen, thisThreadId );
+			snprintf( buf, sizeof( buf ), "RFSignal(%s) type=%d, freq=%d, code=%d, codeValidLen=%d, headlen=%d, taillen=%d -ThId%d\r\n", info?info:"", this->signal_type, this->freq, this->code, this->codeValidLen, this->headlen, this->taillen, thisThreadId );
 		}
 		break;
 
 	case defRFSignalType_original:
 	case defRFSignalType_IR_original:
 		{
-			sprintf_s( buf, sizeof( buf ), "RFSignal(%s) type=%d, freq=%d, og_headflag=%d, og_headtime=%d, og_len=%d -ThId%d\r\n", info?info:"", this->signal_type, this->freq, this->original_headflag, this->original_headtime, this->original_len, thisThreadId );
+			snprintf( buf, sizeof( buf ), "RFSignal(%s) type=%d, freq=%d, og_headflag=%d, og_headtime=%d, og_len=%d -ThId%d\r\n", info?info:"", this->signal_type, this->freq, this->original_headflag, this->original_headtime, this->original_len, thisThreadId );
 		}
 		break;
 
 	case defRFSignalType_IR_code:
 	default:
 		{
-			sprintf_s( buf, sizeof( buf ), "RFSignal(%s) type=%d, freq=%d, og_len=%d -ThId%d\r\n", info?info:"", this->signal_type, this->freq, this->original_len, thisThreadId );
+			snprintf( buf, sizeof( buf ), "RFSignal(%s) type=%d, freq=%d, og_len=%d -ThId%d\r\n", info?info:"", this->signal_type, this->freq, this->original_len, thisThreadId );
 		}
 		break;
-	}
+	}*/
 
 	if( doPrint )
 	{
@@ -297,16 +297,17 @@ std::string RFSignal::GetUIShow( const uint8_t spec_count ) const
 	{
 	case defRFSignalType_original:
 	case defRFSignalType_IR_original:
-		sprintf_s( buf, sizeof(buf), "发送次数=%d, 数据长度=%d, 发送需时%s=%lums, 原始头标志=%d, 原始头=%d, 数据=%s", signal_count, original_len, spec_count?"(1)":"", GetSendNeedTime(spec_count), original_headflag, original_headtime, Get_original( 10 ).c_str() );
+		//jyc20160824
+		//snprintf( buf, sizeof(buf), "发送次数=%d, 数据长度=%d, 发送需时%s=%lums, 原始头标志=%d, 原始头=%d, 数据=%s", signal_count, original_len, spec_count?"(1)":"", GetSendNeedTime(spec_count), original_headflag, original_headtime, Get_original( 10 ).c_str() );
 		break;
 
 	case defRFSignalType_code:
-		sprintf_s( buf, sizeof(buf), "发送次数=%d, 编码=%d, 编码长=%d, 编码头长=%d, 编码尾长=%d", signal_count, code, codeValidLen, headlen, taillen );
+		snprintf( buf, sizeof(buf), "发送次数=%d, 编码=%d, 编码长=%d, 编码头长=%d, 编码尾长=%d", signal_count, code, codeValidLen, headlen, taillen );
 		break;
 
 	case defRFSignalType_IR_code:
 	default:
-		sprintf_s( buf, sizeof(buf), "发送次数=%d, 数据长度=%d, 数据=%s", signal_count, original_len, Get_original(1,true).c_str() );
+		snprintf( buf, sizeof(buf), "发送次数=%d, 数据长度=%d, 数据=%s", signal_count, original_len, Get_original(1,true).c_str() );
 		break;
 	}
 
@@ -347,7 +348,7 @@ bool RFSignal::Set_original( const std::string &stroriginal, const bool isByteSt
 
 	if( 1!=flag )
 	{
-		LOGMSGEX( defLOGNAME, defLOG_WORN, "Set_original, id=%d", id );
+		//LOGMSGEX( defLOGNAME, defLOG_WORN, "Set_original, id=%d", id );
 		//return false;
 	}
 
@@ -437,7 +438,7 @@ std::string RFSignal::Get_original( int format, const bool isByteStr ) const
 
 			if( 1==format )
 			{
-				sprintf_s( msg, sizeof( msg ), "%02X", pdata[i] );
+				snprintf( msg, sizeof( msg ), "%02X", pdata[i] );
 			}
 
 			str.append( msg );
@@ -475,7 +476,7 @@ std::string RFSignal::Get_original( int format, const bool isByteStr ) const
 
 	uint16_t flag = (uint16_t)format;
 
-	sprintf_s( msg, sizeof(msg), "%04X_", flag );
+	snprintf( msg, sizeof(msg), "%04X_", flag );
 	str.append( msg );
 
 	if( isByteStreamFmt )
@@ -485,7 +486,7 @@ std::string RFSignal::Get_original( int format, const bool isByteStr ) const
 		{
 			if( 1==format )
 			{
-				sprintf_s( msg, sizeof( msg ), "%02X", pdata[i] );
+				snprintf( msg, sizeof( msg ), "%02X", pdata[i] );
 			}
 
 			str.append( msg );
@@ -498,18 +499,18 @@ std::string RFSignal::Get_original( int format, const bool isByteStr ) const
 	{
 		if( 16==format )
 		{
-			sprintf_s( msg, sizeof(msg), "%04X", this->original[i] );
+			snprintf( msg, sizeof(msg), "%04X", this->original[i] );
 		}
 		else if( 1==format )
 		{
 			const uint8_t *btval = (uint8_t*)&(this->original[i]);
-			sprintf_s( msg, sizeof(msg), "%02X%02X", btval[0], btval[1] );
+			snprintf( msg, sizeof(msg), "%02X%02X", btval[0], btval[1] );
 		}
 		else
 		{
 			if( 0!=i )
 				str.append( "," );
-			sprintf_s( msg, sizeof(msg), "%d", this->original[i] );
+			snprintf( msg, sizeof(msg), "%d", this->original[i] );
 		}
 
 		str.append( msg );
@@ -521,13 +522,14 @@ std::string RFSignal::Get_original( int format, const bool isByteStr ) const
 #define defRFSignalFile_AppName "RFSignal"
 #define defRFSignalFile_Ver "1000"
 
-#define macRFFSave_Str(key,strval) if( !::WritePrivateProfileStringA( defRFSignalFile_AppName, key, strval, filename.c_str() ) ) { return false; }
-#define macRFFSave_Int(key,intval) _ultoa_s(intval, buf, sizeof(buf), 10); macRFFSave_Str( key, buf );
+//#define macRFFSave_Str(key,strval) if( !::WritePrivateProfileStringA( defRFSignalFile_AppName, key, strval, filename.c_str() ) ) { return false; }
+//#define macRFFSave_Int(key,intval) _ultoa_s(intval, buf, sizeof(buf), 10); macRFFSave_Str( key, buf );
 bool RFSignal::SaveToFile( const std::string &filename ) const
 {
 	char buf[256] = {0};
 
 	// 写入信息
+	/*
 	macRFFSave_Str( "ver", defRFSignalFile_Ver );
 
 	macRFFSave_Int( "signal_type", this->signal_type );
@@ -564,18 +566,19 @@ bool RFSignal::SaveToFile( const std::string &filename ) const
 	macRFFSave_Int( "original_headflag", this->original_headflag );
 	macRFFSave_Int( "original_headtime", this->original_headtime );
 	macRFFSave_Str( "original", this->Get_original().c_str() );
+	*/
 
 	return true;
 }
 
-#define macRFFLoad_Str(key) ::GetPrivateProfileStringA( defRFSignalFile_AppName, key, "", buf, sizeof(buf), filename.c_str() )
-#define macRFFLoad_Int(key) ::GetPrivateProfileIntA( defRFSignalFile_AppName, key, 0, filename.c_str() )
+//#define macRFFLoad_Str(key) ::GetPrivateProfileStringA( defRFSignalFile_AppName, key, "", buf, sizeof(buf), filename.c_str() )
+//#define macRFFLoad_Int(key) ::GetPrivateProfileIntA( defRFSignalFile_AppName, key, 0, filename.c_str() )
 bool RFSignal::LoadFromFile( const std::string &filename )
 {
 	char buf[1024] = {0};
 
 	this->id = 0;
-
+	/*
 	this->signal_type = (defRFSignalType)macRFFLoad_Int( "signal_type" );
 	this->freq = (defFreq)macRFFLoad_Int( "freq" );
 	this->code = macRFFLoad_Int( "code" );
@@ -610,7 +613,7 @@ bool RFSignal::LoadFromFile( const std::string &filename )
 	this->original_headflag = macRFFLoad_Int( "original_headflag" );
 	this->original_headtime = macRFFLoad_Int( "original_headtime" );
 	macRFFLoad_Str( "original" ); this->Set_original( buf );
-
+	*/
 	return true; // this->isValid();导入后根据信息自行判断
 }
 
@@ -695,7 +698,7 @@ std::string RFSignal::Get_DecodeDesc( bool showint ) const
 		for( int i=0; i<8/2; ++i )
 		{
 			uint16_t intdata = *((uint16_t*)(ptemp+i*2));
-			sprintf_s( msg, sizeof( msg ), "%d,", intdata );
+			snprintf( msg, sizeof( msg ), "%d,", intdata );
 			strdesc += msg;
 		}
 	}
@@ -712,7 +715,7 @@ std::string RFSignal::Get_DecodeDesc( bool showint ) const
 		
 		if( bitlen ) datalen += 1;
 
-		sprintf_s( msg, sizeof( msg ), "数据=%d%s: ", datalen, dataflag?"H":"t" );
+		snprintf( msg, sizeof( msg ), "数据=%d%s: ", datalen, dataflag?"H":"t" );
 		strdesc += msg;
 
 		if( showint && 0==dataflag )
@@ -720,7 +723,7 @@ std::string RFSignal::Get_DecodeDesc( bool showint ) const
 			for( int i=0; i<datalen/2; ++i )
 			{
 				uint16_t intdata = *((uint16_t*)(ptemp+1+i*2));
-				sprintf_s( msg, sizeof( msg ), "%d,", intdata );
+				snprintf( msg, sizeof( msg ), "%d,", intdata );
 				strdesc += msg;
 			}
 		}

@@ -1,7 +1,6 @@
 #include "CommLinkManager.h"
 //#include <Windows.h>
 
-
 void g_del_struDelCommLink( struDelCommLink &delobj )
 {
 	if( delobj.runobj )
@@ -20,74 +19,6 @@ CCommLinkManager::CCommLinkManager(void)
 {
 	m_last_CheckDeleteList = timeGetTime();
 
-#if 0
-#ifdef _DEBUG
-	//cfg
-	CommLinkCfg *cfg105 = new CommLinkCfg();
-	cfg105->id = 105;
-	cfg105->name = "linktest105";
-	cfg105->enable = 0;
-	cfg105->link_type = defCommLinkType_TCP;
-	cfg105->trans_mod = defTransMod_GSIOT;
-	CCommLinkRun_TCP::setparam_ip( cfg105, "192.168.0.95" );
-	CCommLinkRun_TCP::setparam_port( cfg105, defCommLink_DefaultTCPPort );
-
-	CommLinkCfg *cfg206 = new CommLinkCfg();
-	cfg206->id = 206;
-	cfg206->name = "linktest206";
-	cfg206->enable = 1;
-	cfg206->link_type = defCommLinkType_TCP;
-	cfg206->trans_mod = defTransMod_GSIOT;
-	CCommLinkRun_TCP::setparam_ip( cfg206, "127.0.0.1" );
-	CCommLinkRun_TCP::setparam_port( cfg206, defCommLink_DefaultTCPPort );
-	
-	CommLinkCfg *cfg307 = new CommLinkCfg();
-	cfg307->id = 307;
-	cfg307->name = "linktest307";
-	cfg307->enable = 1;
-	cfg307->link_type = defCommLinkType_TCP;
-	cfg307->trans_mod = defTransMod_GSIOT;
-	CCommLinkRun_TCP::setparam_ip( cfg307, "192.168.0.133" );
-	CCommLinkRun_TCP::setparam_port( cfg307, defCommLink_DefaultTCPPort );
-
-	//rel
-	GSIOTDeviceKey key;
-	int RelationID = 1;
-
-	key.m_type=IOT_DEVICE_RS485; key.m_id=654321;//not being
-	m_RelationList[key] = CommLinkRelation(key.m_type, key.m_id, cfg307->id);
-
-	key.m_type=IOT_DEVICE_RS485; key.m_id=43;
-	m_RelationList[key] = CommLinkRelation(key.m_type, key.m_id, cfg307->id);
-
-	key.m_type=IOT_DEVICE_RS485; key.m_id=36;
-	m_RelationList[key] = CommLinkRelation(key.m_type, key.m_id, cfg307->id);
-
-	key.m_type=IOT_DEVICE_Remote; key.m_id=14;
-	m_RelationList[key] = CommLinkRelation(key.m_type, key.m_id, cfg307->id);
-
-	key.m_type=IOT_DEVICE_Remote; key.m_id=13;
-	m_RelationList[key] = CommLinkRelation(key.m_type, key.m_id, cfg307->id);
-
-	//
-	key.m_type=IOT_DEVICE_RS485; key.m_id=36;
-	m_RelationList[key] = CommLinkRelation(key.m_type, key.m_id, cfg105->id);
-
-	//
-	key.m_type=IOT_DEVICE_RS485; key.m_id=44;
-	m_RelationList[key] = CommLinkRelation(key.m_type, key.m_id, cfg206->id);
-
-	//run
-	m_CfgList[cfg105->id] = cfg105;
-	m_RunList[cfg105->id] = new CCommLinkRun_TCP(cfg105);
-
-	m_CfgList[cfg206->id] = cfg206;
-	m_RunList[cfg206->id] = new CCommLinkRun_TCP(cfg206);
-
-	m_CfgList[cfg307->id] = cfg307;
-	m_RunList[cfg307->id] = new CCommLinkRun_TCP(cfg307);
-#endif
-#endif
 }
 
 CCommLinkManager::~CCommLinkManager(void)
@@ -110,7 +41,7 @@ bool CCommLinkManager::Init()
 			{
 			case defCommLinkType_TCP:
 				{
-					//m_RunList[it->second->id] = new CCommLinkRun_TCP(it->second);
+					m_RunList[it->second->id] = new CCommLinkRun_TCP(it->second);
 				}
 				break;
 
@@ -203,12 +134,15 @@ bool CCommLinkManager::LoadDB_comm_link()
 
 		int col = 0;
 		cfg->id = query.getColumn(col++).getInt();
-		//cfg->name = query.getColumn(col++);
+		//jyc20160826 modify
+		string tmp1 = query.getColumn(col++);
+		cfg->name = tmp1;
 		cfg->enable = query.getColumn(col++).getInt();
 		cfg->link_type = (defCommLinkType)query.getColumn(col++).getInt();
 		cfg->trans_mod = (defTransMod)query.getColumn(col++).getInt();
 		cfg->heartbeat_type = (defCommLinkHeartbeatType)query.getColumn(col++).getInt();
-		//cfg->heartbeat_param.setstrfmt( (std::string)query.getColumn(col++) );
+		string tmp2 = query.getColumn(col++);
+		cfg->heartbeat_param.setstrfmt( tmp2 ); //jyc20160826 modify
 
 		cfg->param[0] = query.getColumn(col++).getInt();
 		cfg->param[1] = query.getColumn(col++).getInt();
@@ -219,6 +153,10 @@ bool CCommLinkManager::LoadDB_comm_link()
 
 		//cfg->param_str[0] = query.getColumn(col++);
 		//cfg->param_str[1] = query.getColumn(col++);
+		string tmp3 = query.getColumn(col++);
+		cfg->param_str[0] = tmp3;
+		string tmp4 = query.getColumn(col++);
+		cfg->param_str[1] = tmp4;
 
 		if( defCommLinkType_TCP != cfg->link_type )
 		{
@@ -267,7 +205,7 @@ int CCommLinkManager::db_Insert_comm_link( CommLinkCfg *const cfgobj )
 	query.bind( col++, cfgobj->link_type );
 	query.bind( col++, cfgobj->trans_mod );
 	query.bind( col++, cfgobj->heartbeat_type );
-	//query.bind( col++, cfgobj->heartbeat_param.getstrfmt(cfgobj->heartbeat_type) );
+	query.bind( col++, cfgobj->heartbeat_param.getstrfmt(cfgobj->heartbeat_type) );
 	query.bind( col++, cfgobj->param[0] );
 	query.bind( col++, cfgobj->param[1] );
 	query.bind( col++, cfgobj->param[2] );
@@ -288,12 +226,12 @@ int CCommLinkManager::db_Insert_comm_link( CommLinkCfg *const cfgobj )
 bool CCommLinkManager::db_Update_comm_link( CommLinkCfg *const cfgobj )
 {
 	char sqlbuf[4096] = {0};
-	/*
+
 	snprintf( sqlbuf, sizeof(sqlbuf), "update comm_link set name='%s', enable=%d, link_type=%d, trans_mod=%d, heartbeat_type=%d, heartbeat_param='%s',"\
 		"param1=%d, param2=%d, param3=%d, param4=%d, param5=%d, param6=%d, param_str1='%s', param_str2='%s' where id=%d", 
 		cfgobj->name.c_str(), cfgobj->enable, cfgobj->link_type, cfgobj->trans_mod, cfgobj->heartbeat_type, cfgobj->heartbeat_param.getstrfmt(cfgobj->heartbeat_type).c_str(),
 		cfgobj->param[0], cfgobj->param[1], cfgobj->param[2], cfgobj->param[3], cfgobj->param[4], cfgobj->param[5], 
-		cfgobj->param_str[0].c_str(), cfgobj->param_str[1].c_str(), cfgobj->id );*/
+		cfgobj->param_str[0].c_str(), cfgobj->param_str[1].c_str(), cfgobj->id );
 
 	db->exec( sqlbuf );
 
@@ -410,8 +348,8 @@ defGSReturn CCommLinkManager::Cfg_CheckExist( const CommLinkCfg &cfgobj, std::st
 			if( strerr ) *strerr = "名称已存在";
 			return defGSReturn_SameName;
 		}
-		
-		//if( cfgobj == *(it->second) )
+
+		if( cfgobj == *(it->second) )
 		{
 			if( strerr ) *strerr = "配置已存在";
 			return defGSReturn_IsExist;
@@ -465,12 +403,13 @@ defGSReturn CCommLinkManager::Cfg_Delete( const defLinkID LinkID )
 	struDelCommLink delobj;
 	delobj.delts = timeGetTime();
 
-	defmapCommLinkCfg::const_iterator it = this->m_CfgList.find(LinkID);
+	//defmapCommLinkCfg::const_iterator it = this->m_CfgList.find(LinkID);
+	defmapCommLinkCfg::iterator it = this->m_CfgList.find(LinkID);
 	if( it != this->m_CfgList.end() )
 	{
 		it->second->enable = 0;
 		delobj.cfgobj = it->second;
-		//m_CfgList.erase(it);
+		m_CfgList.erase(it);
 
 		LOGMSG( "CommLinkMgr:CfgList Del LinkID=%d, aftercount(%d)", LinkID, m_CfgList.size() );
 	}
@@ -582,10 +521,11 @@ defGSReturn CCommLinkManager::Relation_DeleteForDev( const GSIOTDeviceKey &key )
 {
 	db_Delete_comm_link_relation( key );
 
-	defmapCommLinkRelation::const_iterator it = this->m_RelationList.find(key);
+	//defmapCommLinkRelation::const_iterator it = this->m_RelationList.find(key);
+	defmapCommLinkRelation::iterator it = this->m_RelationList.find(key);
 	if( it != this->m_RelationList.end() )
 	{
-		//m_RelationList.erase(it);
+		m_RelationList.erase(it);
 	}
 
 	return defGSReturn_Success;
@@ -596,11 +536,12 @@ defGSReturn CCommLinkManager::Relation_DeleteForLink( const defLinkID LinkID )
 {
 	db_Delete_comm_link_relation_all( LinkID );
 
-	for( defmapCommLinkRelation::const_iterator it=m_RelationList.begin(); it!=m_RelationList.end(); )
+	//for( defmapCommLinkRelation::const_iterator it=m_RelationList.begin(); it!=m_RelationList.end(); )
+	for( defmapCommLinkRelation::iterator it=m_RelationList.begin(); it!=m_RelationList.end(); )
 	{
 		if( LinkID == it->second.link_id )
 		{
-			//m_RelationList.erase(it);
+			m_RelationList.erase(it);
 			it=m_RelationList.begin();
 			continue;
 		}
@@ -622,15 +563,20 @@ CCommLinkRun* CCommLinkManager::Run_Proc_Get( const bool allowConnect )
 	gloox::util::MutexGuard mutexguard( m_mutex_CommLinkMgr );
 
 	CheckDeleteList();
-
+	
 	if( !m_RunList.empty() )
 	{
 		CCommLinkRun *runobj = NULL;
 
+		//printf("runlist size=%d\n",m_RunList.size()); //jyc20160914
+		unsigned int testii = 0;
 		for( defmapCommLinkRun::iterator it = m_RunList.begin(); it!=m_RunList.end(); ++it )
 		{
-			if( it->second->m_lockProc )
+			++testii;
+			if( it->second->m_lockProc ){
+				//printf("lockproc %d...\n",testii);
 				continue;
+			}
 
 			it->second->check_cfg();
 
@@ -638,9 +584,12 @@ CCommLinkRun* CCommLinkManager::Run_Proc_Get( const bool allowConnect )
 			{
 				if( !it->second->IsOpen() )
 				{
+					//printf("no open %d...\n",testii);
 					continue;
 				}
 			}
+
+			//printf("runlist size=%d listnum=%d\n",m_RunList.size(),testii);
 
 			if( !allowConnect )
 			{
@@ -675,8 +624,9 @@ CCommLinkRun* CCommLinkManager::Run_Proc_Get( const bool allowConnect )
 				runobj = it->second;
 			}
 
-			if( 0==runobj->m_lastWork )
+			if( 0==runobj->m_lastWork ){
 				break;
+			}
 		}
 
 		if( runobj )
@@ -698,7 +648,7 @@ CCommLinkRun* CCommLinkManager::Run_Proc_Get( const bool allowConnect )
 			return runobj;
 		}
 	}
-
+	
 	return NULL;
 }
 
@@ -842,7 +792,7 @@ defGSReturn CCommLinkManager::Run_Add( CommLinkCfg *cfgobj, std::string *strerr 
 	{
 	case defCommLinkType_TCP:
 		{
-			//m_RunList[cfgobj->id] = new CCommLinkRun_TCP(cfgobj);
+			m_RunList[cfgobj->id] = new CCommLinkRun_TCP(cfgobj);
 
 			LOGMSG( "CommLinkMgr:RunList Add LinkID=%d, aftercount(%d)", cfgobj->id, m_RunList.size() );
 

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "typedef.h"
-#include "string.h"
+#include "common.h"
 
 enum defRFSignalType
 {

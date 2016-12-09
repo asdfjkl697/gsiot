@@ -108,7 +108,21 @@ am_gsiot_OBJECTS = AddressManager.$(OBJEXT) common.$(OBJEXT) \
 	ControlEvent.$(OBJEXT) IGSMessageHandler.$(OBJEXT) \
 	CANDeviceControl.$(OBJEXT) DeviceManager.$(OBJEXT) \
 	PresetManager.$(OBJEXT) CommLinkManager.$(OBJEXT) \
-	rs232.$(OBJEXT)
+	rs232.$(OBJEXT) RS485DevControl.$(OBJEXT) ModbusProc.$(OBJEXT) \
+	RFRemoteControl.$(OBJEXT) RemoteButtonManager.$(OBJEXT) \
+	RemoteButtonClass.$(OBJEXT) ControlMessage.$(OBJEXT) \
+	GSIOTEvent.$(OBJEXT) AutoCallEvent.$(OBJEXT) \
+	AutoControlEvent.$(OBJEXT) AutoEventthing.$(OBJEXT) \
+	AutoNoticeEvent.$(OBJEXT) AutoSendSMSEvent.$(OBJEXT) \
+	XmppRegister.$(OBJEXT) SerialDataBuffer.$(OBJEXT) \
+	SerialMessage.$(OBJEXT) HeartbeatMon.$(OBJEXT) \
+	CommLink.$(OBJEXT) NetBaseClient.$(OBJEXT) NetMan.$(OBJEXT) \
+	NetModule.$(OBJEXT) NetTcpClient.$(OBJEXT) \
+	NetUdpClient.$(OBJEXT) RFDeviceControl.$(OBJEXT) \
+	RFDevice.$(OBJEXT) XmppGSChange.$(OBJEXT) \
+	XmppGSEvent.$(OBJEXT) TimerManager.$(OBJEXT) \
+	RFSignalDefine.$(OBJEXT) XmppGSRelation.$(OBJEXT) \
+	XmppGSReport.$(OBJEXT)
 gsiot_OBJECTS = $(am_gsiot_OBJECTS)
 gsiot_DEPENDENCIES =
 AM_V_lt = $(am__v_lt_$(V))
@@ -431,7 +445,6 @@ gsiot_SOURCES = \
 	ControlEvent.h \
 	IDeviceHandler.h \
 	ICANDeviceHandler.h \
-	IDeviceHandler.h \
 	IGSMessageHandler.cpp \
 	IGSMessageHandler.h \
 	IRFReadHandler.h \
@@ -446,7 +459,68 @@ gsiot_SOURCES = \
 	CommLinkManager.cpp \
 	CommLinkManager.h \
 	rs232.cpp \
-	rs232.h
+	rs232.h \
+	RS485DevControl.cpp \
+	RS485DevControl.h \
+	ModbusProc.cpp \
+	ModbusProc.h \
+	RFRemoteControl.cpp \
+	RFRemoteControl.h \
+	RemoteButtonManager.cpp \
+	RemoteButtonManager.h \
+	RemoteButtonClass.cpp \
+	RemoteButtonClass.h \
+	ControlMessage.cpp \
+	ControlMessage.h \
+	GSIOTEvent.cpp \
+	GSIOTEvent.h \
+	AutoCallEvent.cpp \
+	AutoCallEvent.h \
+	AutoControlEvent.cpp \
+	AutoControlEvent.h \
+	AutoEventthing.cpp \
+	AutoEventthing.h \
+	AutoNoticeEvent.cpp \
+	AutoNoticeEvent.h \
+	AutoSendSMSEvent.cpp \
+	AutoSendSMSEvent.h \
+	XmppRegister.cpp \
+	XmppRegister.h \
+	SerialDataBuffer.cpp \
+	SerialDataBuffer.h \
+	SerialMessage.cpp \
+	SerialMessage.h \
+	memmacro.h \
+	HeartbeatMon.cpp \
+	HeartbeatMon.h \
+	CommLink.cpp \
+	CommLink.h \
+	NetBaseClient.cpp \
+	NetBaseClient.h \
+	NetMan.cpp \
+	NetMan.h \
+	NetModule.cpp \
+	NetModule.h \
+	NetTcpClient.cpp \
+	NetTcpClient.h \
+	NetUdpClient.cpp \
+	NetUdpClient.h \
+	RFDeviceControl.cpp \
+	RFDeviceControl.h \
+	RFDevice.cpp \
+	RFDevice.h \
+	XmppGSChange.cpp \
+	XmppGSChange.h \
+	XmppGSEvent.cpp \
+	XmppGSEvent.h \
+	TimerManager.cpp \
+	TimerManager.h \
+	RFSignalDefine.cpp \
+	RFSignalDefine.h \
+	XmppGSRelation.cpp \
+	XmppGSRelation.h \
+	XmppGSReport.cpp \
+	XmppGSReport.h
 
 gsiot_LDFLAGS = 
 gsiot_LDADD = \
@@ -549,10 +623,17 @@ distclean-compile:
 	-rm -f *.tab.c
 
 include ./$(DEPDIR)/AddressManager.Po
+include ./$(DEPDIR)/AutoCallEvent.Po
+include ./$(DEPDIR)/AutoControlEvent.Po
+include ./$(DEPDIR)/AutoEventthing.Po
+include ./$(DEPDIR)/AutoNoticeEvent.Po
+include ./$(DEPDIR)/AutoSendSMSEvent.Po
 include ./$(DEPDIR)/CANDeviceControl.Po
 include ./$(DEPDIR)/Column.Po
+include ./$(DEPDIR)/CommLink.Po
 include ./$(DEPDIR)/CommLinkManager.Po
 include ./$(DEPDIR)/ControlEvent.Po
+include ./$(DEPDIR)/ControlMessage.Po
 include ./$(DEPDIR)/DBUpdate.Po
 include ./$(DEPDIR)/DataStoreMgr.Po
 include ./$(DEPDIR)/Database.Po
@@ -565,22 +646,45 @@ include ./$(DEPDIR)/GSIOTConfig.Po
 include ./$(DEPDIR)/GSIOTControl.Po
 include ./$(DEPDIR)/GSIOTDevice.Po
 include ./$(DEPDIR)/GSIOTDeviceInfo.Po
+include ./$(DEPDIR)/GSIOTEvent.Po
 include ./$(DEPDIR)/GSIOTHeartbeat.Po
 include ./$(DEPDIR)/GSIOTInfo.Po
 include ./$(DEPDIR)/GSIOTUser.Po
 include ./$(DEPDIR)/GSIOTUserMgr.Po
+include ./$(DEPDIR)/HeartbeatMon.Po
 include ./$(DEPDIR)/IGSMessageHandler.Po
+include ./$(DEPDIR)/ModbusProc.Po
+include ./$(DEPDIR)/NetBaseClient.Po
+include ./$(DEPDIR)/NetMan.Po
+include ./$(DEPDIR)/NetModule.Po
+include ./$(DEPDIR)/NetTcpClient.Po
+include ./$(DEPDIR)/NetUdpClient.Po
 include ./$(DEPDIR)/PresetManager.Po
+include ./$(DEPDIR)/RFDevice.Po
+include ./$(DEPDIR)/RFDeviceControl.Po
+include ./$(DEPDIR)/RFRemoteControl.Po
+include ./$(DEPDIR)/RFSignalDefine.Po
+include ./$(DEPDIR)/RS485DevControl.Po
+include ./$(DEPDIR)/RemoteButtonClass.Po
+include ./$(DEPDIR)/RemoteButtonManager.Po
 include ./$(DEPDIR)/RunCode.Po
 include ./$(DEPDIR)/SQLiteHelper.Po
+include ./$(DEPDIR)/SerialDataBuffer.Po
+include ./$(DEPDIR)/SerialMessage.Po
 include ./$(DEPDIR)/Statement.Po
+include ./$(DEPDIR)/TimerManager.Po
 include ./$(DEPDIR)/Transaction.Po
 include ./$(DEPDIR)/TriggerControl.Po
 include ./$(DEPDIR)/XmppGSAuth.Po
+include ./$(DEPDIR)/XmppGSChange.Po
+include ./$(DEPDIR)/XmppGSEvent.Po
 include ./$(DEPDIR)/XmppGSManager.Po
 include ./$(DEPDIR)/XmppGSMessage.Po
+include ./$(DEPDIR)/XmppGSRelation.Po
+include ./$(DEPDIR)/XmppGSReport.Po
 include ./$(DEPDIR)/XmppGSResult.Po
 include ./$(DEPDIR)/XmppGSState.Po
+include ./$(DEPDIR)/XmppRegister.Po
 include ./$(DEPDIR)/common.Po
 include ./$(DEPDIR)/gsiot.Po
 include ./$(DEPDIR)/rs232.Po

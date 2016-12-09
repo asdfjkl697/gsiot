@@ -4,10 +4,11 @@
 #include <pthread.h>
 #include "RunCode.h"
 #include <utility>
-//#include "HeartbeatMon.h"
 
-#define __stdcall  //20160607
-#define LPVOID void *
+#include <memory> //jyc20160901 for auto_ptr
+
+//#define __stdcall  //20160607
+//#define LPVOID void *
 
 #define defTEST_ModbusMod // modbus透传测试模式
 
@@ -23,7 +24,8 @@ uint16_t ByteToCommand(uint8_t *buf)
 }
 
 
-unsigned __stdcall SerialPortThread(LPVOID lpPara)
+//unsigned __stdcall SerialPortThread(LPVOID lpPara)
+void *SerialPort_Thread(LPVOID lpPara)
 {
 	int n;
 	int cport_nr = 0;
@@ -34,25 +36,25 @@ unsigned __stdcall SerialPortThread(LPVOID lpPara)
 	uint32_t lastPrintTime = ::timeGetTime()-3600000;
 	
 	cport_nr = device->GetPort();
-	//CHeartbeatGuard hbGuard( "Serial" );
-	//CHeartbeatGuard *phbGuard = &hbGuard;
+	CHeartbeatGuard hbGuard( "Serial" );
+	CHeartbeatGuard *phbGuard = &hbGuard;
 
 	while(device->GetRunning())
 	{
-		//hbGuard.alive();
+		hbGuard.alive();
 
 		if( ::timeGetTime()-lastPrintTime > 180000 )
 		{
 			LOGMSG( "Heartbeat: SerialPortThread(port=%d, br=%d)\r\n", device->m_usecfg_port, device->m_usecfg_baudrate );
 			lastPrintTime = ::timeGetTime();
 		}
-
+		//jyc20160824
 		//device->GetGSM().OnWork(NULL, true);
 
 		if( !device->GetRunning() ) { break; }
 
-		//device->OnTimer( phbGuard, NULL, 1 );
-
+		device->OnTimer( phbGuard, NULL, 1 );
+		
 		if( !device->GetRunning() ) { break; }
 
 		usleep(100000); 
@@ -63,7 +65,7 @@ unsigned __stdcall SerialPortThread(LPVOID lpPara)
 		n = device->RecvData( NULL, buf+defSerialBufPreLen, 4095-defSerialBufPreLen );
 		if(n > 0)
         {
-			//device->OnDataReceived( NULL, NULL, buf+defSerialBufPreLen, n );
+			device->OnDataReceived( NULL, NULL, buf+defSerialBufPreLen, n );
 
 			if( !device->GetRunning() ) { break; }
 
@@ -77,21 +79,24 @@ unsigned __stdcall SerialPortThread(LPVOID lpPara)
 	}
 
 	device->OnThreadExit();
-	return 0;
+	//return 0;
 }
 
 
-unsigned __stdcall CommLinkThread(LPVOID lpPara)
+//unsigned __stdcall CommLinkThread(LPVOID lpPara) 
+void *CommLink_Thread(LPVOID lpPara) //jyc20160826 test
 {
 	int n;
 	//int cport_nr = 0;
 	unsigned char buf[4096];
 	buf[4096-1] = 0;
 	DeviceConnection *device = (DeviceConnection *)lpPara;
-	//ITimerHandler *timerHandler = device;
 	uint32_t lastPrintTime = ::timeGetTime()-3600000;
 
+	//jyc20160824
 	//const int thisThreadId = ::GetCurrentThreadId();
+	const int thisThreadId = ::pthread_self(); //jyc20160825add get threadid must test later
+	
 	const int this_CommLinkThread_No = device->New_CommLinkThread_id();
 	int CommLinkThread_allowConnectNum = device->Get_CommLinkThread_allowConnectNum();
 
@@ -104,83 +109,79 @@ unsigned __stdcall CommLinkThread(LPVOID lpPara)
 		CommLinkThread_allowConnectNum = device->New_CommLinkThread_allowConnectNum();
 	}
 
-	//LOGMSG( "run LinkThread(%d)(max=%d), allowConnect=(%s)(created %d/%d)-ThId%d", this_CommLinkThread_No, CommLinkThreadMax, allowConnect?"Y":"N", CommLinkThread_allowConnectNum, CommLinkThreadMaxAllow, thisThreadId );
-	
-	//snprintf( (char*)buf, sizeof(buf), "LinkTh%d%s-ThId%d", this_CommLinkThread_No, allowConnect?"a":"", thisThreadId );
-	//CHeartbeatGuard hbGuard( (char*)buf );
-	//CHeartbeatGuard *phbGuard = &hbGuard;
+	LOGMSG( "run LinkThread(%d)(max=%d), allowConnect=(%s)(created %d/%d)-ThId%d \n", this_CommLinkThread_No, CommLinkThreadMax, allowConnect?"Y":"N", CommLinkThread_allowConnectNum, CommLinkThreadMaxAllow, thisThreadId );
+	snprintf( (char*)buf, sizeof(buf), "LinkTh%d%s-ThId%d", this_CommLinkThread_No, allowConnect?"a":"", thisThreadId );
+	CHeartbeatGuard hbGuard( (char*)buf );
+	CHeartbeatGuard *phbGuard = &hbGuard;
 	CCommLinkRun *pCommLink = NULL;
 
 	while(device->GetRunning())
 	{
-		//hbGuard.alive();
-		//macHeartbeatGuard_step(1);
-
+		hbGuard.alive();
+		macHeartbeatGuard_step(1);
+				
 		CCommLinkAuto_Run_Proc_Get AutoCommLink( device->m_CommLinkMgr, allowConnect );
 		CCommLinkRun *pCommLink = AutoCommLink.p();
-		if( !pCommLink )
+		
+		if( !pCommLink ) //jyc20160913 here comes trouble
 		{
-			//macHeartbeatGuard_step(100);
-			
+			macHeartbeatGuard_step(100);			
 			usleep(100000);
 			continue;
 		}
+	
 
 		const bool cfgchanged = pCommLink->pop_CfgChanged_For_check_cfg();
-
 		if( cfgchanged )
 		{
-			//macHeartbeatGuard_step(200);
-
-			//pCommLink->set_hb_device( NULL, 0 );
+			macHeartbeatGuard_step(200);
+			pCommLink->set_hb_device( NULL, 0 ); //jyc20160824
 		}
 
 		if( allowConnect )
 		{
-			//macHeartbeatGuard_step(300);
-
+			macHeartbeatGuard_step(300);
+			
 			if( !pCommLink->get_cfg().enable )
 			{
-				//macHeartbeatGuard_step(400);
-
+				macHeartbeatGuard_step(400);
 				pCommLink->Close();
 				device->OnCommLinkNotify( ICommLinkNotifyHandler::CLNType_Refresh, pCommLink->get_cfg().id );
-
-				//macHeartbeatGuard_step(500);
+				macHeartbeatGuard_step(500);
 				continue;
 			}
 
-			//macHeartbeatGuard_step(600);
+			macHeartbeatGuard_step(600);
 
 			const bool doReconnect = pCommLink->get_doReconnect();
 			if( doReconnect )
 			{
-				//macHeartbeatGuard_step(700);
+				macHeartbeatGuard_step(700);
 
 				pCommLink->set_doReconnect(0);
 
-				//LOGMSG( "Link%d(%s) doReconnect-ThId%d\r\n", pCommLink->get_cfg().id, pCommLink->get_cfg().name.c_str(), thisThreadId );
+				LOGMSG( "Link%d(%s) doReconnect-ThId%d\r\n", pCommLink->get_cfg().id, pCommLink->get_cfg().name.c_str(), thisThreadId );
 
 				pCommLink->Close();
 				device->OnCommLinkNotify( ICommLinkNotifyHandler::CLNType_Refresh, pCommLink->get_cfg().id );
 			}
 
-			//macHeartbeatGuard_step(800);
+			macHeartbeatGuard_step(800);
 			
-			//const bool isRecvTimeover = pCommLink->Heartbeat_isRecvTimeover();
+			const bool isRecvTimeover = pCommLink->Heartbeat_isRecvTimeover();
 
-			//if( !pCommLink->IsOpen() || isRecvTimeover )
+			if( !pCommLink->IsOpen() || isRecvTimeover ) //jyc20160912 overtimer
 			{
-				//const bool IsOKReconnectionInterval = pCommLink->IsOKReconnectionInterval();
+				const bool IsOKReconnectionInterval = pCommLink->IsOKReconnectionInterval();
 
-				//if( isRecvTimeover && IsOKReconnectionInterval )
+				if( isRecvTimeover && IsOKReconnectionInterval )
 				{
-					//LOGMSG( "Link%d(%s) Heartbeat_isRecvTimeover-ThId%d\r\n", pCommLink->get_cfg().id, pCommLink->get_cfg().name.c_str(), thisThreadId );
+					LOGMSG( "Link%d(%s) Heartbeat_isRecvTimeover-ThId%d\r\n", pCommLink->get_cfg().id, pCommLink->get_cfg().name.c_str(), thisThreadId );
 				}
 
-				//if( doReconnect || IsOKReconnectionInterval )
+				if( doReconnect || IsOKReconnectionInterval )
 				{
-					//macHeartbeatGuard_step(1000);
+					macHeartbeatGuard_step(1000);
 
 					if( pCommLink->IsOpen() )
 					{
@@ -189,7 +190,7 @@ unsigned __stdcall CommLinkThread(LPVOID lpPara)
 					}
 					else
 					{
-						//pCommLink->resetTsState();
+						pCommLink->resetTsState();
 						device->OnCommLinkNotify( ICommLinkNotifyHandler::CLNType_Refresh, pCommLink->get_cfg().id );
 					}
 
@@ -201,16 +202,16 @@ unsigned __stdcall CommLinkThread(LPVOID lpPara)
 
 					if( !openret )
 					{
-						//macHeartbeatGuard_step(1100);
+						macHeartbeatGuard_step(1100);
 
-						//device->OnTimer( phbGuard, pCommLink, 1 );
+						device->OnTimer( phbGuard, pCommLink, 1 );
 						continue;
 					}
 				}
 			}
 		}
 		
-		//macHeartbeatGuard_step(1200);
+		macHeartbeatGuard_step(1200);
 
 		if( ::timeGetTime()-lastPrintTime > 180000 )
 		{
@@ -219,11 +220,13 @@ unsigned __stdcall CommLinkThread(LPVOID lpPara)
 		}
 		
 
-		//macHeartbeatGuard_step(1300);
+		macHeartbeatGuard_step(1300);
 
-		if( !device->GetRunning() ) { break; }
+		if( !device->GetRunning() )	{ 
+			break; 
+		}
 
-		//device->OnTimer( phbGuard, pCommLink, 1 );
+		device->OnTimer( phbGuard, pCommLink, 1 );  //onTimer
 
 		if( !device->GetRunning() ) { break; }
 
@@ -231,14 +234,14 @@ unsigned __stdcall CommLinkThread(LPVOID lpPara)
 
 		if( !device->GetRunning() ) { break; }
 
-		//macHeartbeatGuard_step(1400);
+		macHeartbeatGuard_step(1400);
 
 		n = device->RecvData( pCommLink, buf+defSerialBufPreLen, 4095-defSerialBufPreLen );
 		if(n > 0)
 		{
-			//macHeartbeatGuard_step(1500);
+			macHeartbeatGuard_step(1500);
 
-			//device->OnDataReceived( phbGuard, pCommLink, buf+defSerialBufPreLen, n );
+			device->OnDataReceived( phbGuard, pCommLink, buf+defSerialBufPreLen, n );
 
 			if( !device->GetRunning() ) { break; }
 
@@ -246,30 +249,30 @@ unsigned __stdcall CommLinkThread(LPVOID lpPara)
 
 		}
 
-		//macHeartbeatGuard_step(1600);
+		macHeartbeatGuard_step(1600);
 
 		// 是否需要发送心跳
 		if( pCommLink->IsOpen() )
 		{
 			const uint32_t CommLinkHb_SendInterval = RUNCODE_Get(defCodeIndex_CommLinkHb_SendInterval);
-			//if( pCommLink->Heartbeat_isNeedSend() )
+			if( pCommLink->Heartbeat_isNeedSend() ) //jyc20160914 test
 			{
-				//macHeartbeatGuard_step(1700);
+				macHeartbeatGuard_step(1700);
 
 				switch( pCommLink->get_cfg().heartbeat_type )
 				{
 				case defCommLinkHeartbeatType_GSIOT:
 					{
 						device->ReadGSIOTBoardVer( pCommLink->get_cfg().id, (CommLinkHb_SendInterval*1000)+defNormMsgOvertime );
-						//pCommLink->set_lastSendHeartbeat();
+						pCommLink->set_lastSendHeartbeat();
 
-						//LOGMSG( "Link%d(%s) Send Heartbeat GSIOT -ThId%d", pCommLink->get_cfg().id, pCommLink->get_cfg().name.c_str(), thisThreadId );
+						LOGMSG( "Link%d(%s) Send Heartbeat GSIOT -ThId%d", pCommLink->get_cfg().id, pCommLink->get_cfg().name.c_str(), thisThreadId );
 					}
 					break;
 
 				case defCommLinkHeartbeatType_SpecRdAddr:
 					{
-						//pCommLink->set_lastSendHeartbeat();
+						pCommLink->set_lastSendHeartbeat();
 
 						const IOTDeviceType hb_deviceType = pCommLink->get_cfg().heartbeat_param.hb_deviceType;
 						if( IOT_DEVICE_RS485 != hb_deviceType )// 目前支持用作心跳设备的类型
@@ -296,14 +299,14 @@ unsigned __stdcall CommLinkThread(LPVOID lpPara)
 
 						if( !hb_device )
 						{
-							//LOGMSG( "Link%d(%s) do Heartbeat, no hb_dev ptr, type=%d, id=%d -ThId%d\r\n", pCommLink->get_cfg().id, pCommLink->get_cfg().name.c_str(), hb_deviceType, hb_deviceId, thisThreadId );
+							LOGMSG( "Link%d(%s) do Heartbeat, no hb_dev ptr, type=%d, id=%d -ThId%d\r\n", pCommLink->get_cfg().id, pCommLink->get_cfg().name.c_str(), hb_deviceType, hb_deviceId, thisThreadId );
 							break;
 						}
 
 						// 心跳设备所在链路与当前链路不一致时，属于配置异常
 						if( hb_device->GetLinkID() != pCommLink->get_cfg().id )
 						{
-							//LOGMSG( "Link%d(%s) do Heartbeat, Hb'LinkID Cfg Err -ThId%d\r\n", pCommLink->get_cfg().id, pCommLink->get_cfg().name.c_str(), thisThreadId );
+							LOGMSG( "Link%d(%s) do Heartbeat, Hb'LinkID Cfg Err -ThId%d\r\n", pCommLink->get_cfg().id, pCommLink->get_cfg().name.c_str(), thisThreadId );
 							break;
 						}
 
@@ -316,7 +319,7 @@ unsigned __stdcall CommLinkThread(LPVOID lpPara)
 								RS485DevControl *rsCtl = (RS485DevControl*)hb_device->getControl();
 								if( !rsCtl )
 								{
-									//LOGMSG( "Link%d(%s) do Heartbeat, ctl err, type=%d, id=%d -ThId%d\r\n", pCommLink->get_cfg().id, pCommLink->get_cfg().name.c_str(), hb_deviceType, hb_deviceId, thisThreadId );
+									LOGMSG( "Link%d(%s) do Heartbeat, ctl err, type=%d, id=%d -ThId%d\r\n", pCommLink->get_cfg().id, pCommLink->get_cfg().name.c_str(), hb_deviceType, hb_deviceId, thisThreadId );
 									break;
 								}
 
@@ -334,20 +337,20 @@ unsigned __stdcall CommLinkThread(LPVOID lpPara)
 
 								if( !address )
 								{
-									//LOGMSG( "Link%d(%s) do Heartbeat, addr not found, type=%d, id=%d, addr=%d -ThId%d\r\n", pCommLink->get_cfg().id, pCommLink->get_cfg().name.c_str(), hb_deviceType, hb_deviceId, hb_address, thisThreadId );
+									LOGMSG( "Link%d(%s) do Heartbeat, addr not found, type=%d, id=%d, addr=%d -ThId%d\r\n", pCommLink->get_cfg().id, pCommLink->get_cfg().name.c_str(), hb_deviceType, hb_deviceId, hb_address, thisThreadId );
 									break;
 								}
 
 								rsCtl->SetCommand( defModbusCmd_Read );
 								device->SendControl( hb_deviceType, hb_device, address, defNormSendCtlOvertime, (CommLinkHb_SendInterval*1000)+defNormMsgOvertime );
 
-								//LOGMSG( "Link%d(%s) Send Heartbeat SpecRdAddr(%d,%d,%d)-ThId%d", pCommLink->get_cfg().id, pCommLink->get_cfg().name.c_str(), hb_device->getType(), hb_device->getId(), hb_address, thisThreadId );
+								LOGMSG( "Link%d(%s) Send Heartbeat SpecRdAddr(%d,%d,%d)-ThId%d", pCommLink->get_cfg().id, pCommLink->get_cfg().name.c_str(), hb_device->getType(), hb_device->getId(), hb_address, thisThreadId );
 							}
 							break;
 
 						default:
 							{
-								//LOGMSG( "Link%d(%s) Send Heartbeat nosupport devtype=%d -ThId%d", pCommLink->get_cfg().id, pCommLink->get_cfg().name.c_str(), hb_deviceType, thisThreadId );
+								LOGMSG( "Link%d(%s) Send Heartbeat nosupport devtype=%d -ThId%d", pCommLink->get_cfg().id, pCommLink->get_cfg().name.c_str(), hb_deviceType, thisThreadId );
 							}
 							break;
 						}
@@ -360,13 +363,13 @@ unsigned __stdcall CommLinkThread(LPVOID lpPara)
 			}
 		}
 
-		//macHeartbeatGuard_step(999998);
+		macHeartbeatGuard_step(999998);
 	}
 
-	//macHeartbeatGuard_step(999999);
+	macHeartbeatGuard_step(999999);
 
 	device->OnThreadExit();
-	return 0;
+	//return 0;
 }
 
 DeviceConnection::DeviceConnection(IDeviceHandler *handler)
@@ -380,9 +383,8 @@ DeviceConnection::DeviceConnection(IDeviceHandler *handler)
 	this->m_handler = handler;
     isRunning = false;
 
-	//CCommLinkRun::Module_Init();
+	CCommLinkRun::Module_Init(); //jyc20160830 win diff linux   donot remove
 
-	//devXml = new XmlDevice();
 	devManager = new DeviceManager();
 
 	m_CommLinkMgr.Init();
@@ -397,7 +399,7 @@ DeviceConnection::DeviceConnection(IDeviceHandler *handler)
 		}
 	}
 
-	//m_serial_msg = new SerialMessage(this);
+	m_serial_msg = new SerialMessage(this);
 }
 
 DeviceConnection::~DeviceConnection(void)
@@ -422,7 +424,7 @@ DeviceConnection::~DeviceConnection(void)
 	//delete(m_serial_msg);//...testFinalDelete 程序将退出，不释放
 	//m_CommLinkMgr.UnInit();//...testFinalDelete 程序将退出，不释放
 
-	//CCommLinkRun::Module_UnInit();
+	CCommLinkRun::Module_UnInit();
 	LOGMSG("~DeviceConnection end\r\n");
 }
 
@@ -445,23 +447,22 @@ int DeviceConnection::GetAllCommunicationState( const bool getCommLink )
 
 	this->m_CommLinkMgr.Run_GetAllStateInfo( enableCount, allConnectState );
 
-	// 无启用的远程链路
+	//no remotelink
 	if( 0==enableCount )
 	{
 		return PortState;
 	}
 
-	// 本地主控链路为无
+	// no locallink
 	if( PortState<0 )
 	{
 		return ( allConnectState?1:0 );
 	}
 
-	// 本地主控链路和远程链路都有
+	//locallink or remotelink
 	return ( (allConnectState && 1==PortState) ? 1:0 );
 }
 
-// 获取线程ID
 int DeviceConnection::Get_CommLinkThread_id()
 {
 	gloox::util::MutexGuard mutexguard( this->m_mutex_devcon );
@@ -469,7 +470,7 @@ int DeviceConnection::Get_CommLinkThread_id()
 	return m_CommLinkThread_id;
 }
 
-// 线程ID自增
+//new linkthread id
 int DeviceConnection::New_CommLinkThread_id()
 {
 	gloox::util::MutexGuard mutexguard( this->m_mutex_devcon );
@@ -477,7 +478,7 @@ int DeviceConnection::New_CommLinkThread_id()
 	return ( ++m_CommLinkThread_id );
 }
 
-// 获取允许连接线程数
+// get linkthread number
 int DeviceConnection::Get_CommLinkThread_allowConnectNum()
 {
 	gloox::util::MutexGuard mutexguard( this->m_mutex_devcon );
@@ -485,7 +486,7 @@ int DeviceConnection::Get_CommLinkThread_allowConnectNum()
 	return m_CommLinkThread_allowConnectNum;
 }
 
-// 允许连接线程数自增
+//new allow linkthread  jyc20160824
 int DeviceConnection::New_CommLinkThread_allowConnectNum()
 {
 	gloox::util::MutexGuard mutexguard( this->m_mutex_devcon );
@@ -495,19 +496,17 @@ int DeviceConnection::New_CommLinkThread_allowConnectNum()
 
 void DeviceConnection::Check()
 {
-	//m_serial_msg->Check();
+	m_serial_msg->Check();
 }
 
-/*
 void DeviceConnection::OnTimer( CHeartbeatGuard *phbGuard, CCommLinkRun *CommLink, int TimerID )
 {
 	m_serial_msg->onTimer( phbGuard, CommLink );
 }
-*/
 
 void DeviceConnection::SendTransparentData( defLinkID LinkID, uint8_t *data, uint32_t size, uint32_t overtime, uint32_t QueueOverTime )
 {
-	//m_serial_msg->doMessage( LinkID, data, size, IOT_DEVICE_Unknown, 0, NULL, NULL, overtime, QueueOverTime );
+	m_serial_msg->doMessage( LinkID, data, size, IOT_DEVICE_Unknown, 0, NULL, NULL, overtime, QueueOverTime );
 }
 
 void DeviceConnection::SendTransparentData( defLinkID LinkID, const std::string strdata, uint32_t overtime, uint32_t QueueOverTime )
@@ -522,7 +521,7 @@ bool DeviceConnection::ReadGSIOTBoardVer( defLinkID LinkID, uint32_t QueueOverTi
 {
 	uint8_t sendBuf[MIAN_PORT_BUF_MAX] = {0xBC, 0xAC, 0x02, 0x65, Read_IOT_Ver, 0xAC};
 	
-	//m_serial_msg->doMessage( LinkID, sendBuf, 6, IOT_DEVICE_Unknown, 0, NULL, NULL, defNormSendCtlOvertime, QueueOverTime );
+	m_serial_msg->doMessage( LinkID, sendBuf, 6, IOT_DEVICE_Unknown, 0, NULL, NULL, defNormSendCtlOvertime, QueueOverTime );
 
 	return true;
 }
@@ -531,7 +530,7 @@ std::string DeviceConnection::GetGSIOTBoardVer( defLinkID LinkID, uint32_t *last
 {
 	if( defLinkID_Local == LinkID )
 	{
-		//return m_serial_msg->GetMsgCurCmdObj().GetGSIOTBoardVer(last_ts);
+		return m_serial_msg->GetMsgCurCmdObj().GetGSIOTBoardVer(last_ts);
 	}
 	else
 	{
@@ -539,7 +538,7 @@ std::string DeviceConnection::GetGSIOTBoardVer( defLinkID LinkID, uint32_t *last
 		CCommLinkRun *pCommLink = AutoCommLink.p();
 		if( pCommLink )
 		{
-			//return pCommLink->GetMsgCurCmdObj().GetGSIOTBoardVer( last_ts );
+			return pCommLink->GetMsgCurCmdObj().GetGSIOTBoardVer( last_ts );
 		}
 	}
 
@@ -616,7 +615,7 @@ bool DeviceConnection::SetRFMod_EncodeSend( defLinkID LinkID, defFreq freq, uint
 	*pPacketLen = (enc - sendBuf) - MIAN_PORT_UNPkt_LEN;
 	*pPacketEnd = 0xAC;
 
-	//m_serial_msg->doMessage( LinkID, sendBuf, pPacketEnd + 1 - sendBuf, IOT_DEVICE_Unknown, 0, NULL, NULL, defNormSendCtlOvertime, defNormMsgOvertime );
+	m_serial_msg->doMessage( LinkID, sendBuf, pPacketEnd + 1 - sendBuf, IOT_DEVICE_Unknown, 0, NULL, NULL, defNormSendCtlOvertime, defNormMsgOvertime );
 
 	return true;
 }
@@ -635,7 +634,7 @@ bool DeviceConnection::SendMOD_set( const defMODSysSet cmd, const defLinkID Link
 	bool hassend = false;
 	bool ret = true;
 
-	//ret &= SendMOD_set_EncodeSend( cmd, defLinkID_Local, QueueOverTime );
+	ret &= SendMOD_set_EncodeSend( cmd, defLinkID_Local, QueueOverTime );
 
 	const defmapCommLinkCfg &cfglist = m_CommLinkMgr.Cfg_GetList();
 	for( defmapCommLinkCfg::const_iterator it=cfglist.begin(); it!=cfglist.end(); ++it )
@@ -657,28 +656,28 @@ bool DeviceConnection::SendMOD_set_EncodeSend( const defMODSysSet cmd, const def
 	case defMODSysSet_IR_TXCtl_Query:		// IR 收发控制 - 查询
 		{
 			uint8_t sendBuf[MIAN_PORT_BUF_MAX] = { 0xBC, 0xAC, 0x04, 0x65, MOD_SYS_set, 0x30, 0x0A, 0xAC };
-			//m_serial_msg->doMessage( LinkID, sendBuf, 8, IOT_DEVICE_Unknown, 0, NULL, NULL, defNormSendCtlOvertime, QueueOverTime );
+			m_serial_msg->doMessage( LinkID, sendBuf, 8, IOT_DEVICE_Unknown, 0, NULL, NULL, defNormSendCtlOvertime, QueueOverTime );
 		}
 		break;
 
 	case defMODSysSet_IR_TXCtl_RX:			// IR 收发控制 - 设为收
 		{
 			uint8_t sendBuf[MIAN_PORT_BUF_MAX] = {0xBC, 0xAC, 0x05, 0x65, MOD_SYS_set, 0x30, 0x1A, 0x00, 0xAC};
-			//m_serial_msg->doMessage( LinkID, sendBuf, 9, IOT_DEVICE_Unknown, 0, NULL, NULL, defNormSendCtlOvertime, QueueOverTime );
+			m_serial_msg->doMessage( LinkID, sendBuf, 9, IOT_DEVICE_Unknown, 0, NULL, NULL, defNormSendCtlOvertime, QueueOverTime );
 		}
 		break;
 
 	case defMODSysSet_IR_TXCtl_TX:			// IR 收发控制 - 设为发
 		{
 			uint8_t sendBuf[MIAN_PORT_BUF_MAX] = {0xBC, 0xAC, 0x05, 0x65, MOD_SYS_set, 0x30, 0x1A, 0x01, 0xAC};
-			//m_serial_msg->doMessage( LinkID, sendBuf, 9, IOT_DEVICE_Unknown, 0, NULL, NULL, defNormSendCtlOvertime, QueueOverTime );
+			m_serial_msg->doMessage( LinkID, sendBuf, 9, IOT_DEVICE_Unknown, 0, NULL, NULL, defNormSendCtlOvertime, QueueOverTime );
 		}
 		break;
 
 	case defMODSysSet_IR_RXMod_Query:		// IR 收模式查询
 		{
 			uint8_t sendBuf[MIAN_PORT_BUF_MAX] = {0xBC, 0xAC, 0x04, 0x65, MOD_SYS_set, 0x30, 0x0D, 0xAC};
-			//m_serial_msg->doMessage( LinkID, sendBuf, 8, IOT_DEVICE_Unknown, 0, NULL, NULL, defNormSendCtlOvertime, QueueOverTime );
+			m_serial_msg->doMessage( LinkID, sendBuf, 8, IOT_DEVICE_Unknown, 0, NULL, NULL, defNormSendCtlOvertime, QueueOverTime );
 		}
 		break;
 
@@ -686,7 +685,7 @@ bool DeviceConnection::SendMOD_set_EncodeSend( const defMODSysSet cmd, const def
 		{
 			//uint8_t sendBuf[MIAN_PORT_BUF_MAX] = {0xBC, 0xAC, 0x0B, 0x65, MOD_SYS_set, 0x30, 0x1D, 0x01, 0x00, 0x00, 0x70, 0x94, 0x00, 0x00, 0xAC};
 			uint8_t sendBuf[MIAN_PORT_BUF_MAX] = {0xBC, 0xAC, 0x0B, 0x65, MOD_SYS_set, 0x30, 0x1D, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xAC};
-			//m_serial_msg->doMessage( LinkID, sendBuf, 15, IOT_DEVICE_Unknown, 0, NULL, NULL, defNormSendCtlOvertime, QueueOverTime );
+			m_serial_msg->doMessage( LinkID, sendBuf, 15, IOT_DEVICE_Unknown, 0, NULL, NULL, defNormSendCtlOvertime, QueueOverTime );
 		}
 		break;
 
@@ -694,28 +693,28 @@ bool DeviceConnection::SendMOD_set_EncodeSend( const defMODSysSet cmd, const def
 		{
 			//uint8_t sendBuf[MIAN_PORT_BUF_MAX] = {0xBC, 0xAC, 0x0B, 0x65, MOD_SYS_set, 0x30, 0x1D, 0x00, 0x00, 0x00, 0x70, 0x94, 0x00, 0x00, 0xAC};
 			uint8_t sendBuf[MIAN_PORT_BUF_MAX] = {0xBC, 0xAC, 0x0B, 0x65, MOD_SYS_set, 0x30, 0x1D, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xAC};
-			//m_serial_msg->doMessage( LinkID, sendBuf, 15, IOT_DEVICE_Unknown, 0, NULL, NULL, defNormSendCtlOvertime, QueueOverTime );
+			m_serial_msg->doMessage( LinkID, sendBuf, 15, IOT_DEVICE_Unknown, 0, NULL, NULL, defNormSendCtlOvertime, QueueOverTime );
 		}
 		break;
 		
 	case defMODSysSet_RF_RX_freq_Query:		// RF 频率设置查询
 		{
 			uint8_t sendBuf[MIAN_PORT_BUF_MAX] = {0xBC, 0xAC, 0x04, 0x65, MOD_SYS_set, 0x10, 0x0D, 0xAC};
-			//m_serial_msg->doMessage( LinkID, sendBuf, 8, IOT_DEVICE_Unknown, 0, NULL, NULL, defNormSendCtlOvertime, QueueOverTime );
+			m_serial_msg->doMessage( LinkID, sendBuf, 8, IOT_DEVICE_Unknown, 0, NULL, NULL, defNormSendCtlOvertime, QueueOverTime );
 		}
 		break;
 
 	case defMODSysSet_RF_RX_freq_315:		// RF 频率设置315
 		{
 			uint8_t sendBuf[MIAN_PORT_BUF_MAX] = {0xBC, 0xAC, 0x08, 0x65, MOD_SYS_set, 0x10, 0x1D, 0xC0, 0x84, 0xC6, 0x12, 0xAC};
-			//m_serial_msg->doMessage( LinkID, sendBuf, 15, IOT_DEVICE_Unknown, 0, NULL, NULL, defNormSendCtlOvertime, QueueOverTime );
+			m_serial_msg->doMessage( LinkID, sendBuf, 15, IOT_DEVICE_Unknown, 0, NULL, NULL, defNormSendCtlOvertime, QueueOverTime );
 		}
 		break;
 
 	case defMODSysSet_RF_RX_freq_433:		// RF 频率设置433
 		{
 			uint8_t sendBuf[MIAN_PORT_BUF_MAX] = {0xBC, 0xAC, 0x08, 0x65, MOD_SYS_set, 0x10, 0x1D, 0x00, 0x18, 0xDD, 0x19, 0xAC};
-			//m_serial_msg->doMessage( LinkID, sendBuf, 15, IOT_DEVICE_Unknown, 0, NULL, NULL, defNormSendCtlOvertime, QueueOverTime );
+			m_serial_msg->doMessage( LinkID, sendBuf, 15, IOT_DEVICE_Unknown, 0, NULL, NULL, defNormSendCtlOvertime, QueueOverTime );
 		}
 		break;
 		
@@ -977,7 +976,7 @@ defGSReturn DeviceConnection::SendControl( const IOTDeviceType DevType, const GS
 
 				*pPacketLen = (enc - sendBuf) - MIAN_PORT_UNPkt_LEN;
 				*pPacketEnd = 0xAC;
-				//m_serial_msg->doMessage( LinkID, sendBuf, pPacketEnd + 1 - sendBuf, DevType, DevID, NULL, NULL, overtime, QueueOverTime, nextInterval );
+				m_serial_msg->doMessage( LinkID, sendBuf, pPacketEnd + 1 - sendBuf, DevType, DevID, NULL, NULL, overtime, QueueOverTime, nextInterval );
 				isSuccess = defGSReturn_Success;
 			    break;
 			}
@@ -1016,7 +1015,7 @@ defGSReturn DeviceConnection::SendControl( const IOTDeviceType DevType, const GS
 
 				*pPacketLen = (enc - sendBuf) - MIAN_PORT_UNPkt_LEN;
 				*pPacketEnd = 0xAC;
-				//m_serial_msg->doMessage( LinkID, sendBuf, pPacketEnd + 1 - sendBuf, DevType, DevID, NULL, NULL, overtime, QueueOverTime, nextInterval );
+				m_serial_msg->doMessage( LinkID, sendBuf, pPacketEnd + 1 - sendBuf, DevType, DevID, NULL, NULL, overtime, QueueOverTime, nextInterval );
 				isSuccess = defGSReturn_Success;
 			    break;
 			}
@@ -1025,12 +1024,12 @@ defGSReturn DeviceConnection::SendControl( const IOTDeviceType DevType, const GS
 			{
 				*pModuleIndex = Module_RS485; //module
 
-				// 数据段
+				// data 
 				//enc
 				RS485DevControl *rsCtl = (RS485DevControl *)ctl;
 
 				defRS485MsgQue que;
-				//if( rsCtl->Encode( que, address ) )
+				if( rsCtl->Encode( que, address ) )
 				{
 					uint8_t *ptemp_enc = enc;
 
@@ -1048,14 +1047,14 @@ defGSReturn DeviceConnection::SendControl( const IOTDeviceType DevType, const GS
 
 						*pPacketLen = (enc - sendBuf) - MIAN_PORT_UNPkt_LEN;
 						*pPacketEnd = 0xAC;
-						//m_serial_msg->doMessage( LinkID, sendBuf, pPacketEnd + 1 - sendBuf, DevType, DevID, rsCtl, address, overtime, QueueOverTime, nextInterval );
+						m_serial_msg->doMessage( LinkID, sendBuf, pPacketEnd + 1 - sendBuf, DevType, DevID, rsCtl, address, overtime, QueueOverTime, nextInterval );
 						isSuccess = defGSReturn_Success;
 
 						enc = ptemp_enc;
 					}
 				}
 
-				//g_DeleteRS485MsgQue( que );
+				g_DeleteRS485MsgQue( que );
 				break;
 			}
 
@@ -1075,7 +1074,6 @@ defGSReturn DeviceConnection::SendControl( const IOTDeviceType DevType, const GS
 					uint16_t buflen = sizeof(sendBuf)-(enc -sendBuf);
 					if( Encode_RFRemote( pCurButton->GetSignal(), enc, buflen ) )
 					{
-						//memcpy( enc, pMsg->buf, pMsg->buflen );
 						enc += buflen;
 
 						pPacketEnd = enc;
@@ -1083,12 +1081,14 @@ defGSReturn DeviceConnection::SendControl( const IOTDeviceType DevType, const GS
 
 						*pPacketLen = (enc - sendBuf) - MIAN_PORT_UNPkt_LEN;
 						*pPacketEnd = 0xAC;
-
-						//*pModuleIndex = pCurButton->GetSignal().GetModuleIndex(); //module
+						*pModuleIndex = pCurButton->GetSignal().GetModuleIndex(); //module
 
 						// 发送次数包含在编码里
-						//LOGMSG( "RFRemoteCtrl(%s) Send module=%d, %s", pCurButton->GetObjName().c_str(), pCurButton->GetSignal().GetModuleIndex(), pCurButton->GetSignal().Print( "", false ).c_str() );
-						//m_serial_msg->doMessage( LinkID, sendBuf, pPacketEnd + 1 - sendBuf, DevType, DevID, rfCtl, address, overtime, QueueOverTime, nextInterval>1 ? nextInterval : pCurButton->GetSignal().GetSendNeedTime() );
+						LOGMSG( "RFRemoteCtrl(%s) Send module=%d, %s", pCurButton->GetObjName().c_str(), \
+						       pCurButton->GetSignal().GetModuleIndex(), pCurButton->GetSignal().Print( "", false ).c_str() );
+						m_serial_msg->doMessage( LinkID, sendBuf, pPacketEnd + 1 - sendBuf, \
+						       DevType, DevID, rfCtl, address, overtime, QueueOverTime, \
+						       nextInterval>1 ? nextInterval : pCurButton->GetSignal().GetSendNeedTime() );
 
 						isSuccess = defGSReturn_Success;
 					}
@@ -1242,9 +1242,8 @@ int DeviceConnection::RecvData(CCommLinkRun *CommLink, unsigned char *buf,int si
 	}
 	else
 	{
-		recvsize = RS232_PollComport( this->GetPort(), buf, size );
+		//recvsize = RS232_PollComport( this->GetPort(), buf, size ); //jyc20160901
 	}
-
 	if( IsRUNCODEEnable(defCodeIndex_PrintRecv_MainPort) )
 	{
 		g_PrintfByte( buf, recvsize, "recv (dev RecvData)", CommLink?CommLink->get_cfg().id:defPrintfByteDefaultLinkID, CommLink?CommLink->get_cfg().name.c_str():"" );
@@ -1264,7 +1263,7 @@ void DeviceConnection::Run(int port)
 
 	//load device
 	this->LoadDevice();
-
+	//jyc20160824
 	//m_GSM.setSerialPortHandler( this );
 
 	isRunning = true;
@@ -1280,9 +1279,22 @@ void DeviceConnection::Run(int port)
 		const int CommLinkThreadNum = m_CommLinkMgr.Cfg_GetList().size();
 		for( int i=1; i<=CommLinkThreadNum && i<=CommLinkThreadMax; ++i )
 		{
-			AddCommLinkThread( CommLinkThreadNum );
+			AddCommLinkThread( CommLinkThreadNum ); 
 		}
 	}
+
+	/* jyc20160906 delete
+	pthread_t id_2;  
+	int i,ret;  
+	//this->isRunning = true; //jyc20160826 add just test
+
+	ret=pthread_create(&id_2,NULL,SerialPort_Thread,this);  
+	if(ret!=0)  
+	{  
+   		printf("Create timemanager_pthread error!\n");  
+		//return -1;  
+		return; 
+	}//*/
 
 	if(port>=1)
 	{
@@ -1310,14 +1322,14 @@ void DeviceConnection::Run(int port)
 			RS232_disableDTR( m_port );
 			RS232_disableRTS( m_port );
 
-			/*
+			/*jyc20160824
 			//创建COM监听线程		
 			HANDLE   hth1;
 			unsigned  uiThread1ID;
 			m_threadRunning++;
 			hth1 = (HANDLE)_beginthreadex(NULL, 0, SerialPortThread, this, 0, &uiThread1ID);
 			CloseHandle(hth1);
-			*/
+			*/	
 		}
 	}
 }
@@ -1337,7 +1349,7 @@ void DeviceConnection::AddCommLinkThread( int CommLinkCount )
 	{
 		return;
 	}
-	/*
+	/*jyc20160824
 	//创建线程
 	HANDLE   hth1;
 	unsigned  uiThread1ID;
@@ -1345,13 +1357,26 @@ void DeviceConnection::AddCommLinkThread( int CommLinkCount )
 	hth1 = (HANDLE)_beginthreadex(NULL, 0, CommLinkThread, this, 0, &uiThread1ID);
 	CloseHandle(hth1);
 	*/
+
+	pthread_t id_1;  
+    int i,ret;  
+	//this->isRunning = true; //jyc20160826 add just test
+	//printf("creat pthread print...\n");
+
+    ret=pthread_create(&id_1,NULL,CommLink_Thread,this);  
+    if(ret!=0)  
+    {  
+        printf("Create timemanager_pthread error!\n");  
+		//return -1;  
+		return; 
+    } 
 }
 
 void DeviceConnection::Stoped()
 {
 	this->isRunning = false;
 }
-/*20160607
+
 void DeviceConnection::OnDataReceived( CHeartbeatGuard *phbGuard, CCommLinkRun *CommLink, uint8_t* const srcbuf, const uint32_t srcbufsize )
 {
 	defTransMod trans_mod = defTransMod_GSIOT;
@@ -1484,7 +1509,7 @@ if( IsRUNCODEEnable(defCodeIndex_TEST_ModbusMod) )
 
 					if( IsRUNCODEEnable(defCodeIndex_Disable_Recv_GSM) )
 					{
-						LOGMSGEX( defLOGNAME, defLOG_WORN, "__TEST__: Disable_Recv_GSM!" );
+						//LOGMSGEX( defLOGNAME, defLOG_WORN, "__TEST__: Disable_Recv_GSM!" );
 						return;
 					}
 
@@ -1527,7 +1552,6 @@ if( IsRUNCODEEnable(defCodeIndex_TEST_ModbusMod) )
 		PacketEnd = *buffer++; size--;			// 结束确认位 位置
 	}
 }
-*/
 
 void DeviceConnection::LoadDevice()
 {
@@ -1595,18 +1619,6 @@ bool DeviceConnection::ModifyAddress( GSIOTDevice *iotdevice, DeviceAddress *add
 
 int DeviceConnection::AddController(ControlBase *ctl, const std::string &ver, uint32_t enable, GSIOTDevice **outNewDev)
 {
-	//std::list<GSIOTDevice *> deviceList = devManager->GetDeviceList();
-	//if(deviceList.size()>0){
-	//	std::list<GSIOTDevice *>::iterator it = deviceList.begin();
-	//	for(;it!=deviceList.end();it++){
-	//		if((*it)->getControl() == ctl){
-	//            (*it)->setName(ctl->GetName());
-	//			(*it)->setId( devManager->SaveToDB(*it) );
-	//			m_handler->OnDeviceConnect(*it);
-	//			return;
-	//		}
-	//	}
-	//}
 	int newid = 0;
 	if(devManager)
 	{
@@ -1693,20 +1705,10 @@ void DeviceConnection::RemoveCANDeviceHandler(ICANDeviceHandler *handler)
 
 void DeviceConnection::GetRFDeviceInfo(uint32_t productID,uint32_t passCode)
 {
-	//if(productID>0 && passCode>0){
-	//	uint8_t sendBuf[32] = {0};
-	//	uint8_t *enc = sendBuf;
 
-	//	*enc ++= 0x65;//version
- //       *enc ++= CC1101_433; //module
-	//	enc = CommandToByte(enc,Device_Info_Request);//cmd
-	//	enc = Int32ToByte(enc,productID);
-	//	enc = Int32ToByte(enc,passCode);
-	//	this->SendData(sendBuf, enc - sendBuf);
-	//}
 }
 
-/*
+
 void DeviceConnection::DecodeRxb8Data( CHeartbeatGuard *phbGuard, CCommLinkRun *CommLink, defFreq freq, uint8_t* const srcbuf, const uint32_t srcbufsize )
 {
 	if( IsRUNCODEEnable(defCodeIndex_PrintRecv_RF) )
@@ -1718,7 +1720,7 @@ void DeviceConnection::DecodeRxb8Data( CHeartbeatGuard *phbGuard, CCommLinkRun *
 	{
 		if( IsRUNCODEEnable(defCodeIndex_PrintRecv_RF) )
 		{
-			LOGMSGEX( defLOGNAME, defLOG_WORN, "__TEST__: Disable_Recv_RF! recv DecodeRxb8Data" );
+			//LOGMSGEX( defLOGNAME, defLOG_WORN, "__TEST__: Disable_Recv_RF! recv DecodeRxb8Data" );
 		}
 
 		return;
@@ -1730,7 +1732,7 @@ void DeviceConnection::DecodeRxb8Data( CHeartbeatGuard *phbGuard, CCommLinkRun *
 	// 至少字节数
 	if( srcbufsize < 3 )
 	{
-		LOGMSGEX( defLOGNAME, defLOG_ERROR, "DeviceConnection::DecodeRxb8Data size=%d err!\r\n", srcbufsize );
+		//LOGMSGEX( defLOGNAME, defLOG_ERROR, "DeviceConnection::DecodeRxb8Data size=%d err!\r\n", srcbufsize );
 		return;
 	}
 
@@ -1757,7 +1759,7 @@ void DeviceConnection::DecodeRxb8Data( CHeartbeatGuard *phbGuard, CCommLinkRun *
 	const uint32_t needsize = (1+1+sizeof(uint16_t)*signal.headlen+2*4+4+2+sizeof(uint16_t)*signal.taillen);
 	if( size < needsize )
 	{
-		LOGMSGEX( defLOGNAME, defLOG_INFO, "DeviceConnection::DecodeRxb8Data size=%d err! needsize=%d, headlen=%d, taillen=%d\r\n", srcbufsize, needsize, signal.headlen, signal.taillen );
+		//LOGMSGEX( defLOGNAME, defLOG_INFO, "DeviceConnection::DecodeRxb8Data size=%d err! needsize=%d, headlen=%d, taillen=%d\r\n", srcbufsize, needsize, signal.headlen, signal.taillen );
 		return;
 	}
 
@@ -1816,14 +1818,13 @@ void DeviceConnection::DecodeRxb8Data( CHeartbeatGuard *phbGuard, CCommLinkRun *
 
 	if( IsRUNCODEEnable(defCodeIndex_PrintRecv_val_RF) )
 	{
-		signal.Print( "recv DecodeRxb8Data" );
+		//jyc20160824 debug all off
+		//signal.Print( "recv DecodeRxb8Data" );
 	}
 
 	OnDeviceData_RFSignal( phbGuard, CommLink, signal );
 }
-*/
 
-/*
 void DeviceConnection::OnDeviceData_RFSignal( CHeartbeatGuard *phbGuard, CCommLinkRun *CommLink, const RFSignal &signal )
 {
 	macHeartbeatGuard_step(151100);
@@ -1843,6 +1844,7 @@ void DeviceConnection::OnDeviceData_RFSignal( CHeartbeatGuard *phbGuard, CCommLi
 				TriggerControl *tc = (TriggerControl *)(*it)->getControl();
 				if(tc)
 				{
+					/*jyc20160824*/
 					if( tc->GetSignal().IsNear( signal ) )
 					{
 						if( (*it)->GetEnable() )
@@ -1850,11 +1852,9 @@ void DeviceConnection::OnDeviceData_RFSignal( CHeartbeatGuard *phbGuard, CCommLi
 							this->m_handler->OnDeviceData( LinkID, *it, tc, NULL );
 						}
 
-						//return;
 						isAdd = true;
 						strAddedName = (*it)->getName();
-						//break;
-					}
+					}//*/
 				}
 			}
 		}
@@ -1869,9 +1869,7 @@ void DeviceConnection::OnDeviceData_RFSignal( CHeartbeatGuard *phbGuard, CCommLi
 
 	macHeartbeatGuard_step(151900);
 }
-*/
 
-/*
 void DeviceConnection::DecodeCC1101Data(CCommLinkRun *CommLink, uint8_t *buf,uint32_t size)
 {
 	return;
@@ -2126,7 +2124,7 @@ void DeviceConnection::Decode_RS485Data( CHeartbeatGuard *phbGuard, CCommLinkRun
 	{
 		if( IsRUNCODEEnable(defCodeIndex_PrintRecv_RS485) )
 		{
-			LOGMSGEX( defLOGNAME, defLOG_WORN, "__TEST__: Disable_Recv_RS485! recv Decode_RS485Data" );
+			//LOGMSGEX( defLOGNAME, defLOG_WORN, "__TEST__: Disable_Recv_RS485! recv Decode_RS485Data" );
 		}
 
 		return;
@@ -2149,7 +2147,6 @@ void DeviceConnection::Decode_RS485Data( CHeartbeatGuard *phbGuard, CCommLinkRun
 	}
 
 	pDecodeCtrl->SetLinkID( LinkID );
-
 	std::auto_ptr<RS485DevControl> autop(pDecodeCtrl);
 
 	if( IsRUNCODEEnable(defCodeIndex_PrintRecv_val_RS485) )
@@ -2178,7 +2175,7 @@ void DeviceConnection::Decode_RS485Data( CHeartbeatGuard *phbGuard, CCommLinkRun
 	RS485DevControl *CurCmd_Ctrl = (RS485DevControl*)CurCmd->ctl;
 	DeviceAddress *CurCmd_Addr = CurCmd->address;
 
-	if( !CurCmd_Ctrl )//if( !CurCmd_Ctrl || !CurCmd_Addr )
+	if( !CurCmd_Ctrl )
 	{
 		CMsgCurCmd::Delete_CurCmd_Content_spec( CurCmd );
 
@@ -2195,7 +2192,7 @@ void DeviceConnection::Decode_RS485Data( CHeartbeatGuard *phbGuard, CCommLinkRun
 	if( CurCmd_Ctrl->GetDeviceid() != pDecodeCtrl->GetDeviceid() )
 	{
 		// 解码出来有地址，配置里却没有，配置错误
-		LOGMSGEX( defLOGNAME, defLOG_ERROR, "DeviceConnection::Decode_RS485Data %s devid error! send devid=%d, recv devid=%d\r\n", CurCmd_Ctrl->GetName().c_str(), CurCmd_Ctrl->GetDeviceid(), pDecodeCtrl->GetDeviceid() );
+		//LOGMSGEX( defLOGNAME, defLOG_ERROR, "DeviceConnection::Decode_RS485Data %s devid error! send devid=%d, recv devid=%d\r\n", CurCmd_Ctrl->GetName().c_str(), CurCmd_Ctrl->GetDeviceid(), pDecodeCtrl->GetDeviceid() );
 		CMsgCurCmd::Delete_CurCmd_Content_spec( CurCmd );
 
 		if( this->IsCurGSDevViewMod_Debug() )
@@ -2222,7 +2219,7 @@ void DeviceConnection::Decode_RS485Data( CHeartbeatGuard *phbGuard, CCommLinkRun
 			if( CurCmd_Addr && CurCmd_Addr->GetAddress() != pDecodeCtrlAddr->GetAddress() )
 			{
 				// 解码出来有地址，配置里却没有，配置错误
-				LOGMSGEX( defLOGNAME, defLOG_ERROR, "DeviceConnection::Decode_RS485Data %s addr error! send addr=%d, recv addr=%d\r\n", CurCmd_Ctrl->GetName().c_str(), CurCmd_Addr->GetAddress(), pDecodeCtrlAddr->GetAddress() );
+				//LOGMSGEX( defLOGNAME, defLOG_ERROR, "DeviceConnection::Decode_RS485Data %s addr error! send addr=%d, recv addr=%d\r\n", CurCmd_Ctrl->GetName().c_str(), CurCmd_Addr->GetAddress(), pDecodeCtrlAddr->GetAddress() );
 				CMsgCurCmd::Delete_CurCmd_Content_spec( CurCmd );
 
 				if( this->IsCurGSDevViewMod_Debug() )
@@ -2286,7 +2283,7 @@ void DeviceConnection::Decode_RS485Data( CHeartbeatGuard *phbGuard, CCommLinkRun
 						if( RS485DevControl::IsValueOverRange( pOneAddr_Decode->GetType(), flVal ) )
 						{
 							isOverRange = true;
-							LOGMSGEX( defLOGNAME, defLOG_ERROR, "ValueOverRange: devid=%d, addr=%d, val=%.2f!!!\r\n", CurCmd_Ctrl?CurCmd_Ctrl->GetDeviceid():0, pOneAddr_Decode->GetAddress(), flVal );
+							//LOGMSGEX( defLOGNAME, defLOG_ERROR, "ValueOverRange: devid=%d, addr=%d, val=%.2f!!!\r\n", CurCmd_Ctrl?CurCmd_Ctrl->GetDeviceid():0, pOneAddr_Decode->GetAddress(), flVal );
 						}
 
 						flVal = RS485DevControl::ValueRangeFix( pOneAddr_Decode->GetType(), flVal );
@@ -2354,7 +2351,7 @@ void DeviceConnection::Decode_Rxb8Data_original( CHeartbeatGuard *phbGuard, CCom
 	{
 		if( IsRUNCODEEnable(defCodeIndex_PrintRecv_RF_original) )
 		{
-			LOGMSGEX( defLOGNAME, defLOG_WORN, "__TEST__: Disable_Recv_RF_original! recv Decode_Rxb8Data_original" );
+			//LOGMSGEX( defLOGNAME, defLOG_WORN, "__TEST__: Disable_Recv_RF_original! recv Decode_Rxb8Data_original" );
 		}
 
 		return;
@@ -2366,7 +2363,7 @@ void DeviceConnection::Decode_Rxb8Data_original( CHeartbeatGuard *phbGuard, CCom
 	// 至少字节数
 	if( srcbufsize < 2 )
 	{
-		LOGMSGEX( defLOGNAME, defLOG_ERROR, "DeviceConnection::Decode_Rxb8Data_original size=%d err!\r\n", srcbufsize );
+		//LOGMSGEX( defLOGNAME, defLOG_ERROR, "DeviceConnection::Decode_Rxb8Data_original size=%d err!\r\n", srcbufsize );
 		return;
 	}
 
@@ -2392,14 +2389,14 @@ void DeviceConnection::Decode_Rxb8Data_original( CHeartbeatGuard *phbGuard, CCom
 
 	if( !timenum == signal.original_len )
 	{
-		LOGMSGEX( defLOGNAME, defLOG_ERROR, "Decode_Rxb8Data_original recv err, recv timenum=%d, analyse original_len=%d\r\n", timenum, signal.original_len );
+		//LOGMSGEX( defLOGNAME, defLOG_ERROR, "Decode_Rxb8Data_original recv err, recv timenum=%d, analyse original_len=%d\r\n", timenum, signal.original_len );
 	}
 
 	memcpy( &signal.original, buf, sizeof(uint16_t)*signal.original_len );
 
 	if( IsRUNCODEEnable(defCodeIndex_PrintRecv_val_RF) )
 	{
-		signal.Print( "recv Decode_Rxb8Data_original" );
+		//signal.Print( "recv Decode_Rxb8Data_original" );
 	}
 
 	OnDeviceData_RFSignal( phbGuard, CommLink, signal );
@@ -2416,7 +2413,7 @@ void DeviceConnection::Decode_MOD_IR_RX_original( CHeartbeatGuard *phbGuard, CCo
 	{
 		if( IsRUNCODEEnable(defCodeIndex_PrintRecv_IR_original) )
 		{
-			LOGMSGEX( defLOGNAME, defLOG_WORN, "__TEST__: Disable_Recv_IR_original! recv Decode_MOD_IR_RX_original" );
+			//LOGMSGEX( defLOGNAME, defLOG_WORN, "__TEST__: Disable_Recv_IR_original! recv Decode_MOD_IR_RX_original" );
 		}
 
 		return;
@@ -2428,7 +2425,7 @@ void DeviceConnection::Decode_MOD_IR_RX_original( CHeartbeatGuard *phbGuard, CCo
 	// 至少字节数
 	if( srcbufsize < 2 )
 	{
-		LOGMSGEX( defLOGNAME, defLOG_ERROR, "DeviceConnection::Decode_MOD_IR_RX_original size=%d err!\r\n", srcbufsize );
+		//LOGMSGEX( defLOGNAME, defLOG_ERROR, "DeviceConnection::Decode_MOD_IR_RX_original size=%d err!\r\n", srcbufsize );
 		return;
 	}
 
@@ -2454,14 +2451,14 @@ void DeviceConnection::Decode_MOD_IR_RX_original( CHeartbeatGuard *phbGuard, CCo
 
 	if( !timenum == signal.original_len )
 	{
-		LOGMSGEX( defLOGNAME, defLOG_ERROR, "Decode_MOD_IR_RX_original recv err, recv timenum=%d, analyse original_len=%d\r\n", timenum, signal.original_len );
+		//LOGMSGEX( defLOGNAME, defLOG_ERROR, "Decode_MOD_IR_RX_original recv err, recv timenum=%d, analyse original_len=%d\r\n", timenum, signal.original_len );
 	}
 
 	memcpy( &signal.original, buf, sizeof(uint16_t)*signal.original_len );
 
 	if( IsRUNCODEEnable(defCodeIndex_PrintRecv_val_IR) )
 	{
-		signal.Print( "recv Decode_MOD_IR_RX_original" );
+		//signal.Print( "recv Decode_MOD_IR_RX_original" );
 	}
 
 	OnDeviceData_RFSignal( phbGuard, CommLink, signal );
@@ -2478,7 +2475,7 @@ void DeviceConnection::Decode_MOD_IR_RX_code( CHeartbeatGuard *phbGuard, CCommLi
 	{
 		if( IsRUNCODEEnable(defCodeIndex_PrintRecv_IR_code) )
 		{
-			LOGMSGEX( defLOGNAME, defLOG_WORN, "__TEST__: Disable_Recv_IR_code! recv Decode_MOD_IR_RX_code" );
+			//LOGMSGEX( defLOGNAME, defLOG_WORN, "__TEST__: Disable_Recv_IR_code! recv Decode_MOD_IR_RX_code" );
 		}
 
 		return;
@@ -2490,7 +2487,7 @@ void DeviceConnection::Decode_MOD_IR_RX_code( CHeartbeatGuard *phbGuard, CCommLi
 	// 至少字节数
 	if( srcbufsize < 2 )
 	{
-		LOGMSGEX( defLOGNAME, defLOG_ERROR, "DeviceConnection::Decode_MOD_IR_RX_code size=%d err!\r\n", srcbufsize );
+		//LOGMSGEX( defLOGNAME, defLOG_ERROR, "DeviceConnection::Decode_MOD_IR_RX_code size=%d err!\r\n", srcbufsize );
 		return;
 	}
 
@@ -2509,7 +2506,8 @@ void DeviceConnection::Decode_MOD_IR_RX_code( CHeartbeatGuard *phbGuard, CCommLi
 
 	if( IsRUNCODEEnable(defCodeIndex_PrintRecv_val_IR) )
 	{
-		signal.Print( "recv Decode_MOD_IR_RX_code" );
+		//jyc20160824
+		//signal.Print( "recv Decode_MOD_IR_RX_code" );
 	}
 
 	OnDeviceData_RFSignal( phbGuard, CommLink, signal );
@@ -2612,7 +2610,7 @@ void DeviceConnection::Decode_MOD_SYS_get( CHeartbeatGuard *phbGuard, CCommLinkR
 
 	macHeartbeatGuard_step(150990);
 }
-*/
+
 
 // 修改设备地址
 bool DeviceConnection::ModifyDevID( GSIOTDevice *iotdevice, uint8_t newID, const std::string &ver, uint8_t SpecAddr )
@@ -2658,13 +2656,13 @@ bool DeviceConnection::ModifyDevID( GSIOTDevice *iotdevice, uint8_t newID, const
 // 修改RS485模块下子设备的设备地址
 bool DeviceConnection::ModifyDevID_RS485( const defLinkID in_LinkID, IOTDeviceType Type, uint8_t oldID, uint8_t newID, const std::string &ver, uint8_t SpecAddr )
 {
-	/*RS485DevControl *ModifyDevIDCtl = RS485DevControl::CreateRS485DevControl_ModifyDevAddr( Type, oldID, newID, ver );
+	RS485DevControl *ModifyDevIDCtl = RS485DevControl::CreateRS485DevControl_ModifyDevAddr( Type, oldID, newID, ver );
 	
 	if( !ModifyDevIDCtl )
 		return false;
 	
 	GSIOTDevice *device = new GSIOTDevice( 0, c_NullStr, IOT_DEVICE_RS485, c_NullStr, c_NullStr, c_NullStr, ModifyDevIDCtl );
-	//std::auto_ptr<GSIOTDevice> autop(device);
+	std::auto_ptr<GSIOTDevice> autop(device);
 
 	ModifyDevIDCtl->SetLinkID( in_LinkID );
 
@@ -2674,7 +2672,6 @@ bool DeviceConnection::ModifyDevID_RS485( const defLinkID in_LinkID, IOTDeviceTy
 	}
 
 	return this->SendControl( IOT_DEVICE_RS485, device, ModifyDevIDCtl->GetFristAddress() )>0;
-	*/
 }
 
 void DeviceConnection::OnThreadExit()
@@ -2702,7 +2699,8 @@ bool DeviceConnection::OnTest_Trigger( const int devid )
 					TriggerControl *tc = (TriggerControl*)(*it)->getControl();
 					if(tc)
 					{
-						//OnDeviceData_RFSignal( NULL, NULL, tc->GetSignal() );
+						//jyc20160824
+						OnDeviceData_RFSignal( NULL, NULL, tc->GetSignal() );
 						return true;
 					}
 				}

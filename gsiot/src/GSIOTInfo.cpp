@@ -102,8 +102,7 @@ Tag* GSIOTInfo::tag() const
 			c->addAttribute("name",ASCIIToUTF8((*it)->getName()));
 			c->addAttribute("type",(*it)->getType());
 			if( (*it)->getType()!=(*it)->getExType() && IOT_DEVICE_Unknown!=(*it)->getExType() ){ c->addAttribute( "extype", (*it)->getExType() ); }
-			//c->addAttribute("serialno",(*it)->getSerialno());
-			//c->addAttribute("factoryno",(*it)->getFactoryno());
+
 			if( !(*it)->getVer().empty() && (*it)->getVer()!="1.0" ) c->addAttribute("ver",(*it)->getVer());
 			c->addAttribute("readtype",(*it)->getReadType());
 			

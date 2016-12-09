@@ -446,7 +446,7 @@ defGSReturn GSIOTUserMgr::Delete_User( const std::string &jid, const bool Failed
 		this->OnNotify( defNotify_Delete, it->second );
 
 		delete (it->second);
-		//m_mapUser.erase(it);
+		//m_mapUser.erase(it);  //jyc20160922 trouble
 		return defGSReturn_Success;
 	}
 

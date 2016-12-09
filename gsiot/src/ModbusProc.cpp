@@ -48,7 +48,7 @@ bool ModbusProc::Decode_dev_cmd( uint8_t* const originalBuf, const uint16_t bufl
 
 	if( buflen < 4 )
 	{
-		LOGMSGEX( defLOGNAME, defLOG_ERROR, "ModbusProc::Decode_dev_cmd buflen error!!!\r\n");
+		//LOGMSGEX( defLOGNAME, defLOG_ERROR, "ModbusProc::Decode_dev_cmd buflen error!!!\r\n");
 		return false;
 	}
 
@@ -58,7 +58,7 @@ bool ModbusProc::Decode_dev_cmd( uint8_t* const originalBuf, const uint16_t bufl
 
 	if( crcFromDecode != crcFromCal )
 	{
-		LOGMSGEX( defLOGNAME, defLOG_ERROR, "ModbusProc::Decode_dev_cmd crc error!!! crcFromDecode=%d, crcFromCal=%d\r\n", crcFromDecode, crcFromCal );
+		//LOGMSGEX( defLOGNAME, defLOG_ERROR, "ModbusProc::Decode_dev_cmd crc error!!! crcFromDecode=%d, crcFromCal=%d\r\n", crcFromDecode, crcFromCal );
 		return false;
 	}
 
@@ -101,13 +101,13 @@ bool ModbusProc::Decode_Response_addressData( uint8_t* const originalBuf, const 
 
 	if( ptemp > ptempEnd )
 	{
-		LOGMSGEX( defLOGNAME, defLOG_ERROR, "ModbusProc::Decode_Response_addressData(%s) ptempEnd error!!!\r\n", loginfo?loginfo:"" );
+		//LOGMSGEX( defLOGNAME, defLOG_ERROR, "ModbusProc::Decode_Response_addressData(%s) ptempEnd error!!!\r\n", loginfo?loginfo:"" );
 		return false;
 	}
 
 	if( AddressCount > (ptempEnd-ptemp) )
 	{
-		LOGMSGEX( defLOGNAME, defLOG_ERROR, "ModbusProc::Decode_Response_addressData(%s) address count error!!! decoded count=%d\r\n", loginfo?loginfo:"", AddressCount );
+		//LOGMSGEX( defLOGNAME, defLOG_ERROR, "ModbusProc::Decode_Response_addressData(%s) address count error!!! decoded count=%d\r\n", loginfo?loginfo:"", AddressCount );
 		return false;
 	}
 
@@ -138,7 +138,7 @@ bool ModbusProc::Decode_address_value( uint8_t* const originalBuf, const uint16_
 
 	if( buflen < 4 )
 	{
-		LOGMSGEX( defLOGNAME, defLOG_ERROR, "ModbusProc::Decode_address_value(%s) buflen error!!!\r\n", loginfo?loginfo:"" );
+		//LOGMSGEX( defLOGNAME, defLOG_ERROR, "ModbusProc::Decode_address_value(%s) buflen error!!!\r\n", loginfo?loginfo:"" );
 		return false;
 	}
 
@@ -161,7 +161,7 @@ bool ModbusProc::Encode_data_2short( uint8_t* destBuf, uint16_t &buflen, const u
 {
 	if( buflen < 8 )
 	{
-		LOGMSGEX( defLOGNAME, defLOG_ERROR, "ModbusProc::Encode_data_2short(%s) buflen=%d error!!! devid=%d, cmd=%d\r\n", loginfo?loginfo:"", buflen, devid, cmd );
+		//LOGMSGEX( defLOGNAME, defLOG_ERROR, "ModbusProc::Encode_data_2short(%s) buflen=%d error!!! devid=%d, cmd=%d\r\n", loginfo?loginfo:"", buflen, devid, cmd );
 		return false;
 	}
 
@@ -193,7 +193,7 @@ bool ModbusProc::Encode_data_1Byte( uint8_t* destBuf, uint16_t &buflen, const ui
 {
 	if( buflen < 6 )
 	{
-		LOGMSGEX( defLOGNAME, defLOG_ERROR, "ModbusProc::Encode_data_1Byte(%s) buflen=%d error!!! devid=%d, cmd=%d\r\n", loginfo?loginfo:"", buflen, devid, cmd );
+		//LOGMSGEX( defLOGNAME, defLOG_ERROR, "ModbusProc::Encode_data_1Byte(%s) buflen=%d error!!! devid=%d, cmd=%d\r\n", loginfo?loginfo:"", buflen, devid, cmd );
 		return false;
 	}
 

@@ -45,7 +45,7 @@ std::string CommLinkCfg_heartbeat_param::getstrfmt( const defCommLinkHeartbeatTy
 
 	if( defCommLinkHeartbeatType_SpecRdAddr == heartbeat_type )
 	{
-		sprintf_s( buf, sizeof(buf), "SPECADDR,%d,%d,%d", this->hb_deviceType, this->hb_deviceId, this->hb_address );
+		snprintf( buf, sizeof(buf), "SPECADDR,%d,%d,%d", this->hb_deviceType, this->hb_deviceId, this->hb_address );
 	}
 	
 	return std::string(buf);
@@ -205,7 +205,7 @@ std::string CommLinkCfg::getstr_cfgdesc( const CommLinkCfg *cfg )
 		{
 		case defCommLinkType_TCP:
 			{
-				sprintf_s( buf, sizeof(buf), "%s:%d", CCommLinkRun_TCP::getparam_ip( cfg ).c_str(), CCommLinkRun_TCP::getparam_port(cfg) );
+				snprintf( buf, sizeof(buf), "%s:%d", CCommLinkRun_TCP::getparam_ip( cfg ).c_str(), CCommLinkRun_TCP::getparam_port(cfg) );
 
 				return std::string(buf);
 			}

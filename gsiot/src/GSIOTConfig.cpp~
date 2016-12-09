@@ -54,16 +54,38 @@ bool GSIOTConfig::PreInit( const std::string &RunParam )
 
 	SQLite::Statement query(*this->db,"SELECT * FROM config ORDER BY id DESC LIMIT 1");
 	if (query.executeStep()){
+
 		//this->m_serialnumber = query.getColumn(1);
 		//this->m_jid = query.getColumn(2);
 		//this->m_password = query.getColumn(3);
+		string tmp1 = query.getColumn(1); //jyc20160823 add string tmpx
+		this->m_serialnumber = tmp1;
+		string tmp2 = query.getColumn(2);
+		this->m_jid = tmp2;
+		string tmp3 = query.getColumn(3);
+		this->m_password = tmp3;
 		this->m_serialport = query.getColumn(4);
 		//this->m_smtpserver = query.getColumn(5);
 		//this->m_smtpuser = query.getColumn(6);
 		//this->m_smtppassword = query.getColumn(7);
 		//this->m_noticejid = query.getColumn(8);
-		//if( !query.isColumnNull(9) ) { this->m_phone = query.getColumn(9); }
-		if( !query.isColumnNull(10) ) { this->m_DoInterval_ForSMS = (uint32_t)query.getColumn(10).getInt(); }
+		string tmp5 = query.getColumn(5);
+		this->m_smtpserver = tmp5;
+		string tmp6 = query.getColumn(6);
+		this->m_smtpuser = tmp6;
+		string tmp7 = query.getColumn(7);
+		this->m_smtppassword = tmp7;
+		string tmp8 = query.getColumn(8);
+		this->m_noticejid = tmp8;
+		
+		if( !query.isColumnNull(9) ) { 
+			string tmp9 = query.getColumn(9);
+			this->m_phone = tmp9;
+			//this->m_phone = query.getColumn(9); 
+		}
+		if( !query.isColumnNull(10) ) { 
+			this->m_DoInterval_ForSMS = (uint32_t)query.getColumn(10).getInt(); 
+		}
 	}
 
 	m_UserMgr.Init(db);
@@ -249,11 +271,13 @@ bool GSIOTConfig::ClearAllRelation_SpecType( IOTDeviceType device_type )
 {
 	if( !m_mapRelation.empty() )
 	{
-		for( defmapRelation::const_iterator it = m_mapRelation.begin(); it != m_mapRelation.end(); )
+		for( defmapRelation::iterator //const_iterator 
+		    it = m_mapRelation.begin(); it != m_mapRelation.end(); )
 		{
 			if( it->first.device_type == device_type )
 			{
-				//20160604 m_mapRelation.erase(it); 
+				//20160604 
+				m_mapRelation.erase(it); 
 				it = m_mapRelation.begin();
 				continue;
 			}
@@ -512,8 +536,13 @@ bool GSIOTConfig::LoadDB_vobj_config()
 		cfg.enable = query.getColumn(col++).getInt();
 		cfg.vobj_type = (IOTDeviceType)query.getColumn(col++).getInt();
 		cfg.vobj_flag = query.getColumn(col++).getInt();
+
 		//cfg.name = query.getColumn(col++);
 		//cfg.ver = query.getColumn(col++);
+		string strtmp1 = query.getColumn(col++); //jyc20160823
+		cfg.name = strtmp1;
+		string strtmp2 = query.getColumn(col++);
+		cfg.ver = strtmp2;
 
 		cfg.param[0] = query.getColumn(col++).getInt();
 		cfg.param[1] = query.getColumn(col++).getInt();
@@ -524,6 +553,10 @@ bool GSIOTConfig::LoadDB_vobj_config()
 
 		//cfg.param_str[0] = query.getColumn(col++);
 		//cfg.param_str[1] = query.getColumn(col++);
+		string strtmp3 = query.getColumn(col++);
+		cfg.param_str[0] = strtmp3;
+		string strtmp4 = query.getColumn(col++);
+		cfg.param_str[1] = strtmp4;
 
 		if( IOT_DEVICE_Unknown==cfg.vobj_type )
 		{

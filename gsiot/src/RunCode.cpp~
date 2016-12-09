@@ -855,8 +855,10 @@ void CRunCodeMgr::LoadDB_code()
 		int val2 = query.getColumn(col++).getInt();
 		int val3 = query.getColumn(col++).getInt();
 		int val4 = query.getColumn(col++).getInt();
-		std::string str_val = query.getColumn(col++);
 
+		//jyc20160825 can not run have trouble
+		//std::string str_val = query.getColumn(col++);
+		
 		s_RunCode[RUNCODE_Index(code, codestr.c_str())].str_val = str_val;
 		RUNCODE_Set( RUNCODE_Index(code, codestr.c_str()), val1, val2, val3, val4, true, true, true, true );
 	}
@@ -871,7 +873,7 @@ bool CRunCodeMgr::SaveDB_code( defCodeIndex_ index, bool save_str_val )
 	}
 
 	char sqlbuf[1024] = {0};
-	sprintf_s( sqlbuf, sizeof(sqlbuf), "SELECT id FROM [code] WHERE code=%d OR codestr='%s' LIMIT 1", s_RunCode[index].code, s_RunCode[index].codestr );
+	snprintf( sqlbuf, sizeof(sqlbuf), "SELECT id FROM [code] WHERE code=%d OR codestr='%s' LIMIT 1", s_RunCode[index].code, s_RunCode[index].codestr );
 
 	SQLite::Statement queryid( *this->db, sqlbuf );
 

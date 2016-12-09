@@ -2671,10 +2671,11 @@ bool CDataStoreMgr::insertdata_CheckSaveInvalid( const GSIOTAddrObjKey &AddrObjK
 		if( !m_mapCheckInvalid.empty() )
 		{
 			// 移除之前无效记录
-			std::map<GSIOTAddrObjKey,int>::const_iterator it = m_mapCheckInvalid.find( AddrObjKey );
+			//std::map<GSIOTAddrObjKey,int>::const_iterator it = m_mapCheckInvalid.find( AddrObjKey );
+			std::map<GSIOTAddrObjKey,int>::iterator it = m_mapCheckInvalid.find( AddrObjKey );
 			if( it != m_mapCheckInvalid.end() )
 			{
-				//m_mapCheckInvalid.erase( it );
+				m_mapCheckInvalid.erase( it );
 			}
 		}
 

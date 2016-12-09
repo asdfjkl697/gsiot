@@ -7,7 +7,7 @@
 #include "DeviceAddress.h"
 #include "ControlBase.h"
 #include "common.h"
-//#include "HeartbeatMon.h" //20160526
+#include "HeartbeatMon.h"
 
 class SerialMessage
 {
@@ -32,7 +32,7 @@ public:
 
 	void doMessage( defLinkID LinkID, uint8_t *data, uint32_t size, const IOTDeviceType DevType, const uint32_t DevID, ControlBase *ctl, DeviceAddress *address, uint32_t overtime, uint32_t QueueOverTime, uint32_t nextInterval=1 );	
 	void Check();
-	//void onTimer( CHeartbeatGuard *phbGuard, CCommLinkRun *CommLink ); //20160527
+	void onTimer( CHeartbeatGuard *phbGuard, CCommLinkRun *CommLink );
 };
 
 #endif

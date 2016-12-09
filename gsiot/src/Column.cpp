@@ -35,7 +35,9 @@ Column::~Column(void) throw() // nothrow
 // Return the name of the column
 const char * Column::getName(void) const throw() // nothrow
 {
-    //20160604 return sqlite3_column_origin_name(mStmtPtr, mIndex);
+    //jyc20160604 
+	//return sqlite3_column_origin_name(mStmtPtr, mIndex);
+	//sqlite3_column_origin_name(mStmtPtr, mIndex);
 }
 #endif
 

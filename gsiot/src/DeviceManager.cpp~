@@ -24,7 +24,7 @@ DeviceManager::DeviceManager(void)
 		uint32_t pass_code =  rf_m_query.getColumn(6).getInt();
 		uint32_t addr_count =  rf_m_query.getColumn(7).getInt();
 		uint8_t addr_type =  rf_m_query.getColumn(8).getInt();
-		/*
+		/**/
 		RFDevice *dev = new RFDevice(pro_id,pass_code,serialno,name,addr_count,addr_type);
 
 		std::string sql = "select * from address where mudule_type="+util::int2string(CC1101_433)+" and module_id="+util::int2string(id);
@@ -33,20 +33,20 @@ DeviceManager::DeviceManager(void)
 			uint32_t addr_data = addr_query.getColumn(3).getInt();
 			DeviceAddress *addr=new DeviceAddress(addr_data);
 			int col = 4;
-			//if( !addr_query.isColumnNull(col) ) { addr->SetName((std::string)addr_query.getColumn(col)); } col++;
+			if( !addr_query.isColumnNull(col) ) { addr->SetName(addr_query.getColumn(col)); } col++;
 			addr->SetDeviceType((IOTDeviceType)addr_query.getColumn(col++).getInt());
 			addr->SetReadType((IOTDeviceReadType)addr_query.getColumn(col++).getInt());
 			addr->SetDataType((DataType)addr_query.getColumn(col++).getInt());
-			//addr->SetDefualtValue((std::string)addr_query.getColumn(col++));
-			//addr->SetMinValue((std::string)addr_query.getColumn(col++));
-			//addr->SetMaxValue((std::string)addr_query.getColumn(col++));
+			addr->SetDefualtValue(addr_query.getColumn(col++));
+			addr->SetMinValue(addr_query.getColumn(col++));
+			addr->SetMaxValue(addr_query.getColumn(col++));
 			addr->set_save_col_val_enable((uint32_t)addr_query.getColumn(col++).getInt());
 			dev->AddAddress(addr);
 		}
 		RFDeviceControl *rfControl = new RFDeviceControl(dev);
 		GSIOTDevice *iotdev = new GSIOTDevice(id,name,IOT_DEVICE_RFDevice,ver,serialno,factoryno,rfControl);
 		m_devices.push_back(iotdev);
-		*/
+		//*/
 	}
 	SQLite::Statement can_query(*this->db,"select * from devices_canbus order by id desc");
 	while(can_query.executeStep()){
@@ -68,13 +68,13 @@ DeviceManager::DeviceManager(void)
 			uint32_t addr_data = addr_query.getColumn(3).getInt();
 			DeviceAddress *addr=new DeviceAddress(addr_data);
 			int col = 4;
-			//if( !addr_query.isColumnNull(col) ) { addr->SetName((std::string)addr_query.getColumn(col)); } col++;
+			if( !addr_query.isColumnNull(col) ) { addr->SetName(addr_query.getColumn(col)); } col++;
 			addr->SetDeviceType((IOTDeviceType)addr_query.getColumn(col++).getInt());
 			addr->SetReadType((IOTDeviceReadType)addr_query.getColumn(col++).getInt());
 			addr->SetDataType((DataType)addr_query.getColumn(col++).getInt());
-			//addr->SetDefualtValue((std::string)addr_query.getColumn(col++));
-			//addr->SetMinValue((std::string)addr_query.getColumn(col++));
-			//addr->SetMaxValue((std::string)addr_query.getColumn(col++));
+			addr->SetDefualtValue(addr_query.getColumn(col++));
+			addr->SetMinValue(addr_query.getColumn(col++));
+			addr->SetMaxValue(addr_query.getColumn(col++));
 			addr->set_save_col_val_enable((uint32_t)addr_query.getColumn(col++).getInt());
 			ctl->AddAddress(addr);
 		}
@@ -229,6 +229,7 @@ bool DeviceManager::DeleteDevice( GSIOTDevice *iotdevice )
 	{
 	case IOT_DEVICE_RS485:
 		//strcpy_s( chTable, sizeof(chTable),"devices_rs485" );
+		memcpy( chTable, "devices_rs485", sizeof(chTable)); //jyc20160921
 		break;
 
 	case IOT_DEVICE_Trigger:
@@ -240,6 +241,7 @@ bool DeviceManager::DeleteDevice( GSIOTDevice *iotdevice )
 			}
 
 			//strcpy_s( chTable, sizeof(chTable),"devices_rf_trigger" );
+			memcpy( chTable,"devices_rf_trigger", sizeof(chTable) );
 		}
 		break;
 
@@ -248,6 +250,7 @@ bool DeviceManager::DeleteDevice( GSIOTDevice *iotdevice )
 			DB_Delete_remote_button( iotdevice );
 
 			//strcpy_s( chTable, sizeof(chTable),"devices_rf_remote" );
+			memcpy( chTable,"devices_rf_remote", sizeof(chTable) );
 		}
 		break;
 
@@ -848,7 +851,7 @@ bool DeviceManager::LoadDB_rfsignal()
 		signal.original_headflag = query.getColumn(col++).getInt();
 		signal.original_headtime = query.getColumn(col++).getInt();
 		std::string stroriginal = query.getColumn(col++);
-		//signal.Set_original( stroriginal );
+		signal.Set_original( stroriginal ); //jyc20160921 un note
 
 		m_mapRFSignal[signal.id] = signal;
 	}
@@ -870,7 +873,7 @@ bool DeviceManager::LoadDB_RS485()
 		uint32_t device_id = query.getColumn(5).getInt();
 		uint32_t protocol =  query.getColumn(6).getInt();
 		uint32_t enable =  query.getColumn(7).getInt();
-		/*
+		
 		RS485DevControl *ctl = new RS485DevControl( device_id, 0, protocol, ver );
 
 		std::string sql = "select * from address where mudule_type="+util::int2string(Module_RS485)+" and module_id="+util::int2string(id)+" order by addr";
@@ -879,20 +882,19 @@ bool DeviceManager::LoadDB_RS485()
 			uint32_t addr_data = addr_query.getColumn(3).getInt();
 			DeviceAddress *addr=new DeviceAddress(addr_data);
 			int col = 4;
-			//if( !addr_query.isColumnNull(col) ) { addr->SetName((std::string)addr_query.getColumn(col)); } col++;
+			if( !addr_query.isColumnNull(col) ) { addr->SetName(addr_query.getColumn(col)); } col++;
 			addr->SetDeviceType((IOTDeviceType)addr_query.getColumn(col++).getInt());
 			addr->SetReadType((IOTDeviceReadType)addr_query.getColumn(col++).getInt());
 			addr->SetDataType((DataType)addr_query.getColumn(col++).getInt());
-			//addr->SetDefualtValue((std::string)addr_query.getColumn(col++));
-			//addr->SetMinValue((std::string)addr_query.getColumn(col++));
-			//addr->SetMaxValue((std::string)addr_query.getColumn(col++));
+			addr->SetDefualtValue(addr_query.getColumn(col++));
+			addr->SetMinValue(addr_query.getColumn(col++));
+			addr->SetMaxValue(addr_query.getColumn(col++));
 			addr->set_save_col_val_enable((uint32_t)addr_query.getColumn(col++).getInt());
 			ctl->AddAddress(addr);
 		}
 		GSIOTDevice *iotdev = new GSIOTDevice(id,name,IOT_DEVICE_RS485,ver,serialno,factoryno,ctl);
 		iotdev->SetEnable( enable );
 		m_devices.push_back(iotdev);
-		*/
 	}
 
 	return true;
@@ -945,7 +947,7 @@ bool DeviceManager::LoadDB_rf_remote()
 		std::string serialno = query.getColumn(col++);
 		std::string factoryno = query.getColumn(col++);
 		int enable = query.getColumn(col++).getInt();
-		/*
+		
 		const IOTDeviceType ExType = RFRemoteControl::Save_TransFromExType( serialno );
 		RFRemoteControl *ctl = NULL;
 
@@ -977,7 +979,7 @@ bool DeviceManager::LoadDB_rf_remote()
 		GSIOTDevice *iotdev = new GSIOTDevice(id,name,IOT_DEVICE_Remote,ver,serialno,factoryno,ctl);
 		iotdev->SetEnable( enable );
 		m_devices.push_back(iotdev);
-		*/
+		
 	}
 
 	return true;
@@ -1001,8 +1003,13 @@ bool DeviceManager::LoadDB_remote_button( const IOTDeviceType device_type, const
 		int id = query.getColumn(col++);
 		int read_device_type = query.getColumn(col++);
 		int read_device_id = query.getColumn(col++);
-		std::string name;
-		//if( !query.isColumnNull(col) ) { name = (std::string)query.getColumn(col); } col++;
+		std::string name ;
+		if( !query.isColumnNull(col) ) { 
+			string tmpname = query.getColumn(col); 
+			name = tmpname ;//(std::string)query.getColumn(col);  //jyc20160921
+		} 
+		col++;
+		
 		const int enable_col_save = query.getColumn(col++).getInt();
 		int rfsignal_id = query.getColumn(col++).getInt();
 
@@ -1139,7 +1146,7 @@ int DeviceManager::SaveToDB_rfsignal( const RFSignal &signal )
 
 	query.bind(col++, (int)signal.original_headflag);
 	query.bind(col++, (int)signal.original_headtime);
-	query.bind(col++, signal.Get_original() );
+	//query.bind(col++, signal.Get_original() );
 
 	query.exec();
 	return db->execAndGet("SELECT id FROM rfsignal ORDER BY id DESC LIMIT 1");

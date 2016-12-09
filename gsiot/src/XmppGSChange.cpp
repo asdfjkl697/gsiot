@@ -1,6 +1,6 @@
 #include "XmppGSChange.h"
 #include "GSIOTClient.h"
-#include "util.h"
+#include "gloox/util.h"
 #include "common.h"
 
 XmppGSChange::XmppGSChange( const struTagParam &TagParam, uint32_t change_count, uint32_t change_ts )
@@ -46,7 +46,7 @@ Tag* XmppGSChange::tag() const
 
 	Tag *tglobal = new Tag(tmgr, "global");
 
-	sprintf_s( buf, sizeof(buf), "%08X%08X", m_change_count, m_change_ts );
+	snprintf( buf, sizeof(buf), "%08X%08X", m_change_count, m_change_ts );
 	tglobal->addAttribute( "cfg", std::string(buf) );
 
 	return i;

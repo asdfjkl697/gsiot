@@ -1,5 +1,5 @@
 #include "RFDeviceControl.h"
-#include "util.h"
+#include "gloox/util.h"
 
 
 RFDeviceControl::RFDeviceControl(RFDevice* device)
