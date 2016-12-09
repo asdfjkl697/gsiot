@@ -124,7 +124,7 @@ int main(void)
 	char testbuffer[20] = {"good job!"};
 	//fwrite(testbuffer,1,sizeof(outBuffer),fptxt);
 	fwrite(outBuffer,1, sizeof(outBuffer), fptxt);
-	printf("change ok! \n");
+	printf("change ok! \n"); //jyc20161209 test roll back
 	printf("%s\n",testbuffer);
 	fclose(fptxt);
 	fclose(fp);
