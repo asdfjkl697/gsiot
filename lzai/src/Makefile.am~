@@ -18,10 +18,14 @@ AM_CFLAGS =\
 bin_PROGRAMS = lzai
 
 lzai_SOURCES = \
-	main.cc
+	main.cc \
+	lzal.cpp \
+	lzsql.cpp \
+	Makefile.am
 
 lzai_LDFLAGS = 
 
-lzai_LDADD =$(libcurl_LIBS)
+gsiot_LDADD = \
+	-lsqlite3
 
 

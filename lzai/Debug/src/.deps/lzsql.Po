@@ -1,5 +1,5 @@
-main.o: /home/chen/projects/lzai/src/main.cc /usr/include/stdc-predef.h \
- /usr/include/c++/4.8/iostream \
+lzsql.o: /home/chen/projects/lzai/src/lzsql.cpp \
+ /usr/include/stdc-predef.h /usr/include/c++/4.8/iostream \
  /usr/include/i386-linux-gnu/c++/4.8/bits/c++config.h \
  /usr/include/i386-linux-gnu/c++/4.8/bits/os_defines.h \
  /usr/include/features.h /usr/include/i386-linux-gnu/sys/cdefs.h \
@@ -80,33 +80,11 @@ main.o: /home/chen/projects/lzai/src/main.cc /usr/include/stdc-predef.h \
  /usr/include/i386-linux-gnu/bits/select.h \
  /usr/include/i386-linux-gnu/bits/sigset.h \
  /usr/include/i386-linux-gnu/sys/sysmacros.h /usr/include/alloca.h \
- /usr/include/i386-linux-gnu/bits/stdlib-float.h \
- /usr/local/include/curl/curl.h /usr/local/include/curl/curlver.h \
- /usr/local/include/curl/curlbuild.h \
- /usr/lib/gcc/i686-linux-gnu/4.8/include/stdint.h /usr/include/stdint.h \
- /usr/include/inttypes.h /usr/include/i386-linux-gnu/sys/socket.h \
- /usr/include/i386-linux-gnu/sys/uio.h \
- /usr/include/i386-linux-gnu/bits/uio.h \
- /usr/include/i386-linux-gnu/bits/socket.h \
- /usr/include/i386-linux-gnu/bits/socket_type.h \
- /usr/include/i386-linux-gnu/bits/sockaddr.h \
- /usr/include/i386-linux-gnu/asm/socket.h \
- /usr/include/asm-generic/socket.h \
- /usr/include/i386-linux-gnu/asm/sockios.h \
- /usr/include/asm-generic/sockios.h /usr/local/include/curl/curlrules.h \
- /usr/include/libio.h /usr/include/_G_config.h \
- /usr/include/i386-linux-gnu/bits/stdio_lim.h \
- /usr/include/i386-linux-gnu/bits/sys_errlist.h \
- /usr/lib/gcc/i686-linux-gnu/4.8/include-fixed/limits.h \
- /usr/lib/gcc/i686-linux-gnu/4.8/include-fixed/syslimits.h \
- /usr/include/limits.h /usr/include/i386-linux-gnu/bits/posix1_lim.h \
- /usr/include/i386-linux-gnu/bits/local_lim.h /usr/include/linux/limits.h \
- /usr/include/i386-linux-gnu/bits/posix2_lim.h \
- /usr/include/i386-linux-gnu/bits/xopen_lim.h \
- /usr/include/i386-linux-gnu/sys/time.h /usr/local/include/curl/easy.h \
- /usr/local/include/curl/multi.h /usr/local/include/curl/curl.h \
- /usr/include/string.h /usr/local/include/sqlite3.h \
- /home/chen/projects/lzai/src/lzal.h /home/chen/projects/lzai/src/lzsql.h
+ /usr/include/i386-linux-gnu/bits/stdlib-float.h /usr/include/libio.h \
+ /usr/include/_G_config.h /usr/include/i386-linux-gnu/bits/stdio_lim.h \
+ /usr/include/i386-linux-gnu/bits/sys_errlist.h /usr/include/string.h \
+ /usr/local/include/sqlite3.h /home/chen/projects/lzai/src/lzal.h \
+ /home/chen/projects/lzai/src/lzsql.h
 
 /usr/include/stdc-predef.h:
 
@@ -316,40 +294,6 @@ main.o: /home/chen/projects/lzai/src/main.cc /usr/include/stdc-predef.h \
 
 /usr/include/i386-linux-gnu/bits/stdlib-float.h:
 
-/usr/local/include/curl/curl.h:
-
-/usr/local/include/curl/curlver.h:
-
-/usr/local/include/curl/curlbuild.h:
-
-/usr/lib/gcc/i686-linux-gnu/4.8/include/stdint.h:
-
-/usr/include/stdint.h:
-
-/usr/include/inttypes.h:
-
-/usr/include/i386-linux-gnu/sys/socket.h:
-
-/usr/include/i386-linux-gnu/sys/uio.h:
-
-/usr/include/i386-linux-gnu/bits/uio.h:
-
-/usr/include/i386-linux-gnu/bits/socket.h:
-
-/usr/include/i386-linux-gnu/bits/socket_type.h:
-
-/usr/include/i386-linux-gnu/bits/sockaddr.h:
-
-/usr/include/i386-linux-gnu/asm/socket.h:
-
-/usr/include/asm-generic/socket.h:
-
-/usr/include/i386-linux-gnu/asm/sockios.h:
-
-/usr/include/asm-generic/sockios.h:
-
-/usr/local/include/curl/curlrules.h:
-
 /usr/include/libio.h:
 
 /usr/include/_G_config.h:
@@ -357,30 +301,6 @@ main.o: /home/chen/projects/lzai/src/main.cc /usr/include/stdc-predef.h \
 /usr/include/i386-linux-gnu/bits/stdio_lim.h:
 
 /usr/include/i386-linux-gnu/bits/sys_errlist.h:
-
-/usr/lib/gcc/i686-linux-gnu/4.8/include-fixed/limits.h:
-
-/usr/lib/gcc/i686-linux-gnu/4.8/include-fixed/syslimits.h:
-
-/usr/include/limits.h:
-
-/usr/include/i386-linux-gnu/bits/posix1_lim.h:
-
-/usr/include/i386-linux-gnu/bits/local_lim.h:
-
-/usr/include/linux/limits.h:
-
-/usr/include/i386-linux-gnu/bits/posix2_lim.h:
-
-/usr/include/i386-linux-gnu/bits/xopen_lim.h:
-
-/usr/include/i386-linux-gnu/sys/time.h:
-
-/usr/local/include/curl/easy.h:
-
-/usr/local/include/curl/multi.h:
-
-/usr/local/include/curl/curl.h:
 
 /usr/include/string.h:
 
