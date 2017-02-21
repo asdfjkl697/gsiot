@@ -1243,7 +1243,6 @@ int DeviceConnection::RecvData(CCommLinkRun *CommLink, unsigned char *buf,int si
 	else
 	{
 		//recvsize = RS232_PollComport( this->GetPort(), buf, size ); //jyc20160901
-		;
 	}
 	if( IsRUNCODEEnable(defCodeIndex_PrintRecv_MainPort) )
 	{

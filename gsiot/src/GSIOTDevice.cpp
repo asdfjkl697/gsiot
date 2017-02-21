@@ -62,18 +62,11 @@ GSIOTDevice::GSIOTDevice( const Tag* tag)
 		return;
 	}
 
-	t = tag->findChild(defDeviceTypeTag_rfdevice);
-	if(t){
-	    	this->m_control = new RFDeviceControl(t);
-		return;
-	}
-
 	t = tag->findChild(defDeviceTypeTag_candevice);
 	if(t){
 	    	this->m_control = new CANDeviceControl(t);
 		return;
 	}*/
-
 
 	Tag *t = tag->findChild(defDeviceTypeTag_rs485device);
 	//t = tag->findChild(defDeviceTypeTag_rs485device);
@@ -81,6 +74,7 @@ GSIOTDevice::GSIOTDevice( const Tag* tag)
 	    	this->m_control = new RS485DevControl(t);
 		return;
 	}
+
 
 	t = tag->findChild(defDeviceTypeTag_rfdevice);
 	if(t){

@@ -44,8 +44,6 @@ void SerialMessage::doMessage( defLinkID LinkID, uint8_t *data, uint32_t size, c
 		return;
 	}
 
-	//if(m_queue_state){
-		
 		m_queue_mutex.lock();
 
 		if( !m_buffer_queue.empty() )
@@ -56,7 +54,7 @@ void SerialMessage::doMessage( defLinkID LinkID, uint8_t *data, uint32_t size, c
 			{
 				SERIALDATABUFFER *curbuffer = (*it);
 
-				// 完全相同的已存在
+				// same is exist
 				if( curbuffer->IsSame( LinkID, data, size, DevType, DevID, ctl, address, overtime, QueueOverTime, nextInterval ) )
 				{
 					curbuffer->SetNowTime();
@@ -72,7 +70,7 @@ void SerialMessage::doMessage( defLinkID LinkID, uint8_t *data, uint32_t size, c
 
 		SERIALDATABUFFER *buffer = new SERIALDATABUFFER();
 		buffer->LinkID = LinkID;
-		//buffer->data = (uint8_t *)malloc(size);
+
 		buffer->data = new uint8_t[size];
 		buffer->size = size;
 		memcpy(buffer->data,data,size);
@@ -93,10 +91,6 @@ void SerialMessage::doMessage( defLinkID LinkID, uint8_t *data, uint32_t size, c
 		m_buffer_queue.push_back(buffer);
 
 		m_queue_mutex.unlock();
-	//}else{
-	//	m_queue_state = true;
-	//	m_handler->SendData(data,size);
-	//}
 }
 
 void SerialMessage::Check()

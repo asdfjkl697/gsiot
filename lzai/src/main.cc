@@ -42,14 +42,10 @@ int main(void)
 	while(1){
 		
 		getline(cin,s1);
-		//test_sql();
 		lz_sql_insert(s1);
 		//cin.get(s1);
 		//s2= atoi( s1.c_str() );
 		s2=s1;
-		//int num1 = std::atoi(s1.c_str());
-		//printf("%s\n",s1);
-		//cout<<s1;
 		printf("result:");
 		cout<<s2;
 		printf("\ncin:");

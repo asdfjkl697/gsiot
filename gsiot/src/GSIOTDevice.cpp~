@@ -62,12 +62,6 @@ GSIOTDevice::GSIOTDevice( const Tag* tag)
 		return;
 	}
 
-	t = tag->findChild(defDeviceTypeTag_rfdevice);
-	if(t){
-	    	this->m_control = new RFDeviceControl(t);
-		return;
-	}
-
 	t = tag->findChild(defDeviceTypeTag_candevice);
 	if(t){
 	    	this->m_control = new CANDeviceControl(t);
@@ -81,6 +75,7 @@ GSIOTDevice::GSIOTDevice( const Tag* tag)
 	    	this->m_control = new RS485DevControl(t);
 		return;
 	}
+
 
 	t = tag->findChild(defDeviceTypeTag_rfdevice);
 	if(t){
@@ -98,16 +93,13 @@ GSIOTDevice::GSIOTDevice( const Tag* tag)
 	{
 		if(  this->m_type != m_control->GetType() )
 		{
-			//LOGMSGEX( defLOGNAME, defLOG_ERROR, "GSIOTDevice() error, dev_type=%d, ctl_type=%d!\r\n", m_type, m_control->GetType() );
-			printf("GSIOTDevice() error\n");
+			printf( "GSIOTDevice() error, dev_type=%d, ctl_type=%d!\r\n", m_type, m_control->GetType() );
 			delete m_control;
 			m_control = NULL;
 		}
 	}
 	else
 	{
-		//LOGMSGEX( defLOGNAME, defLOG_WORN, "GSIOTDevice() ctl null, dev_type=%d, ctl_type unknown!\r\n", m_type );
-		//printf("GSIOTDevice() ctl null\n");
 		printf( "GSIOTDevice() ctl null, dev_type=%d, ctl_type unknown!\r\n", m_type );
 	}
 

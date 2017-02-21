@@ -215,7 +215,7 @@ void *CommLink_Thread(LPVOID lpPara) //jyc20160826 test
 
 		if( ::timeGetTime()-lastPrintTime > 180000 )
 		{
-			//LOGMSG( "Heartbeat: SerialPortThread(port=%d, br=%d)\r\n", device->m_usecfg_port, device->m_usecfg_baudrate );
+			LOGMSG( "Heartbeat: SerialPortThread(port=%d, br=%d)\r\n", device->m_usecfg_port, device->m_usecfg_baudrate );
 			lastPrintTime = ::timeGetTime();
 		}
 		

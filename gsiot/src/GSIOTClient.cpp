@@ -3170,12 +3170,12 @@ void GSIOTClient::OnDeviceData_ProcOne( defLinkID LinkID, GSIOTDevice *iotdevice
 		}
 		break;
 	}
-	//send to UI
+	//send to UI     
 	if(m_handler){
 	    m_handler->OnDeviceData(LinkID, iotdevice, ctl, addr);
 	}
 
-	while(1)
+	while(1)   //send to network UI  JYC20170220 TRANS
 	{
 		ControlMessage *pCtlMsg = PopControlMesssageQueue( iotdevice, ctl, addr );
 		if( pCtlMsg && addr )
@@ -3190,9 +3190,9 @@ void GSIOTClient::OnDeviceData_ProcOne( defLinkID LinkID, GSIOTDevice *iotdevice
 
 			if( pCtlMsg->GetJid() )
 			{
-			IQ re( IQ::Result, pCtlMsg->GetJid(), pCtlMsg->GetId());
-			re.addExtension(new GSIOTControl(pCtlMsg->GetDevice()->clone(), defUserAuth_RW, false));
-			XmppClientSend(re,"OnDeviceData Send");
+				IQ re( IQ::Result, pCtlMsg->GetJid(), pCtlMsg->GetId());
+				re.addExtension(new GSIOTControl(pCtlMsg->GetDevice()->clone(), defUserAuth_RW, false));
+				XmppClientSend(re,"OnDeviceData Send");
 			}
 
 			delete pCtlMsg;

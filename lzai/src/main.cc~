@@ -42,8 +42,7 @@ int main(void)
 	while(1){
 		
 		getline(cin,s1);
-		//test_sql();
-		lz_sql_insert();
+		lz_sql_insert(s1);
 		//cin.get(s1);
 		//s2= atoi( s1.c_str() );
 		s2=s1;
