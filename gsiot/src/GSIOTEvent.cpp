@@ -1,4 +1,8 @@
 #include "GSIOTEvent.h"
+#include "stdlib.h"
+#include "string.h"
+#include "stdio.h"
+#include <string>
 #include <functional>
 
 
@@ -204,10 +208,9 @@ bool GSIOTEvent::ModifyEvent(ControlEvent *evt, const ControlEvent *evtsrc)
 				&& evt->GetType() == evtsrc->GetType() )
 			{
 				const AutoNoticeEvent *aevtsrc = (AutoNoticeEvent*)evtsrc;
-				//jyc20160823
-				//aevt->SetToJid( aevtsrc->GetToJid() );
-				//aevt->SetSubject( aevtsrc->GetSubject() );
-				//aevt->SetBody( aevtsrc->GetBody() );
+				aevt->SetToJid( aevtsrc->GetToJid() );		
+				aevt->SetSubject( aevtsrc->GetSubject() );
+				aevt->SetBody( aevtsrc->GetBody() );
 			}
 
 			SQLite::Statement query( *this->db, "UPDATE event_notice SET level=?,enable=?,do_interval=?,"\
@@ -507,10 +510,12 @@ bool GSIOTEvent::LoadDB_event_notice()
 		evt->SetEnable(query.getColumn(col++).getInt());
 		evt->SetDoInterval(query.getColumn(col++).getInt());
 
-		//jyc20160823
-		//if( !query.isColumnNull(col) ) { evt->SetToJid((std::string)query.getColumn(col)); } col++;
+		if( !query.isColumnNull(col) ) {
+			//evt->SetToJid((std::string)query.getColumn(col));  //jyc20170223 modify
+			evt->SetToJid(query.getColumn(col));
+		}col++;
 		std::string msg_subject = query.getColumn(col++);
-		std::string msg_body = query.getColumn(col++);
+		std::string msg_body = query.getColumn(col++); 
 
 		evt->SetSubject(msg_subject);
 		evt->SetBody(msg_body);
@@ -538,7 +543,7 @@ bool GSIOTEvent::LoadDB_event_autocontrol()
 		evt->SetControlDeviceType((IOTDeviceType)query.getColumn(col++).getInt());
 		evt->SetControlDeviceId(query.getColumn(col++).getInt());
 		evt->SetAddress(query.getColumn(col++).getInt());
-		//evt->SetValue((std::string)query.getColumn(col++));
+		evt->SetValue(query.getColumn(col++)); //jyc20170223 unnote
 
 		this->m_event.push_back(evt);
 	}

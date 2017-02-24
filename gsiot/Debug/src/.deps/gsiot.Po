@@ -111,55 +111,32 @@ gsiot.o: /home/chen/projects/gsiot/src/gsiot.cc \
  /usr/include/i386-linux-gnu/bits/environments.h \
  /usr/include/i386-linux-gnu/bits/confname.h /usr/include/getopt.h \
  /home/chen/projects/gsiot/src/GSIOTClient.h \
- /usr/local/include/gloox/subscriptionhandler.h \
- /usr/local/include/gloox/subscription.h \
- /usr/local/include/gloox/messagehandler.h \
- /usr/local/include/gloox/message.h \
- /usr/local/include/gloox/delayeddelivery.h \
- /usr/local/include/gloox/util.h /usr/include/c++/4.8/cmath \
- /usr/include/math.h /usr/include/i386-linux-gnu/bits/huge_val.h \
- /usr/include/i386-linux-gnu/bits/huge_valf.h \
- /usr/include/i386-linux-gnu/bits/huge_vall.h \
- /usr/include/i386-linux-gnu/bits/inf.h \
- /usr/include/i386-linux-gnu/bits/nan.h \
- /usr/include/i386-linux-gnu/bits/mathdef.h \
- /usr/include/i386-linux-gnu/bits/mathcalls.h \
- /usr/include/c++/4.8/algorithm /usr/include/c++/4.8/bits/stl_algo.h \
- /usr/include/c++/4.8/cstdlib /usr/include/stdlib.h \
- /usr/include/i386-linux-gnu/bits/waitflags.h \
- /usr/include/i386-linux-gnu/bits/waitstatus.h \
- /usr/include/i386-linux-gnu/sys/types.h \
- /usr/include/i386-linux-gnu/sys/select.h \
- /usr/include/i386-linux-gnu/bits/select.h \
- /usr/include/i386-linux-gnu/bits/sigset.h \
- /usr/include/i386-linux-gnu/sys/sysmacros.h /usr/include/alloca.h \
- /usr/include/i386-linux-gnu/bits/stdlib-float.h \
- /usr/include/c++/4.8/bits/algorithmfwd.h \
- /usr/include/c++/4.8/bits/stl_heap.h \
- /usr/include/c++/4.8/bits/stl_tempbuf.h \
- /usr/include/c++/4.8/bits/stl_construct.h \
- /usr/include/c++/4.8/ext/alloc_traits.h \
- /usr/local/include/gloox/iqhandler.h \
- /home/chen/projects/gsiot/src/GSIOTDevice.h \
+ /home/chen/projects/gsiot/src/GSIOTConfig.h \
+ /home/chen/projects/gsiot/src/common.h \
+ /home/chen/projects/gsiot/src/memmacro.h \
  /home/chen/projects/gsiot/src/typedef.h /usr/include/fcntl.h \
  /usr/include/i386-linux-gnu/bits/fcntl.h \
  /usr/include/i386-linux-gnu/bits/fcntl-linux.h \
  /usr/include/i386-linux-gnu/bits/uio.h \
- /usr/include/i386-linux-gnu/bits/stat.h \
+ /usr/include/i386-linux-gnu/sys/types.h \
+ /usr/include/i386-linux-gnu/sys/select.h \
+ /usr/include/i386-linux-gnu/bits/select.h \
+ /usr/include/i386-linux-gnu/bits/sigset.h \
+ /usr/include/i386-linux-gnu/sys/sysmacros.h \
+ /usr/include/i386-linux-gnu/bits/stat.h /usr/include/stdlib.h \
+ /usr/include/i386-linux-gnu/bits/waitflags.h \
+ /usr/include/i386-linux-gnu/bits/waitstatus.h /usr/include/alloca.h \
+ /usr/include/i386-linux-gnu/bits/stdlib-float.h \
  /usr/lib/gcc/i686-linux-gnu/4.8/include/stdint.h /usr/include/stdint.h \
  /usr/include/c++/4.8/set /usr/include/c++/4.8/bits/stl_set.h \
  /usr/include/c++/4.8/bits/stl_multiset.h /usr/include/c++/4.8/vector \
+ /usr/include/c++/4.8/bits/stl_construct.h \
+ /usr/include/c++/4.8/ext/alloc_traits.h \
  /usr/include/c++/4.8/bits/stl_uninitialized.h \
  /usr/include/c++/4.8/bits/stl_vector.h \
  /usr/include/c++/4.8/bits/stl_bvector.h \
  /usr/include/c++/4.8/bits/vector.tcc \
  /usr/local/include/gloox/stanzaextension.h \
- /home/chen/projects/gsiot/src/ControlBase.h \
- /home/chen/projects/gsiot/src/DeviceAddress.h \
- /usr/local/include/gloox/mutexguard.h \
- /home/chen/projects/gsiot/src/EditAttrMgr.h \
- /home/chen/projects/gsiot/src/common.h \
- /home/chen/projects/gsiot/src/memmacro.h \
  /home/chen/projects/gsiot/src/RunCode.h \
  /home/chen/projects/gsiot/src/SQLiteHelper.h \
  /home/chen/projects/gsiot/src/SQLiteC++.h \
@@ -169,22 +146,26 @@ gsiot.o: /home/chen/projects/gsiot/src/gsiot.cc \
  /home/chen/projects/gsiot/src/Column.h \
  /home/chen/projects/gsiot/src/Statement.h \
  /home/chen/projects/gsiot/src/Transaction.h /usr/include/string.h \
- /home/chen/projects/gsiot/src/GSIOTObjBase.h /usr/include/c++/4.8/bitset \
+ /home/chen/projects/gsiot/src/GSIOTUserMgr.h \
+ /home/chen/projects/gsiot/src/GSIOTUser.h /usr/include/c++/4.8/bitset \
+ /usr/local/include/gloox/mutexguard.h \
+ /home/chen/projects/gsiot/src/GSIOTEvent.h \
+ /home/chen/projects/gsiot/src/AutoControlEvent.h \
+ /home/chen/projects/gsiot/src/GSIOTDevice.h \
+ /home/chen/projects/gsiot/src/ControlBase.h \
+ /home/chen/projects/gsiot/src/DeviceAddress.h \
+ /home/chen/projects/gsiot/src/EditAttrMgr.h \
+ /home/chen/projects/gsiot/src/GSIOTObjBase.h \
  /home/chen/projects/gsiot/src/RemoteButtonClass.h \
  /home/chen/projects/gsiot/src/RFSignalDefine.h \
  /home/chen/projects/gsiot/src/GSObjLocker.h \
- /home/chen/projects/gsiot/src/GSIOTConfig.h \
- /home/chen/projects/gsiot/src/GSIOTUserMgr.h \
- /home/chen/projects/gsiot/src/GSIOTUser.h \
- /home/chen/projects/gsiot/src/GSIOTEvent.h \
- /home/chen/projects/gsiot/src/AutoControlEvent.h \
  /home/chen/projects/gsiot/src/ControlEvent.h \
  /home/chen/projects/gsiot/src/AutoNoticeEvent.h \
  /home/chen/projects/gsiot/src/AutoSendSMSEvent.h \
  /home/chen/projects/gsiot/src/AutoEventthing.h \
  /home/chen/projects/gsiot/src/AutoCallEvent.h \
- /home/chen/projects/gsiot/src/DeviceConnection.h \
  /home/chen/projects/gsiot/src/IDeviceHandler.h \
+ /home/chen/projects/gsiot/src/DeviceConnection.h \
  /home/chen/projects/gsiot/src/IRFReadHandler.h \
  /home/chen/projects/gsiot/src/IRFDeviceHandler.h \
  /home/chen/projects/gsiot/src/RFDevice.h \
@@ -208,13 +189,30 @@ gsiot.o: /home/chen/projects/gsiot/src/gsiot.cc \
  /home/chen/projects/gsiot/src/CommLinkManager.h \
  /home/chen/projects/gsiot/src/IGSMessageHandler.h \
  /usr/local/include/gloox/gloox.h /usr/local/include/gloox/jid.h \
- /home/chen/projects/gsiot/src/ControlMessage.h \
+ /usr/local/include/gloox/message.h \
+ /usr/local/include/gloox/delayeddelivery.h \
+ /usr/local/include/gloox/util.h /usr/include/c++/4.8/cmath \
+ /usr/include/math.h /usr/include/i386-linux-gnu/bits/huge_val.h \
+ /usr/include/i386-linux-gnu/bits/huge_valf.h \
+ /usr/include/i386-linux-gnu/bits/huge_vall.h \
+ /usr/include/i386-linux-gnu/bits/inf.h \
+ /usr/include/i386-linux-gnu/bits/nan.h \
+ /usr/include/i386-linux-gnu/bits/mathdef.h \
+ /usr/include/i386-linux-gnu/bits/mathcalls.h \
+ /usr/include/c++/4.8/algorithm /usr/include/c++/4.8/bits/stl_algo.h \
+ /usr/include/c++/4.8/cstdlib /usr/include/c++/4.8/bits/algorithmfwd.h \
+ /usr/include/c++/4.8/bits/stl_heap.h \
+ /usr/include/c++/4.8/bits/stl_tempbuf.h \
+ /usr/local/include/gloox/iqhandler.h \
+ /usr/local/include/gloox/subscriptionhandler.h \
+ /usr/local/include/gloox/subscription.h \
+ /usr/local/include/gloox/messagehandler.h \
  /home/chen/projects/gsiot/src/TimerManager.h \
- /home/chen/projects/gsiot/src/XmppGSResult.h \
+ /home/chen/projects/gsiot/src/ControlMessage.h \
  /home/chen/projects/gsiot/src/XmppGSAuth.h \
- /home/chen/projects/gsiot/src/XmppGSState.h \
  /home/chen/projects/gsiot/src/XmppGSManager.h \
  /home/chen/projects/gsiot/src/XmppGSEvent.h \
+ /home/chen/projects/gsiot/src/XmppGSState.h \
  /home/chen/projects/gsiot/src/XmppGSRelation.h \
  /home/chen/projects/gsiot/src/XmppGSPreset.h \
  /home/chen/projects/gsiot/src/XmppGSVObj.h \
@@ -519,75 +517,11 @@ gsiot.o: /home/chen/projects/gsiot/src/gsiot.cc \
 
 /home/chen/projects/gsiot/src/GSIOTClient.h:
 
-/usr/local/include/gloox/subscriptionhandler.h:
+/home/chen/projects/gsiot/src/GSIOTConfig.h:
 
-/usr/local/include/gloox/subscription.h:
+/home/chen/projects/gsiot/src/common.h:
 
-/usr/local/include/gloox/messagehandler.h:
-
-/usr/local/include/gloox/message.h:
-
-/usr/local/include/gloox/delayeddelivery.h:
-
-/usr/local/include/gloox/util.h:
-
-/usr/include/c++/4.8/cmath:
-
-/usr/include/math.h:
-
-/usr/include/i386-linux-gnu/bits/huge_val.h:
-
-/usr/include/i386-linux-gnu/bits/huge_valf.h:
-
-/usr/include/i386-linux-gnu/bits/huge_vall.h:
-
-/usr/include/i386-linux-gnu/bits/inf.h:
-
-/usr/include/i386-linux-gnu/bits/nan.h:
-
-/usr/include/i386-linux-gnu/bits/mathdef.h:
-
-/usr/include/i386-linux-gnu/bits/mathcalls.h:
-
-/usr/include/c++/4.8/algorithm:
-
-/usr/include/c++/4.8/bits/stl_algo.h:
-
-/usr/include/c++/4.8/cstdlib:
-
-/usr/include/stdlib.h:
-
-/usr/include/i386-linux-gnu/bits/waitflags.h:
-
-/usr/include/i386-linux-gnu/bits/waitstatus.h:
-
-/usr/include/i386-linux-gnu/sys/types.h:
-
-/usr/include/i386-linux-gnu/sys/select.h:
-
-/usr/include/i386-linux-gnu/bits/select.h:
-
-/usr/include/i386-linux-gnu/bits/sigset.h:
-
-/usr/include/i386-linux-gnu/sys/sysmacros.h:
-
-/usr/include/alloca.h:
-
-/usr/include/i386-linux-gnu/bits/stdlib-float.h:
-
-/usr/include/c++/4.8/bits/algorithmfwd.h:
-
-/usr/include/c++/4.8/bits/stl_heap.h:
-
-/usr/include/c++/4.8/bits/stl_tempbuf.h:
-
-/usr/include/c++/4.8/bits/stl_construct.h:
-
-/usr/include/c++/4.8/ext/alloc_traits.h:
-
-/usr/local/include/gloox/iqhandler.h:
-
-/home/chen/projects/gsiot/src/GSIOTDevice.h:
+/home/chen/projects/gsiot/src/memmacro.h:
 
 /home/chen/projects/gsiot/src/typedef.h:
 
@@ -599,7 +533,27 @@ gsiot.o: /home/chen/projects/gsiot/src/gsiot.cc \
 
 /usr/include/i386-linux-gnu/bits/uio.h:
 
+/usr/include/i386-linux-gnu/sys/types.h:
+
+/usr/include/i386-linux-gnu/sys/select.h:
+
+/usr/include/i386-linux-gnu/bits/select.h:
+
+/usr/include/i386-linux-gnu/bits/sigset.h:
+
+/usr/include/i386-linux-gnu/sys/sysmacros.h:
+
 /usr/include/i386-linux-gnu/bits/stat.h:
+
+/usr/include/stdlib.h:
+
+/usr/include/i386-linux-gnu/bits/waitflags.h:
+
+/usr/include/i386-linux-gnu/bits/waitstatus.h:
+
+/usr/include/alloca.h:
+
+/usr/include/i386-linux-gnu/bits/stdlib-float.h:
 
 /usr/lib/gcc/i686-linux-gnu/4.8/include/stdint.h:
 
@@ -613,6 +567,10 @@ gsiot.o: /home/chen/projects/gsiot/src/gsiot.cc \
 
 /usr/include/c++/4.8/vector:
 
+/usr/include/c++/4.8/bits/stl_construct.h:
+
+/usr/include/c++/4.8/ext/alloc_traits.h:
+
 /usr/include/c++/4.8/bits/stl_uninitialized.h:
 
 /usr/include/c++/4.8/bits/stl_vector.h:
@@ -622,18 +580,6 @@ gsiot.o: /home/chen/projects/gsiot/src/gsiot.cc \
 /usr/include/c++/4.8/bits/vector.tcc:
 
 /usr/local/include/gloox/stanzaextension.h:
-
-/home/chen/projects/gsiot/src/ControlBase.h:
-
-/home/chen/projects/gsiot/src/DeviceAddress.h:
-
-/usr/local/include/gloox/mutexguard.h:
-
-/home/chen/projects/gsiot/src/EditAttrMgr.h:
-
-/home/chen/projects/gsiot/src/common.h:
-
-/home/chen/projects/gsiot/src/memmacro.h:
 
 /home/chen/projects/gsiot/src/RunCode.h:
 
@@ -661,25 +607,33 @@ gsiot.o: /home/chen/projects/gsiot/src/gsiot.cc \
 
 /usr/include/string.h:
 
-/home/chen/projects/gsiot/src/GSIOTObjBase.h:
+/home/chen/projects/gsiot/src/GSIOTUserMgr.h:
+
+/home/chen/projects/gsiot/src/GSIOTUser.h:
 
 /usr/include/c++/4.8/bitset:
+
+/usr/local/include/gloox/mutexguard.h:
+
+/home/chen/projects/gsiot/src/GSIOTEvent.h:
+
+/home/chen/projects/gsiot/src/AutoControlEvent.h:
+
+/home/chen/projects/gsiot/src/GSIOTDevice.h:
+
+/home/chen/projects/gsiot/src/ControlBase.h:
+
+/home/chen/projects/gsiot/src/DeviceAddress.h:
+
+/home/chen/projects/gsiot/src/EditAttrMgr.h:
+
+/home/chen/projects/gsiot/src/GSIOTObjBase.h:
 
 /home/chen/projects/gsiot/src/RemoteButtonClass.h:
 
 /home/chen/projects/gsiot/src/RFSignalDefine.h:
 
 /home/chen/projects/gsiot/src/GSObjLocker.h:
-
-/home/chen/projects/gsiot/src/GSIOTConfig.h:
-
-/home/chen/projects/gsiot/src/GSIOTUserMgr.h:
-
-/home/chen/projects/gsiot/src/GSIOTUser.h:
-
-/home/chen/projects/gsiot/src/GSIOTEvent.h:
-
-/home/chen/projects/gsiot/src/AutoControlEvent.h:
 
 /home/chen/projects/gsiot/src/ControlEvent.h:
 
@@ -691,9 +645,9 @@ gsiot.o: /home/chen/projects/gsiot/src/gsiot.cc \
 
 /home/chen/projects/gsiot/src/AutoCallEvent.h:
 
-/home/chen/projects/gsiot/src/DeviceConnection.h:
-
 /home/chen/projects/gsiot/src/IDeviceHandler.h:
+
+/home/chen/projects/gsiot/src/DeviceConnection.h:
 
 /home/chen/projects/gsiot/src/IRFReadHandler.h:
 
@@ -743,19 +697,61 @@ gsiot.o: /home/chen/projects/gsiot/src/gsiot.cc \
 
 /usr/local/include/gloox/jid.h:
 
-/home/chen/projects/gsiot/src/ControlMessage.h:
+/usr/local/include/gloox/message.h:
+
+/usr/local/include/gloox/delayeddelivery.h:
+
+/usr/local/include/gloox/util.h:
+
+/usr/include/c++/4.8/cmath:
+
+/usr/include/math.h:
+
+/usr/include/i386-linux-gnu/bits/huge_val.h:
+
+/usr/include/i386-linux-gnu/bits/huge_valf.h:
+
+/usr/include/i386-linux-gnu/bits/huge_vall.h:
+
+/usr/include/i386-linux-gnu/bits/inf.h:
+
+/usr/include/i386-linux-gnu/bits/nan.h:
+
+/usr/include/i386-linux-gnu/bits/mathdef.h:
+
+/usr/include/i386-linux-gnu/bits/mathcalls.h:
+
+/usr/include/c++/4.8/algorithm:
+
+/usr/include/c++/4.8/bits/stl_algo.h:
+
+/usr/include/c++/4.8/cstdlib:
+
+/usr/include/c++/4.8/bits/algorithmfwd.h:
+
+/usr/include/c++/4.8/bits/stl_heap.h:
+
+/usr/include/c++/4.8/bits/stl_tempbuf.h:
+
+/usr/local/include/gloox/iqhandler.h:
+
+/usr/local/include/gloox/subscriptionhandler.h:
+
+/usr/local/include/gloox/subscription.h:
+
+/usr/local/include/gloox/messagehandler.h:
 
 /home/chen/projects/gsiot/src/TimerManager.h:
 
-/home/chen/projects/gsiot/src/XmppGSResult.h:
+/home/chen/projects/gsiot/src/ControlMessage.h:
 
 /home/chen/projects/gsiot/src/XmppGSAuth.h:
-
-/home/chen/projects/gsiot/src/XmppGSState.h:
 
 /home/chen/projects/gsiot/src/XmppGSManager.h:
 
 /home/chen/projects/gsiot/src/XmppGSEvent.h:
+
+/home/chen/projects/gsiot/src/XmppGSState.h:
 
 /home/chen/projects/gsiot/src/XmppGSRelation.h:
 

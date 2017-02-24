@@ -78,10 +78,10 @@ bool GSIOTConfig::PreInit( const std::string &RunParam )
 		string tmp8 = query.getColumn(8);
 		this->m_noticejid = tmp8;
 		
-		if( !query.isColumnNull(9) ) { 
-			string tmp9 = query.getColumn(9);
-			this->m_phone = tmp9;
+		if( !query.isColumnNull(9) ) {
 			//this->m_phone = query.getColumn(9); 
+			string tmp9 = query.getColumn(9);
+			this->m_phone = tmp9;	
 		}
 		if( !query.isColumnNull(10) ) { 
 			this->m_DoInterval_ForSMS = (uint32_t)query.getColumn(10).getInt(); 
@@ -271,12 +271,11 @@ bool GSIOTConfig::ClearAllRelation_SpecType( IOTDeviceType device_type )
 {
 	if( !m_mapRelation.empty() )
 	{
-		for( defmapRelation::iterator //const_iterator 
+		for( defmapRelation::iterator //const_iterator //jyc20160922 modify
 		    it = m_mapRelation.begin(); it != m_mapRelation.end(); )
 		{
 			if( it->first.device_type == device_type )
 			{
-				//20160604 
 				m_mapRelation.erase(it); 
 				it = m_mapRelation.begin();
 				continue;
@@ -541,6 +540,7 @@ bool GSIOTConfig::LoadDB_vobj_config()
 		//cfg.ver = query.getColumn(col++);
 		string strtmp1 = query.getColumn(col++); //jyc20160823
 		cfg.name = strtmp1;
+		//cfg.name = query.getColumn(col++);
 		string strtmp2 = query.getColumn(col++);
 		cfg.ver = strtmp2;
 

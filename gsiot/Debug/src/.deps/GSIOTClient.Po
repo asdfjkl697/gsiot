@@ -1,7 +1,7 @@
 GSIOTClient.o: /home/chen/projects/gsiot/src/GSIOTClient.cpp \
- /usr/include/stdc-predef.h /home/chen/projects/gsiot/src/GSIOTClient.h \
- /usr/local/include/gloox/client.h /usr/local/include/gloox/clientbase.h \
- /usr/local/include/gloox/macros.h /usr/local/include/gloox/gloox.h \
+ /usr/include/stdc-predef.h /usr/local/include/gloox/message.h \
+ /usr/local/include/gloox/delayeddelivery.h \
+ /usr/local/include/gloox/gloox.h /usr/local/include/gloox/macros.h \
  /usr/include/c++/4.8/string \
  /usr/include/i386-linux-gnu/c++/4.8/bits/c++config.h \
  /usr/include/i386-linux-gnu/c++/4.8/bits/os_defines.h \
@@ -65,60 +65,14 @@ GSIOTClient.o: /home/chen/projects/gsiot/src/GSIOTClient.cpp \
  /usr/include/c++/4.8/bits/stl_list.h /usr/include/c++/4.8/bits/list.tcc \
  /usr/include/c++/4.8/map /usr/include/c++/4.8/bits/stl_tree.h \
  /usr/include/c++/4.8/bits/stl_map.h \
- /usr/include/c++/4.8/bits/stl_multimap.h \
- /usr/local/include/gloox/eventdispatcher.h \
- /usr/local/include/gloox/event.h /usr/local/include/gloox/iqhandler.h \
- /usr/local/include/gloox/iq.h /usr/local/include/gloox/stanza.h \
- /usr/local/include/gloox/tag.h /usr/include/c++/4.8/utility \
- /usr/include/c++/4.8/bits/stl_relops.h /usr/local/include/gloox/jid.h \
+ /usr/include/c++/4.8/bits/stl_multimap.h /usr/local/include/gloox/jid.h \
  /usr/local/include/gloox/stanzaextension.h \
- /usr/local/include/gloox/logsink.h /usr/local/include/gloox/loghandler.h \
- /usr/local/include/gloox/mutex.h /usr/local/include/gloox/taghandler.h \
- /usr/local/include/gloox/statisticshandler.h \
- /usr/local/include/gloox/tlshandler.h \
- /usr/local/include/gloox/compressiondatahandler.h \
- /usr/local/include/gloox/connectiondatahandler.h \
- /usr/local/include/gloox/parser.h \
- /usr/local/include/gloox/atomicrefcount.h \
- /usr/local/include/gloox/presence.h \
- /usr/local/include/gloox/connectionlistener.h \
- /usr/local/include/gloox/adhoccommandprovider.h \
- /usr/local/include/gloox/adhoc.h /usr/local/include/gloox/adhocplugin.h \
- /usr/local/include/gloox/disco.h \
- /usr/local/include/gloox/disconodehandler.h \
- /usr/local/include/gloox/discohandler.h /usr/local/include/gloox/disco.h \
- /usr/local/include/gloox/adhoc.h /usr/local/include/gloox/tag.h \
- /usr/local/include/gloox/loghandler.h /usr/local/include/gloox/logsink.h \
- /usr/local/include/gloox/subscriptionhandler.h \
- /usr/local/include/gloox/subscription.h \
- /usr/local/include/gloox/messagehandler.h \
- /usr/local/include/gloox/message.h \
- /usr/local/include/gloox/delayeddelivery.h \
- /usr/local/include/gloox/util.h /usr/include/c++/4.8/cmath \
- /usr/include/math.h /usr/include/i386-linux-gnu/bits/huge_val.h \
- /usr/include/i386-linux-gnu/bits/huge_valf.h \
- /usr/include/i386-linux-gnu/bits/huge_vall.h \
- /usr/include/i386-linux-gnu/bits/inf.h \
- /usr/include/i386-linux-gnu/bits/nan.h \
- /usr/include/i386-linux-gnu/bits/mathdef.h \
- /usr/include/i386-linux-gnu/bits/mathcalls.h \
- /usr/include/c++/4.8/algorithm /usr/include/c++/4.8/bits/stl_algo.h \
- /usr/include/c++/4.8/cstdlib /usr/include/stdlib.h \
- /usr/include/i386-linux-gnu/bits/waitflags.h \
- /usr/include/i386-linux-gnu/bits/waitstatus.h \
- /usr/include/i386-linux-gnu/sys/types.h \
- /usr/include/i386-linux-gnu/sys/select.h \
- /usr/include/i386-linux-gnu/bits/select.h \
- /usr/include/i386-linux-gnu/bits/sigset.h \
- /usr/include/i386-linux-gnu/sys/sysmacros.h /usr/include/alloca.h \
- /usr/include/i386-linux-gnu/bits/stdlib-float.h \
- /usr/include/c++/4.8/bits/algorithmfwd.h \
- /usr/include/c++/4.8/bits/stl_heap.h \
- /usr/include/c++/4.8/bits/stl_tempbuf.h \
- /usr/include/c++/4.8/bits/stl_construct.h \
- /usr/include/c++/4.8/ext/alloc_traits.h \
- /usr/local/include/gloox/iqhandler.h \
- /home/chen/projects/gsiot/src/GSIOTDevice.h \
+ /usr/local/include/gloox/stanza.h /usr/local/include/gloox/tag.h \
+ /usr/include/c++/4.8/utility /usr/include/c++/4.8/bits/stl_relops.h \
+ /home/chen/projects/gsiot/src/GSIOTClient.h \
+ /home/chen/projects/gsiot/src/GSIOTConfig.h \
+ /home/chen/projects/gsiot/src/common.h \
+ /home/chen/projects/gsiot/src/memmacro.h \
  /home/chen/projects/gsiot/src/typedef.h /usr/include/unistd.h \
  /usr/include/i386-linux-gnu/bits/posix_opt.h \
  /usr/include/i386-linux-gnu/bits/environments.h \
@@ -126,23 +80,27 @@ GSIOTClient.o: /home/chen/projects/gsiot/src/GSIOTClient.cpp \
  /usr/include/fcntl.h /usr/include/i386-linux-gnu/bits/fcntl.h \
  /usr/include/i386-linux-gnu/bits/fcntl-linux.h \
  /usr/include/i386-linux-gnu/bits/uio.h \
+ /usr/include/i386-linux-gnu/sys/types.h \
+ /usr/include/i386-linux-gnu/sys/select.h \
+ /usr/include/i386-linux-gnu/bits/select.h \
+ /usr/include/i386-linux-gnu/bits/sigset.h \
+ /usr/include/i386-linux-gnu/sys/sysmacros.h \
  /usr/include/i386-linux-gnu/bits/stat.h /usr/include/libio.h \
  /usr/include/_G_config.h /usr/include/i386-linux-gnu/bits/stdio_lim.h \
- /usr/include/i386-linux-gnu/bits/sys_errlist.h \
+ /usr/include/i386-linux-gnu/bits/sys_errlist.h /usr/include/stdlib.h \
+ /usr/include/i386-linux-gnu/bits/waitflags.h \
+ /usr/include/i386-linux-gnu/bits/waitstatus.h /usr/include/alloca.h \
+ /usr/include/i386-linux-gnu/bits/stdlib-float.h \
  /usr/lib/gcc/i686-linux-gnu/4.8/include/stdint.h /usr/include/stdint.h \
  /usr/include/c++/4.8/set /usr/include/c++/4.8/bits/stl_set.h \
  /usr/include/c++/4.8/bits/stl_multiset.h /usr/include/c++/4.8/vector \
+ /usr/include/c++/4.8/bits/stl_construct.h \
+ /usr/include/c++/4.8/ext/alloc_traits.h \
  /usr/include/c++/4.8/bits/stl_uninitialized.h \
  /usr/include/c++/4.8/bits/stl_vector.h \
  /usr/include/c++/4.8/bits/stl_bvector.h \
  /usr/include/c++/4.8/bits/vector.tcc \
  /usr/local/include/gloox/stanzaextension.h \
- /home/chen/projects/gsiot/src/ControlBase.h \
- /home/chen/projects/gsiot/src/DeviceAddress.h \
- /usr/local/include/gloox/mutexguard.h \
- /home/chen/projects/gsiot/src/EditAttrMgr.h \
- /home/chen/projects/gsiot/src/common.h \
- /home/chen/projects/gsiot/src/memmacro.h \
  /home/chen/projects/gsiot/src/RunCode.h \
  /home/chen/projects/gsiot/src/SQLiteHelper.h \
  /home/chen/projects/gsiot/src/SQLiteC++.h \
@@ -152,22 +110,27 @@ GSIOTClient.o: /home/chen/projects/gsiot/src/GSIOTClient.cpp \
  /home/chen/projects/gsiot/src/Column.h \
  /home/chen/projects/gsiot/src/Statement.h \
  /home/chen/projects/gsiot/src/Transaction.h /usr/include/string.h \
- /home/chen/projects/gsiot/src/GSIOTObjBase.h /usr/include/c++/4.8/bitset \
+ /home/chen/projects/gsiot/src/GSIOTUserMgr.h \
+ /home/chen/projects/gsiot/src/GSIOTUser.h /usr/local/include/gloox/tag.h \
+ /usr/include/c++/4.8/bitset /usr/local/include/gloox/mutexguard.h \
+ /usr/local/include/gloox/mutex.h \
+ /home/chen/projects/gsiot/src/GSIOTEvent.h \
+ /home/chen/projects/gsiot/src/AutoControlEvent.h \
+ /home/chen/projects/gsiot/src/GSIOTDevice.h \
+ /home/chen/projects/gsiot/src/ControlBase.h \
+ /home/chen/projects/gsiot/src/DeviceAddress.h \
+ /home/chen/projects/gsiot/src/EditAttrMgr.h \
+ /home/chen/projects/gsiot/src/GSIOTObjBase.h \
  /home/chen/projects/gsiot/src/RemoteButtonClass.h \
  /home/chen/projects/gsiot/src/RFSignalDefine.h \
  /home/chen/projects/gsiot/src/GSObjLocker.h \
- /home/chen/projects/gsiot/src/GSIOTConfig.h \
- /home/chen/projects/gsiot/src/GSIOTUserMgr.h \
- /home/chen/projects/gsiot/src/GSIOTUser.h \
- /home/chen/projects/gsiot/src/GSIOTEvent.h \
- /home/chen/projects/gsiot/src/AutoControlEvent.h \
  /home/chen/projects/gsiot/src/ControlEvent.h \
  /home/chen/projects/gsiot/src/AutoNoticeEvent.h \
  /home/chen/projects/gsiot/src/AutoSendSMSEvent.h \
  /home/chen/projects/gsiot/src/AutoEventthing.h \
  /home/chen/projects/gsiot/src/AutoCallEvent.h \
- /home/chen/projects/gsiot/src/DeviceConnection.h \
  /home/chen/projects/gsiot/src/IDeviceHandler.h \
+ /home/chen/projects/gsiot/src/DeviceConnection.h \
  /home/chen/projects/gsiot/src/IRFReadHandler.h \
  /home/chen/projects/gsiot/src/IRFDeviceHandler.h \
  /home/chen/projects/gsiot/src/RFDevice.h \
@@ -191,13 +154,48 @@ GSIOTClient.o: /home/chen/projects/gsiot/src/GSIOTClient.cpp \
  /home/chen/projects/gsiot/src/CommLinkManager.h \
  /home/chen/projects/gsiot/src/IGSMessageHandler.h \
  /usr/local/include/gloox/gloox.h /usr/local/include/gloox/jid.h \
- /home/chen/projects/gsiot/src/ControlMessage.h \
+ /usr/local/include/gloox/adhoccommandprovider.h \
+ /usr/local/include/gloox/adhoc.h /usr/local/include/gloox/adhocplugin.h \
+ /usr/local/include/gloox/disco.h /usr/local/include/gloox/iqhandler.h \
+ /usr/local/include/gloox/iq.h \
+ /usr/local/include/gloox/disconodehandler.h \
+ /usr/local/include/gloox/discohandler.h /usr/local/include/gloox/disco.h \
+ /usr/local/include/gloox/adhoc.h /usr/local/include/gloox/loghandler.h \
+ /usr/local/include/gloox/logsink.h /usr/local/include/gloox/loghandler.h \
+ /usr/local/include/gloox/util.h /usr/include/c++/4.8/cmath \
+ /usr/include/math.h /usr/include/i386-linux-gnu/bits/huge_val.h \
+ /usr/include/i386-linux-gnu/bits/huge_valf.h \
+ /usr/include/i386-linux-gnu/bits/huge_vall.h \
+ /usr/include/i386-linux-gnu/bits/inf.h \
+ /usr/include/i386-linux-gnu/bits/nan.h \
+ /usr/include/i386-linux-gnu/bits/mathdef.h \
+ /usr/include/i386-linux-gnu/bits/mathcalls.h \
+ /usr/include/c++/4.8/algorithm /usr/include/c++/4.8/bits/stl_algo.h \
+ /usr/include/c++/4.8/cstdlib /usr/include/c++/4.8/bits/algorithmfwd.h \
+ /usr/include/c++/4.8/bits/stl_heap.h \
+ /usr/include/c++/4.8/bits/stl_tempbuf.h \
+ /usr/local/include/gloox/client.h /usr/local/include/gloox/clientbase.h \
+ /usr/local/include/gloox/eventdispatcher.h \
+ /usr/local/include/gloox/event.h /usr/local/include/gloox/logsink.h \
+ /usr/local/include/gloox/taghandler.h \
+ /usr/local/include/gloox/statisticshandler.h \
+ /usr/local/include/gloox/tlshandler.h \
+ /usr/local/include/gloox/compressiondatahandler.h \
+ /usr/local/include/gloox/connectiondatahandler.h \
+ /usr/local/include/gloox/parser.h \
+ /usr/local/include/gloox/atomicrefcount.h \
+ /usr/local/include/gloox/presence.h \
+ /usr/local/include/gloox/connectionlistener.h \
+ /usr/local/include/gloox/iqhandler.h \
+ /usr/local/include/gloox/subscriptionhandler.h \
+ /usr/local/include/gloox/subscription.h \
+ /usr/local/include/gloox/messagehandler.h \
  /home/chen/projects/gsiot/src/TimerManager.h \
- /home/chen/projects/gsiot/src/XmppGSResult.h \
+ /home/chen/projects/gsiot/src/ControlMessage.h \
  /home/chen/projects/gsiot/src/XmppGSAuth.h \
- /home/chen/projects/gsiot/src/XmppGSState.h \
  /home/chen/projects/gsiot/src/XmppGSManager.h \
  /home/chen/projects/gsiot/src/XmppGSEvent.h \
+ /home/chen/projects/gsiot/src/XmppGSState.h \
  /home/chen/projects/gsiot/src/XmppGSRelation.h \
  /home/chen/projects/gsiot/src/XmppGSPreset.h \
  /home/chen/projects/gsiot/src/XmppGSVObj.h \
@@ -209,6 +207,7 @@ GSIOTClient.o: /home/chen/projects/gsiot/src/GSIOTClient.cpp \
  /home/chen/projects/gsiot/src/GSIOTControl.h \
  /home/chen/projects/gsiot/src/GSIOTDeviceInfo.h \
  /home/chen/projects/gsiot/src/GSIOTHeartbeat.h \
+ /home/chen/projects/gsiot/src/XmppGSResult.h \
  /home/chen/projects/gsiot/src/XmppGSMessage.h \
  /home/chen/projects/gsiot/src/XmppRegister.h \
  /usr/local/include/gloox/registration.h \
@@ -220,15 +219,13 @@ GSIOTClient.o: /home/chen/projects/gsiot/src/GSIOTClient.cpp \
 
 /usr/include/stdc-predef.h:
 
-/home/chen/projects/gsiot/src/GSIOTClient.h:
+/usr/local/include/gloox/message.h:
 
-/usr/local/include/gloox/client.h:
-
-/usr/local/include/gloox/clientbase.h:
-
-/usr/local/include/gloox/macros.h:
+/usr/local/include/gloox/delayeddelivery.h:
 
 /usr/local/include/gloox/gloox.h:
+
+/usr/local/include/gloox/macros.h:
 
 /usr/include/c++/4.8/string:
 
@@ -388,13 +385,9 @@ GSIOTClient.o: /home/chen/projects/gsiot/src/GSIOTClient.cpp \
 
 /usr/include/c++/4.8/bits/stl_multimap.h:
 
-/usr/local/include/gloox/eventdispatcher.h:
+/usr/local/include/gloox/jid.h:
 
-/usr/local/include/gloox/event.h:
-
-/usr/local/include/gloox/iqhandler.h:
-
-/usr/local/include/gloox/iq.h:
+/usr/local/include/gloox/stanzaextension.h:
 
 /usr/local/include/gloox/stanza.h:
 
@@ -404,125 +397,13 @@ GSIOTClient.o: /home/chen/projects/gsiot/src/GSIOTClient.cpp \
 
 /usr/include/c++/4.8/bits/stl_relops.h:
 
-/usr/local/include/gloox/jid.h:
+/home/chen/projects/gsiot/src/GSIOTClient.h:
 
-/usr/local/include/gloox/stanzaextension.h:
+/home/chen/projects/gsiot/src/GSIOTConfig.h:
 
-/usr/local/include/gloox/logsink.h:
+/home/chen/projects/gsiot/src/common.h:
 
-/usr/local/include/gloox/loghandler.h:
-
-/usr/local/include/gloox/mutex.h:
-
-/usr/local/include/gloox/taghandler.h:
-
-/usr/local/include/gloox/statisticshandler.h:
-
-/usr/local/include/gloox/tlshandler.h:
-
-/usr/local/include/gloox/compressiondatahandler.h:
-
-/usr/local/include/gloox/connectiondatahandler.h:
-
-/usr/local/include/gloox/parser.h:
-
-/usr/local/include/gloox/atomicrefcount.h:
-
-/usr/local/include/gloox/presence.h:
-
-/usr/local/include/gloox/connectionlistener.h:
-
-/usr/local/include/gloox/adhoccommandprovider.h:
-
-/usr/local/include/gloox/adhoc.h:
-
-/usr/local/include/gloox/adhocplugin.h:
-
-/usr/local/include/gloox/disco.h:
-
-/usr/local/include/gloox/disconodehandler.h:
-
-/usr/local/include/gloox/discohandler.h:
-
-/usr/local/include/gloox/disco.h:
-
-/usr/local/include/gloox/adhoc.h:
-
-/usr/local/include/gloox/tag.h:
-
-/usr/local/include/gloox/loghandler.h:
-
-/usr/local/include/gloox/logsink.h:
-
-/usr/local/include/gloox/subscriptionhandler.h:
-
-/usr/local/include/gloox/subscription.h:
-
-/usr/local/include/gloox/messagehandler.h:
-
-/usr/local/include/gloox/message.h:
-
-/usr/local/include/gloox/delayeddelivery.h:
-
-/usr/local/include/gloox/util.h:
-
-/usr/include/c++/4.8/cmath:
-
-/usr/include/math.h:
-
-/usr/include/i386-linux-gnu/bits/huge_val.h:
-
-/usr/include/i386-linux-gnu/bits/huge_valf.h:
-
-/usr/include/i386-linux-gnu/bits/huge_vall.h:
-
-/usr/include/i386-linux-gnu/bits/inf.h:
-
-/usr/include/i386-linux-gnu/bits/nan.h:
-
-/usr/include/i386-linux-gnu/bits/mathdef.h:
-
-/usr/include/i386-linux-gnu/bits/mathcalls.h:
-
-/usr/include/c++/4.8/algorithm:
-
-/usr/include/c++/4.8/bits/stl_algo.h:
-
-/usr/include/c++/4.8/cstdlib:
-
-/usr/include/stdlib.h:
-
-/usr/include/i386-linux-gnu/bits/waitflags.h:
-
-/usr/include/i386-linux-gnu/bits/waitstatus.h:
-
-/usr/include/i386-linux-gnu/sys/types.h:
-
-/usr/include/i386-linux-gnu/sys/select.h:
-
-/usr/include/i386-linux-gnu/bits/select.h:
-
-/usr/include/i386-linux-gnu/bits/sigset.h:
-
-/usr/include/i386-linux-gnu/sys/sysmacros.h:
-
-/usr/include/alloca.h:
-
-/usr/include/i386-linux-gnu/bits/stdlib-float.h:
-
-/usr/include/c++/4.8/bits/algorithmfwd.h:
-
-/usr/include/c++/4.8/bits/stl_heap.h:
-
-/usr/include/c++/4.8/bits/stl_tempbuf.h:
-
-/usr/include/c++/4.8/bits/stl_construct.h:
-
-/usr/include/c++/4.8/ext/alloc_traits.h:
-
-/usr/local/include/gloox/iqhandler.h:
-
-/home/chen/projects/gsiot/src/GSIOTDevice.h:
+/home/chen/projects/gsiot/src/memmacro.h:
 
 /home/chen/projects/gsiot/src/typedef.h:
 
@@ -544,6 +425,16 @@ GSIOTClient.o: /home/chen/projects/gsiot/src/GSIOTClient.cpp \
 
 /usr/include/i386-linux-gnu/bits/uio.h:
 
+/usr/include/i386-linux-gnu/sys/types.h:
+
+/usr/include/i386-linux-gnu/sys/select.h:
+
+/usr/include/i386-linux-gnu/bits/select.h:
+
+/usr/include/i386-linux-gnu/bits/sigset.h:
+
+/usr/include/i386-linux-gnu/sys/sysmacros.h:
+
 /usr/include/i386-linux-gnu/bits/stat.h:
 
 /usr/include/libio.h:
@@ -553,6 +444,16 @@ GSIOTClient.o: /home/chen/projects/gsiot/src/GSIOTClient.cpp \
 /usr/include/i386-linux-gnu/bits/stdio_lim.h:
 
 /usr/include/i386-linux-gnu/bits/sys_errlist.h:
+
+/usr/include/stdlib.h:
+
+/usr/include/i386-linux-gnu/bits/waitflags.h:
+
+/usr/include/i386-linux-gnu/bits/waitstatus.h:
+
+/usr/include/alloca.h:
+
+/usr/include/i386-linux-gnu/bits/stdlib-float.h:
 
 /usr/lib/gcc/i686-linux-gnu/4.8/include/stdint.h:
 
@@ -566,6 +467,10 @@ GSIOTClient.o: /home/chen/projects/gsiot/src/GSIOTClient.cpp \
 
 /usr/include/c++/4.8/vector:
 
+/usr/include/c++/4.8/bits/stl_construct.h:
+
+/usr/include/c++/4.8/ext/alloc_traits.h:
+
 /usr/include/c++/4.8/bits/stl_uninitialized.h:
 
 /usr/include/c++/4.8/bits/stl_vector.h:
@@ -575,18 +480,6 @@ GSIOTClient.o: /home/chen/projects/gsiot/src/GSIOTClient.cpp \
 /usr/include/c++/4.8/bits/vector.tcc:
 
 /usr/local/include/gloox/stanzaextension.h:
-
-/home/chen/projects/gsiot/src/ControlBase.h:
-
-/home/chen/projects/gsiot/src/DeviceAddress.h:
-
-/usr/local/include/gloox/mutexguard.h:
-
-/home/chen/projects/gsiot/src/EditAttrMgr.h:
-
-/home/chen/projects/gsiot/src/common.h:
-
-/home/chen/projects/gsiot/src/memmacro.h:
 
 /home/chen/projects/gsiot/src/RunCode.h:
 
@@ -614,25 +507,37 @@ GSIOTClient.o: /home/chen/projects/gsiot/src/GSIOTClient.cpp \
 
 /usr/include/string.h:
 
-/home/chen/projects/gsiot/src/GSIOTObjBase.h:
+/home/chen/projects/gsiot/src/GSIOTUserMgr.h:
+
+/home/chen/projects/gsiot/src/GSIOTUser.h:
+
+/usr/local/include/gloox/tag.h:
 
 /usr/include/c++/4.8/bitset:
+
+/usr/local/include/gloox/mutexguard.h:
+
+/usr/local/include/gloox/mutex.h:
+
+/home/chen/projects/gsiot/src/GSIOTEvent.h:
+
+/home/chen/projects/gsiot/src/AutoControlEvent.h:
+
+/home/chen/projects/gsiot/src/GSIOTDevice.h:
+
+/home/chen/projects/gsiot/src/ControlBase.h:
+
+/home/chen/projects/gsiot/src/DeviceAddress.h:
+
+/home/chen/projects/gsiot/src/EditAttrMgr.h:
+
+/home/chen/projects/gsiot/src/GSIOTObjBase.h:
 
 /home/chen/projects/gsiot/src/RemoteButtonClass.h:
 
 /home/chen/projects/gsiot/src/RFSignalDefine.h:
 
 /home/chen/projects/gsiot/src/GSObjLocker.h:
-
-/home/chen/projects/gsiot/src/GSIOTConfig.h:
-
-/home/chen/projects/gsiot/src/GSIOTUserMgr.h:
-
-/home/chen/projects/gsiot/src/GSIOTUser.h:
-
-/home/chen/projects/gsiot/src/GSIOTEvent.h:
-
-/home/chen/projects/gsiot/src/AutoControlEvent.h:
 
 /home/chen/projects/gsiot/src/ControlEvent.h:
 
@@ -644,9 +549,9 @@ GSIOTClient.o: /home/chen/projects/gsiot/src/GSIOTClient.cpp \
 
 /home/chen/projects/gsiot/src/AutoCallEvent.h:
 
-/home/chen/projects/gsiot/src/DeviceConnection.h:
-
 /home/chen/projects/gsiot/src/IDeviceHandler.h:
+
+/home/chen/projects/gsiot/src/DeviceConnection.h:
 
 /home/chen/projects/gsiot/src/IRFReadHandler.h:
 
@@ -696,19 +601,111 @@ GSIOTClient.o: /home/chen/projects/gsiot/src/GSIOTClient.cpp \
 
 /usr/local/include/gloox/jid.h:
 
-/home/chen/projects/gsiot/src/ControlMessage.h:
+/usr/local/include/gloox/adhoccommandprovider.h:
+
+/usr/local/include/gloox/adhoc.h:
+
+/usr/local/include/gloox/adhocplugin.h:
+
+/usr/local/include/gloox/disco.h:
+
+/usr/local/include/gloox/iqhandler.h:
+
+/usr/local/include/gloox/iq.h:
+
+/usr/local/include/gloox/disconodehandler.h:
+
+/usr/local/include/gloox/discohandler.h:
+
+/usr/local/include/gloox/disco.h:
+
+/usr/local/include/gloox/adhoc.h:
+
+/usr/local/include/gloox/loghandler.h:
+
+/usr/local/include/gloox/logsink.h:
+
+/usr/local/include/gloox/loghandler.h:
+
+/usr/local/include/gloox/util.h:
+
+/usr/include/c++/4.8/cmath:
+
+/usr/include/math.h:
+
+/usr/include/i386-linux-gnu/bits/huge_val.h:
+
+/usr/include/i386-linux-gnu/bits/huge_valf.h:
+
+/usr/include/i386-linux-gnu/bits/huge_vall.h:
+
+/usr/include/i386-linux-gnu/bits/inf.h:
+
+/usr/include/i386-linux-gnu/bits/nan.h:
+
+/usr/include/i386-linux-gnu/bits/mathdef.h:
+
+/usr/include/i386-linux-gnu/bits/mathcalls.h:
+
+/usr/include/c++/4.8/algorithm:
+
+/usr/include/c++/4.8/bits/stl_algo.h:
+
+/usr/include/c++/4.8/cstdlib:
+
+/usr/include/c++/4.8/bits/algorithmfwd.h:
+
+/usr/include/c++/4.8/bits/stl_heap.h:
+
+/usr/include/c++/4.8/bits/stl_tempbuf.h:
+
+/usr/local/include/gloox/client.h:
+
+/usr/local/include/gloox/clientbase.h:
+
+/usr/local/include/gloox/eventdispatcher.h:
+
+/usr/local/include/gloox/event.h:
+
+/usr/local/include/gloox/logsink.h:
+
+/usr/local/include/gloox/taghandler.h:
+
+/usr/local/include/gloox/statisticshandler.h:
+
+/usr/local/include/gloox/tlshandler.h:
+
+/usr/local/include/gloox/compressiondatahandler.h:
+
+/usr/local/include/gloox/connectiondatahandler.h:
+
+/usr/local/include/gloox/parser.h:
+
+/usr/local/include/gloox/atomicrefcount.h:
+
+/usr/local/include/gloox/presence.h:
+
+/usr/local/include/gloox/connectionlistener.h:
+
+/usr/local/include/gloox/iqhandler.h:
+
+/usr/local/include/gloox/subscriptionhandler.h:
+
+/usr/local/include/gloox/subscription.h:
+
+/usr/local/include/gloox/messagehandler.h:
 
 /home/chen/projects/gsiot/src/TimerManager.h:
 
-/home/chen/projects/gsiot/src/XmppGSResult.h:
+/home/chen/projects/gsiot/src/ControlMessage.h:
 
 /home/chen/projects/gsiot/src/XmppGSAuth.h:
-
-/home/chen/projects/gsiot/src/XmppGSState.h:
 
 /home/chen/projects/gsiot/src/XmppGSManager.h:
 
 /home/chen/projects/gsiot/src/XmppGSEvent.h:
+
+/home/chen/projects/gsiot/src/XmppGSState.h:
 
 /home/chen/projects/gsiot/src/XmppGSRelation.h:
 
@@ -731,6 +728,8 @@ GSIOTClient.o: /home/chen/projects/gsiot/src/GSIOTClient.cpp \
 /home/chen/projects/gsiot/src/GSIOTDeviceInfo.h:
 
 /home/chen/projects/gsiot/src/GSIOTHeartbeat.h:
+
+/home/chen/projects/gsiot/src/XmppGSResult.h:
 
 /home/chen/projects/gsiot/src/XmppGSMessage.h:
 

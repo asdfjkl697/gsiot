@@ -49,10 +49,10 @@ GSIOTDevice::GSIOTDevice( const Tag* tag)
 		this->m_ver= tag->findAttribute("ver");
 
 	this->UntagEditAttr( tag );
-	/*/20160527
+	/*/jyc20160527
 	Tag *t = tag->findChild(defDeviceTypeTag_media);
 	if(t){
-	    	this->m_control = new MediaControl(t); //20160527
+	    	this->m_control = new MediaControl(t); //jyc20160527
 		return;
 	}
 
@@ -68,17 +68,15 @@ GSIOTDevice::GSIOTDevice( const Tag* tag)
 		return;
 	}*/
 
-	Tag *t = tag->findChild(defDeviceTypeTag_rs485device);
-	//t = tag->findChild(defDeviceTypeTag_rs485device);
+	Tag *t = tag->findChild(defDeviceTypeTag_rfdevice);
 	if(t){
-	    	this->m_control = new RS485DevControl(t);
+	    	this->m_control = new RFDeviceControl(t);
 		return;
 	}
 
-
-	t = tag->findChild(defDeviceTypeTag_rfdevice);
+	t = tag->findChild(defDeviceTypeTag_rs485device);
 	if(t){
-	    	this->m_control = new RFDeviceControl(t);
+	    	this->m_control = new RS485DevControl(t);
 		return;
 	}
 
@@ -99,7 +97,7 @@ GSIOTDevice::GSIOTDevice( const Tag* tag)
 	}
 	else
 	{
-		printf( "GSIOTDevice() ctl null, dev_type=%d, ctl_type unknown!\r\n", m_type );
+		printf( "\n GSIOTDevice() ctl null, dev_type=%d, ctl_type unknown!\r\n", m_type );
 	}
 
 	if( this->m_control )
@@ -160,7 +158,7 @@ bool GSIOTDevice::IsSupportAlarm( const GSIOTDevice *device )
 	{
 	case IOT_DEVICE_Trigger:
 		return true;
-	/*20160527
+	/*jyc20160527
 	case IOT_DEVICE_Camera:
 		{
 			const IPCameraBase *ctl = (const IPCameraBase*)device->getControl();
@@ -673,10 +671,10 @@ bool GSIOTDevice::isDevSelfAndIncludeAddr( const IOTDeviceType deviceType, const
 
 			if( 0==address )
 			{
-				return ctl->GetFristAddress(); //20160527
+				return ctl->GetFristAddress(); 
 			}
 
-			return ctl->GetAddress(address); //20160527
+			return ctl->GetAddress(address); 
 		}
 		break;
 

@@ -803,9 +803,11 @@ uint16_t crc16_verify( uint8_t *buf, uint16_t len )
 		uchCRCLo = uchCRCHi ^ auchCRCHi[uIndex];
 		uchCRCHi = auchCRCLo[uIndex] ; 
 	} 
-
-	return ( (uchCRCHi << 8)| uchCRCLo );  //jyc20160918 big_end or small_end notice
-	//return ( (uchCRCLo << 8)| uchCRCHi );
+//jyc20170224 bigend or smallend UBUNTU DIFF OPENWRT
+if(OS_UBUNTU_FLAG)
+	return ( (uchCRCHi << 8)| uchCRCLo );
+else
+	return ( (uchCRCLo << 8)| uchCRCHi );
 }
 
 uint32_t g_StringToBuffer( const std::string &str, uint8_t *buf, uint32_t len, bool hasspace )

@@ -87,7 +87,7 @@ bool _sdatabuffer::IsSameOnlyDev(
 	if( other_DevType != DevType )
 		return false;
 	//jyc20160824
-	//if( !GSIOTClient::Compare_Control( other_ctl, ctl ) )
+	if( !GSIOTClient::Compare_Control( other_ctl, ctl ) )
 		return false;
 
 	return true;

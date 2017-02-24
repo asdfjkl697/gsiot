@@ -803,9 +803,12 @@ uint16_t crc16_verify( uint8_t *buf, uint16_t len )
 		uchCRCLo = uchCRCHi ^ auchCRCHi[uIndex];
 		uchCRCHi = auchCRCLo[uIndex] ; 
 	} 
-
-	return ( (uchCRCHi << 8)| uchCRCLo );  //jyc20160918 big_end or small_end notice
-	//return ( (uchCRCLo << 8)| uchCRCHi );
+//jyc20170224 bigend or smallend UBUNTU DIFF OPENWRT
+if(OS_UBUNTU_FLAG)
+	return ( (uchCRCHi << 8)| uchCRCLo );
+#else
+	return ( (uchCRCLo << 8)| uchCRCHi );
+#endif
 }
 
 uint32_t g_StringToBuffer( const std::string &str, uint8_t *buf, uint32_t len, bool hasspace )
@@ -883,7 +886,7 @@ void g_PrintfByte( unsigned char *buf,int len, const char *pinfo, defLinkID Link
 	}
 	else
 	{
-		snprintf( msg, PrintBufferLength, "Link%d(%s) %s(len=%d) : -ThId%d\n", LinkID, pLinkName?pLinkName:"", pinfo?pinfo:"", (int)len, ::GetCurrentThreadId() );
+		snprintf( msg, PrintBufferLength, "Link%d(%s) %s(len=%d) : -ThId%d\n", LinkID, pLinkName?pLinkName:"", pinfo?pinfo:"", (int)len, ::pthread_self() );
 	}
 
 	if (len > 0) 

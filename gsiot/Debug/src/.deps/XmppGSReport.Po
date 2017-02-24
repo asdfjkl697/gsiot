@@ -118,58 +118,29 @@ XmppGSReport.o: /home/chen/projects/gsiot/src/XmppGSReport.cpp \
  /usr/include/c++/4.8/bits/stl_heap.h \
  /usr/include/c++/4.8/bits/stl_tempbuf.h \
  /home/chen/projects/gsiot/src/GSIOTClient.h \
- /usr/local/include/gloox/client.h /usr/local/include/gloox/clientbase.h \
- /usr/local/include/gloox/eventdispatcher.h \
- /usr/local/include/gloox/event.h /usr/local/include/gloox/iqhandler.h \
- /usr/local/include/gloox/iq.h /usr/local/include/gloox/stanza.h \
- /usr/local/include/gloox/tag.h /usr/local/include/gloox/jid.h \
- /usr/local/include/gloox/stanzaextension.h \
- /usr/local/include/gloox/logsink.h /usr/local/include/gloox/loghandler.h \
- /usr/local/include/gloox/taghandler.h \
- /usr/local/include/gloox/statisticshandler.h \
- /usr/local/include/gloox/tlshandler.h \
- /usr/local/include/gloox/compressiondatahandler.h \
- /usr/local/include/gloox/connectiondatahandler.h \
- /usr/local/include/gloox/parser.h \
- /usr/local/include/gloox/atomicrefcount.h \
- /usr/local/include/gloox/presence.h \
- /usr/local/include/gloox/connectionlistener.h \
- /usr/local/include/gloox/adhoccommandprovider.h \
- /usr/local/include/gloox/adhoc.h /usr/local/include/gloox/adhocplugin.h \
- /usr/local/include/gloox/disco.h \
- /usr/local/include/gloox/disconodehandler.h \
- /usr/local/include/gloox/discohandler.h /usr/local/include/gloox/disco.h \
- /usr/local/include/gloox/adhoc.h /usr/local/include/gloox/loghandler.h \
- /usr/local/include/gloox/logsink.h \
- /usr/local/include/gloox/subscriptionhandler.h \
- /usr/local/include/gloox/subscription.h \
- /usr/local/include/gloox/messagehandler.h \
- /usr/local/include/gloox/message.h \
- /usr/local/include/gloox/delayeddelivery.h \
- /usr/local/include/gloox/iqhandler.h \
+ /home/chen/projects/gsiot/src/GSIOTConfig.h \
+ /home/chen/projects/gsiot/src/common.h \
+ /home/chen/projects/gsiot/src/memmacro.h \
+ /home/chen/projects/gsiot/src/RunCode.h \
+ /home/chen/projects/gsiot/src/GSIOTUserMgr.h \
+ /home/chen/projects/gsiot/src/GSIOTUser.h /usr/include/c++/4.8/bitset \
+ /home/chen/projects/gsiot/src/GSIOTEvent.h \
+ /home/chen/projects/gsiot/src/AutoControlEvent.h \
  /home/chen/projects/gsiot/src/GSIOTDevice.h \
  /home/chen/projects/gsiot/src/ControlBase.h \
  /home/chen/projects/gsiot/src/DeviceAddress.h \
  /home/chen/projects/gsiot/src/EditAttrMgr.h \
- /home/chen/projects/gsiot/src/common.h \
- /home/chen/projects/gsiot/src/memmacro.h \
- /home/chen/projects/gsiot/src/RunCode.h \
- /home/chen/projects/gsiot/src/GSIOTObjBase.h /usr/include/c++/4.8/bitset \
+ /home/chen/projects/gsiot/src/GSIOTObjBase.h \
  /home/chen/projects/gsiot/src/RemoteButtonClass.h \
  /home/chen/projects/gsiot/src/RFSignalDefine.h \
  /home/chen/projects/gsiot/src/GSObjLocker.h \
- /home/chen/projects/gsiot/src/GSIOTConfig.h \
- /home/chen/projects/gsiot/src/GSIOTUserMgr.h \
- /home/chen/projects/gsiot/src/GSIOTUser.h \
- /home/chen/projects/gsiot/src/GSIOTEvent.h \
- /home/chen/projects/gsiot/src/AutoControlEvent.h \
  /home/chen/projects/gsiot/src/ControlEvent.h \
  /home/chen/projects/gsiot/src/AutoNoticeEvent.h \
  /home/chen/projects/gsiot/src/AutoSendSMSEvent.h \
  /home/chen/projects/gsiot/src/AutoEventthing.h \
  /home/chen/projects/gsiot/src/AutoCallEvent.h \
- /home/chen/projects/gsiot/src/DeviceConnection.h \
  /home/chen/projects/gsiot/src/IDeviceHandler.h \
+ /home/chen/projects/gsiot/src/DeviceConnection.h \
  /home/chen/projects/gsiot/src/IRFReadHandler.h \
  /home/chen/projects/gsiot/src/IRFDeviceHandler.h \
  /home/chen/projects/gsiot/src/RFDevice.h \
@@ -193,13 +164,40 @@ XmppGSReport.o: /home/chen/projects/gsiot/src/XmppGSReport.cpp \
  /home/chen/projects/gsiot/src/CommLinkManager.h \
  /home/chen/projects/gsiot/src/IGSMessageHandler.h \
  /usr/local/include/gloox/gloox.h /usr/local/include/gloox/jid.h \
- /home/chen/projects/gsiot/src/ControlMessage.h \
+ /usr/local/include/gloox/adhoccommandprovider.h \
+ /usr/local/include/gloox/tag.h /usr/local/include/gloox/jid.h \
+ /usr/local/include/gloox/adhoc.h /usr/local/include/gloox/adhocplugin.h \
+ /usr/local/include/gloox/stanzaextension.h \
+ /usr/local/include/gloox/disco.h /usr/local/include/gloox/iqhandler.h \
+ /usr/local/include/gloox/iq.h /usr/local/include/gloox/stanza.h \
+ /usr/local/include/gloox/disconodehandler.h \
+ /usr/local/include/gloox/discohandler.h /usr/local/include/gloox/disco.h \
+ /usr/local/include/gloox/adhoc.h /usr/local/include/gloox/loghandler.h \
+ /usr/local/include/gloox/logsink.h /usr/local/include/gloox/loghandler.h \
+ /usr/local/include/gloox/message.h \
+ /usr/local/include/gloox/delayeddelivery.h \
+ /usr/local/include/gloox/client.h /usr/local/include/gloox/clientbase.h \
+ /usr/local/include/gloox/eventdispatcher.h \
+ /usr/local/include/gloox/event.h /usr/local/include/gloox/logsink.h \
+ /usr/local/include/gloox/taghandler.h \
+ /usr/local/include/gloox/statisticshandler.h \
+ /usr/local/include/gloox/tlshandler.h \
+ /usr/local/include/gloox/compressiondatahandler.h \
+ /usr/local/include/gloox/connectiondatahandler.h \
+ /usr/local/include/gloox/parser.h \
+ /usr/local/include/gloox/atomicrefcount.h \
+ /usr/local/include/gloox/presence.h \
+ /usr/local/include/gloox/connectionlistener.h \
+ /usr/local/include/gloox/iqhandler.h \
+ /usr/local/include/gloox/subscriptionhandler.h \
+ /usr/local/include/gloox/subscription.h \
+ /usr/local/include/gloox/messagehandler.h \
  /home/chen/projects/gsiot/src/TimerManager.h \
- /home/chen/projects/gsiot/src/XmppGSResult.h \
+ /home/chen/projects/gsiot/src/ControlMessage.h \
  /home/chen/projects/gsiot/src/XmppGSAuth.h \
- /home/chen/projects/gsiot/src/XmppGSState.h \
  /home/chen/projects/gsiot/src/XmppGSManager.h \
  /home/chen/projects/gsiot/src/XmppGSEvent.h \
+ /home/chen/projects/gsiot/src/XmppGSState.h \
  /home/chen/projects/gsiot/src/XmppGSRelation.h \
  /home/chen/projects/gsiot/src/XmppGSPreset.h \
  /home/chen/projects/gsiot/src/XmppGSVObj.h \
@@ -518,79 +516,23 @@ XmppGSReport.o: /home/chen/projects/gsiot/src/XmppGSReport.cpp \
 
 /home/chen/projects/gsiot/src/GSIOTClient.h:
 
-/usr/local/include/gloox/client.h:
+/home/chen/projects/gsiot/src/GSIOTConfig.h:
 
-/usr/local/include/gloox/clientbase.h:
+/home/chen/projects/gsiot/src/common.h:
 
-/usr/local/include/gloox/eventdispatcher.h:
+/home/chen/projects/gsiot/src/memmacro.h:
 
-/usr/local/include/gloox/event.h:
+/home/chen/projects/gsiot/src/RunCode.h:
 
-/usr/local/include/gloox/iqhandler.h:
+/home/chen/projects/gsiot/src/GSIOTUserMgr.h:
 
-/usr/local/include/gloox/iq.h:
+/home/chen/projects/gsiot/src/GSIOTUser.h:
 
-/usr/local/include/gloox/stanza.h:
+/usr/include/c++/4.8/bitset:
 
-/usr/local/include/gloox/tag.h:
+/home/chen/projects/gsiot/src/GSIOTEvent.h:
 
-/usr/local/include/gloox/jid.h:
-
-/usr/local/include/gloox/stanzaextension.h:
-
-/usr/local/include/gloox/logsink.h:
-
-/usr/local/include/gloox/loghandler.h:
-
-/usr/local/include/gloox/taghandler.h:
-
-/usr/local/include/gloox/statisticshandler.h:
-
-/usr/local/include/gloox/tlshandler.h:
-
-/usr/local/include/gloox/compressiondatahandler.h:
-
-/usr/local/include/gloox/connectiondatahandler.h:
-
-/usr/local/include/gloox/parser.h:
-
-/usr/local/include/gloox/atomicrefcount.h:
-
-/usr/local/include/gloox/presence.h:
-
-/usr/local/include/gloox/connectionlistener.h:
-
-/usr/local/include/gloox/adhoccommandprovider.h:
-
-/usr/local/include/gloox/adhoc.h:
-
-/usr/local/include/gloox/adhocplugin.h:
-
-/usr/local/include/gloox/disco.h:
-
-/usr/local/include/gloox/disconodehandler.h:
-
-/usr/local/include/gloox/discohandler.h:
-
-/usr/local/include/gloox/disco.h:
-
-/usr/local/include/gloox/adhoc.h:
-
-/usr/local/include/gloox/loghandler.h:
-
-/usr/local/include/gloox/logsink.h:
-
-/usr/local/include/gloox/subscriptionhandler.h:
-
-/usr/local/include/gloox/subscription.h:
-
-/usr/local/include/gloox/messagehandler.h:
-
-/usr/local/include/gloox/message.h:
-
-/usr/local/include/gloox/delayeddelivery.h:
-
-/usr/local/include/gloox/iqhandler.h:
+/home/chen/projects/gsiot/src/AutoControlEvent.h:
 
 /home/chen/projects/gsiot/src/GSIOTDevice.h:
 
@@ -600,31 +542,13 @@ XmppGSReport.o: /home/chen/projects/gsiot/src/XmppGSReport.cpp \
 
 /home/chen/projects/gsiot/src/EditAttrMgr.h:
 
-/home/chen/projects/gsiot/src/common.h:
-
-/home/chen/projects/gsiot/src/memmacro.h:
-
-/home/chen/projects/gsiot/src/RunCode.h:
-
 /home/chen/projects/gsiot/src/GSIOTObjBase.h:
-
-/usr/include/c++/4.8/bitset:
 
 /home/chen/projects/gsiot/src/RemoteButtonClass.h:
 
 /home/chen/projects/gsiot/src/RFSignalDefine.h:
 
 /home/chen/projects/gsiot/src/GSObjLocker.h:
-
-/home/chen/projects/gsiot/src/GSIOTConfig.h:
-
-/home/chen/projects/gsiot/src/GSIOTUserMgr.h:
-
-/home/chen/projects/gsiot/src/GSIOTUser.h:
-
-/home/chen/projects/gsiot/src/GSIOTEvent.h:
-
-/home/chen/projects/gsiot/src/AutoControlEvent.h:
 
 /home/chen/projects/gsiot/src/ControlEvent.h:
 
@@ -636,9 +560,9 @@ XmppGSReport.o: /home/chen/projects/gsiot/src/XmppGSReport.cpp \
 
 /home/chen/projects/gsiot/src/AutoCallEvent.h:
 
-/home/chen/projects/gsiot/src/DeviceConnection.h:
-
 /home/chen/projects/gsiot/src/IDeviceHandler.h:
+
+/home/chen/projects/gsiot/src/DeviceConnection.h:
 
 /home/chen/projects/gsiot/src/IRFReadHandler.h:
 
@@ -688,19 +612,91 @@ XmppGSReport.o: /home/chen/projects/gsiot/src/XmppGSReport.cpp \
 
 /usr/local/include/gloox/jid.h:
 
-/home/chen/projects/gsiot/src/ControlMessage.h:
+/usr/local/include/gloox/adhoccommandprovider.h:
+
+/usr/local/include/gloox/tag.h:
+
+/usr/local/include/gloox/jid.h:
+
+/usr/local/include/gloox/adhoc.h:
+
+/usr/local/include/gloox/adhocplugin.h:
+
+/usr/local/include/gloox/stanzaextension.h:
+
+/usr/local/include/gloox/disco.h:
+
+/usr/local/include/gloox/iqhandler.h:
+
+/usr/local/include/gloox/iq.h:
+
+/usr/local/include/gloox/stanza.h:
+
+/usr/local/include/gloox/disconodehandler.h:
+
+/usr/local/include/gloox/discohandler.h:
+
+/usr/local/include/gloox/disco.h:
+
+/usr/local/include/gloox/adhoc.h:
+
+/usr/local/include/gloox/loghandler.h:
+
+/usr/local/include/gloox/logsink.h:
+
+/usr/local/include/gloox/loghandler.h:
+
+/usr/local/include/gloox/message.h:
+
+/usr/local/include/gloox/delayeddelivery.h:
+
+/usr/local/include/gloox/client.h:
+
+/usr/local/include/gloox/clientbase.h:
+
+/usr/local/include/gloox/eventdispatcher.h:
+
+/usr/local/include/gloox/event.h:
+
+/usr/local/include/gloox/logsink.h:
+
+/usr/local/include/gloox/taghandler.h:
+
+/usr/local/include/gloox/statisticshandler.h:
+
+/usr/local/include/gloox/tlshandler.h:
+
+/usr/local/include/gloox/compressiondatahandler.h:
+
+/usr/local/include/gloox/connectiondatahandler.h:
+
+/usr/local/include/gloox/parser.h:
+
+/usr/local/include/gloox/atomicrefcount.h:
+
+/usr/local/include/gloox/presence.h:
+
+/usr/local/include/gloox/connectionlistener.h:
+
+/usr/local/include/gloox/iqhandler.h:
+
+/usr/local/include/gloox/subscriptionhandler.h:
+
+/usr/local/include/gloox/subscription.h:
+
+/usr/local/include/gloox/messagehandler.h:
 
 /home/chen/projects/gsiot/src/TimerManager.h:
 
-/home/chen/projects/gsiot/src/XmppGSResult.h:
+/home/chen/projects/gsiot/src/ControlMessage.h:
 
 /home/chen/projects/gsiot/src/XmppGSAuth.h:
-
-/home/chen/projects/gsiot/src/XmppGSState.h:
 
 /home/chen/projects/gsiot/src/XmppGSManager.h:
 
 /home/chen/projects/gsiot/src/XmppGSEvent.h:
+
+/home/chen/projects/gsiot/src/XmppGSState.h:
 
 /home/chen/projects/gsiot/src/XmppGSRelation.h:
 

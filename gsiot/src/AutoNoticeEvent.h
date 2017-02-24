@@ -24,17 +24,20 @@ public:
 		return NOTICE_Event;
 	}
 
-	void SetToJid( std::string &to_jid )
+	//void SetToJid( std::string &to_jid )
+	void SetToJid(const std::string &to_jid )
 	{
 		this->m_to_jid = to_jid;
 	}
 
-	void SetSubject( std::string &subject )
+	//void SetSubject( std::string &subject ) //jyc20170224
+	void SetSubject(const std::string &subject )
 	{
 		this->m_msg_subject = subject;
 	}
 
-	void SetBody( std::string &body  )
+	//void SetBody( std::string &body  )
+	void SetBody(const std::string &body  )
 	{
 		this->m_msg_body = body;
 	}

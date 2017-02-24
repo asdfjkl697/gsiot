@@ -39,8 +39,6 @@ private:
 	std::string m_name;
 	IOTDeviceType m_type;
 	std::string m_ver;
-	//std::string m_serialno;
-	//std::string m_factoryno;
 	ControlBase *m_control;
 	
 	uint32_t m_enable;
@@ -125,12 +123,6 @@ public:
 	const std::string&  getVer() const {
 		return this->m_ver;
 	}
-	//const std::string&  getSerialno() const {
-	//	return this->m_serialno;
-	//}
-	//const std::string&  getFactoryno() const {
-	//	return this->m_factoryno;
-	//}
 	
 	ControlBase *getControl() const{
 		return this->m_control;
@@ -140,8 +132,7 @@ public:
 	}
 	void setName(const std::string& name)
 	{
-		//this->m_name = name;
-		m_name = name;
+		this->m_name = name;
 		if( this->m_control )
 			this->m_control->SetName( name );
 	}
