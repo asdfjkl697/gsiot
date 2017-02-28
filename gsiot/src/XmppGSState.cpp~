@@ -150,16 +150,6 @@ XmppGSState::XmppGSState( const Tag* tag )
 						}
 					}
 				}
-
-				//.resetallday
-				//if( defAlarmGuardTime_AllDay != this->m_mapAGTime[w].allday && defAlarmGuardTime_UnAllDay != this->m_mapAGTime[w].allday )
-				//{
-				//	if( allinvalid )
-				//	{
-				//		LOGMSG( "ad invalid, and reset ad=0(AllDay)" );
-				//		this->m_mapAGTime[w].allday = defAlarmGuardTime_AllDay;
-				//	}
-				//}
 			}
 		}
 
@@ -268,12 +258,9 @@ Tag* XmppGSState::tag() const
 				{
 				case IOT_DEVICE_Trigger:
 					{
-						/*jyc20160607*/
 						TriggerControl *ctl = (TriggerControl*)(*it)->getControl();
-
 						id = (*it)->getId();
 						AGRunStateFinalST = ctl->GetAGRunStateFinalST();
-						//*/
 					}
 					break;
 

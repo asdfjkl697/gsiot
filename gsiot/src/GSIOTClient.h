@@ -51,54 +51,6 @@ namespace httpreq
 
 //#include "typedef.h"
 
-/*
-#include "DeviceConnection.h" //20160823
-
-#include "gloox/client.h"
-#include "gloox/connectionlistener.h"
-#include "gloox/adhoccommandprovider.h"
-#include "gloox/disco.h"
-#include "gloox/adhoc.h"
-#include "gloox/tag.h"
-#include "gloox/loghandler.h"
-#include "gloox/logsink.h"
-
-#include "gloox/subscriptionhandler.h"
-#include "gloox/messagehandler.h"
-#include "gloox/message.h"
-
-#include "gloox/util.h"
-#include "gloox/iqhandler.h" //20160603
-#include "GSIOTDevice.h" //20160603
-
-
-
-#include "ControlMessage.h" //20160819
-
-#include "TimerManager.h" //jyc20160825
-
-#include "XmppGSResult.h"
-#include "XmppGSAuth.h"
-#include "XmppGSState.h"
-
-#include "XmppGSManager.h"
-#include "XmppGSEvent.h"
-#include "XmppGSRelation.h"
-#include "XmppGSPreset.h"
-#include "XmppGSVObj.h"
-//#include "XmppGSTrans.h"
-#include "XmppGSReport.h"
-#include "XmppGSUpdate.h"
-#include "IGSMessageHandler.h"
-
-#include "RunCode.h"
-#include "DataStoreMgr.h"
-
-namespace httpreq
-{
-	#include "HttpRequest.h"
-}
-*/
 
 #define LOGMSG printf
 
@@ -200,8 +152,9 @@ public:
 	{
 		return m_RunCodeMgr;
 	}
-	//virtual void OnTimeOverForCmdRecv( const defLinkID LinkID, const IOTDeviceType DevType, const uint32_t DevID, const uint32_t addr );
-	//virtual defUseable get_all_useable_state_ForLinkID( defLinkID LinkID );
+	virtual void OnTimeOverForCmdRecv( const defLinkID LinkID, const IOTDeviceType DevType, 
+	                                  const uint32_t DevID, const uint32_t addr );
+	virtual defUseable get_all_useable_state_ForLinkID( defLinkID LinkID );
 
 	void OnDeviceNotify( defDeviceNotify_ notify, GSIOTDevice *iotdevice, DeviceAddress *addr );
 	void OnDeviceDisconnect(GSIOTDevice *iotdevice);
@@ -286,6 +239,7 @@ public:
 	// --------------------------
 public:
 	static void XmppPrint( const Tag *ptag, const char *callinfo, const Stanza *stanza, bool dodel=true );
+	//static void XmppPrint( const Tag *ptag, const char *callinfo, const Stanza *stanza, bool dodel );
 	static void XmppPrint( const IQ& iq, const char *callinfo );
 	static void XmppPrint( const Message& msg, const char *callinfo );
 	void XmppClientSend( const IQ& iq, const char *callinfo );

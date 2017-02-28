@@ -1,5 +1,7 @@
 #include "gloox/message.h" //jyc20170222 add
 
+#include "gloox/rostermanager.h" //jyc20170224 add
+
 #include "GSIOTClient.h"
 #include "GSIOTInfo.h"
 #include "GSIOTDevice.h"
@@ -224,7 +226,8 @@ void GSIOTClient::PreInit( const std::string &RunParam )
 	}
 
 	m_IOT_starttime = g_GetUTCTime();
-	m_str_IOT_starttime = g_TimeToStr( m_IOT_starttime );
+	m_str_IOT_starttime = g_TimeToStr( m_IOT_starttime ); //jyc20170224 modify
+	//m_str_IOT_starttime = g_TimeToStr( m_IOT_starttime , defTimeToStrFmt_UTC );
 
 	printf("Start Time(%u): %s\r\n", (uint32_t)m_IOT_starttime, m_str_IOT_starttime.c_str());
 
@@ -265,7 +268,6 @@ void GSIOTClient::PreInit( const std::string &RunParam )
 void GSIOTClient::ResetNoticeJid()
 {
 	//m_NoticeJid.setJID( m_cfg->GetNoticeJid() );
-
 	//if( !m_cfg->GetNoticeJid().empty() && !m_NoticeJid )
 	//{
 	//	LOGMSG( "NoticeJid is invalid! noticejid full=%s, str=%s\r\n", m_NoticeJid.full().c_str(), m_cfg->GetNoticeJid().c_str() );
@@ -319,8 +321,11 @@ GSIOTClient::~GSIOTClient(void)
 	//CoUninitialize();
 }
 
-/* jyc20170223 notice
-void GSIOTClient::OnTimeOverForCmdRecv( const defLinkID LinkID, const IOTDeviceType DevType, const uint32_t DevID, const uint32_t addr )
+//* jyc20170223 notice
+void GSIOTClient::OnTimeOverForCmdRecv(const defLinkID LinkID, 
+                                       const IOTDeviceType DevType, 
+                                       const uint32_t DevID, 
+                                       const uint32_t addr )
 {
 	if( IOT_DEVICE_Unknown==DevType || 0==DevID )
 	{
@@ -384,7 +389,7 @@ defUseable GSIOTClient::get_all_useable_state_ForLinkID( defLinkID LinkID )
 
 	return defUseable_Err;
 }
-*/
+//*/
 
 void GSIOTClient::OnDeviceDisconnect(GSIOTDevice *iotdevice)
 {
@@ -511,7 +516,6 @@ void GSIOTClient::OnDeviceData_ProcOne( defLinkID LinkID, GSIOTDevice *iotdevice
 
 			struGSTime curdt;
 			g_struGSTime_GetCurTime( curdt );
-			/*jyc20160919*/
 			if( m_EnableTriggerDebug && m_ITriggerDebugHandler )
 			{
 				m_ITriggerDebugHandler->OnTriggerDebug( LinkID, iotdevice?iotdevice->getType():IOT_DEVICE_Unknown, iotdevice?iotdevice->getName():"", tctl->GetAGRunState(), this->GetAlarmGuardGlobalFlag(), g_IsValidCurTimeInAlarmGuardState(), curdt, iotdevice->GetStrAlmBody( true, curdt ), iotdevice->GetStrAlmSubject( true ) );
@@ -1202,7 +1206,7 @@ GSMessage* GSIOTClient::PopGSMessage()
 	return NULL;
 }
 
-void GSIOTClient::OnGSMessageProcess()
+void GSIOTClient::OnGSMessageProcess()  //jyc20170227 notice local ui program ,sometime must use;
 {
 	DWORD dwStart = ::timeGetTime();
 	while( ::timeGetTime()-dwStart < 700 )
@@ -1465,6 +1469,8 @@ bool GSIOTClient::handleIq( const IQ& iq )
 #endif
 		return true;
 	}
+
+	XmppPrint( iq, "test recv.......\n" );
 
 	switch( iq.subtype() ){
         	case IQ::Get:
@@ -1952,8 +1958,12 @@ bool GSIOTClient::handleIq( const IQ& iq )
 						XmppClientSend(re,"handleIq Send(Get ExtIotEvent ACK)");
 						return true;
 					}
-					//qjyc20160923
-					this->AddGSMessage( new GSMessage(defGSMsgType_Notify, iq.from(), iq.id(), pExXmppGSEvent->clone() ) );
+					//jyc20170227 modify
+					//this->AddGSMessage( new GSMessage(defGSMsgType_Notify, iq.from(), iq.id(), pExXmppGSEvent->clone() ) );
+					GSMessage *pMsg = new GSMessage(defGSMsgType_Notify, iq.from(), iq.id(), pExXmppGSEvent->clone() );
+					handleIq_Set_XmppGSEvent( pMsg );
+					delete pMsg;
+					
 					return true;
 				}
 
@@ -1993,13 +2003,16 @@ bool GSIOTClient::handleIq( const IQ& iq )
 					{
 						// ack
 						IQ re( IQ::Result, iq.from(), iq.id());
-						re.addExtension( new XmppGSVObj(struTagParam(true,true), pExXmppGSVObj->GetSrcMethod(), defmapVObjConfig(), defGSReturn_NoAuth ) );
+						re.addExtension( new XmppGSVObj(struTagParam(true,true), 
+						                                pExXmppGSVObj->GetSrcMethod(), 
+						                                defmapVObjConfig(), 
+						                                defGSReturn_NoAuth ) );
 						XmppClientSend(re,"handleIq Send(Set ExtIotVObj ACK)");
 						return true;
 					}
 
 					this->AddGSMessage( new GSMessage(defGSMsgType_Notify, iq.from(), iq.id(), pExXmppGSVObj->clone() ) );
-					*/
+					//*/
 					return true;
 				}
 
@@ -2021,7 +2034,6 @@ bool GSIOTClient::handleIq( const IQ& iq )
 												
 						if( 0 != device->getId() )
 						{  
-							//jyc20160823 
 							pLocalDevice = this->GetIOTDevice( device->getType(), device->getId() );
 							if( !pLocalDevice )
 							{
@@ -2384,56 +2396,6 @@ bool GSIOTClient::handleIq( const IQ& iq )
 	return true;
 }
 
-
-void GSIOTClient::handleIq_Get_XmppGSAuth( const XmppGSAuth *pExXmppGSAuth, const IQ& iq, const GSIOTUser *pUser )
-{
-#if !defined(defTest_defCfgOprt_GetSelf)
-	defUserAuth curAuth = m_cfg->m_UserMgr.check_Auth( pUser, IOT_Module_authority, defAuth_ModuleDefaultID );
-	if( !GSIOTUser::JudgeAuth( curAuth, defUserAuth_RO ) )
-	{
-		IQ re( IQ::Result, iq.from(), iq.id());
-		re.addExtension( new XmppGSResult( XMLNS_GSIOT_AUTHORITY, defGSReturn_NoAuth ) );
-		XmppClientSend(re,"handleIq Send(Get ExtIotAuthority ACK)");
-		return ;
-	}
-#endif
-
-	//const std::string DefaultNoticeJid = m_cfg->GetNoticeJid();
-	//if( !DefaultNoticeJid.empty() )
-	//{
-	//	GSIOTUser *pUser = m_cfg->m_UserMgr.GetUser( DefaultNoticeJid );
-
-	//	if( !pUser->get_UserFlag(defUserFlag_NoticeGroup) )
-	//	{
-	//		pUser->set_UserFlag( defUserFlag_NoticeGroup, true );
-	//	}
-	//}
-
-	const defmapGSIOTUser& needGetUser = pExXmppGSAuth->GetList_User();
-
-	defmapGSIOTUser mapUserDest;
-	const defmapGSIOTUser &mapUser = m_cfg->m_UserMgr.GetList_User();
-	for( defmapGSIOTUser::const_iterator it=mapUser.begin(); it!=mapUser.end(); ++it )
-	{
-		const GSIOTUser *pUser = it->second;
-
-		if( defUserAuth_RO == curAuth && !pUser->GetEnable() )
-		{
-			continue;
-		}
-
-		GSIOTUser *pUserRet = pUser->clone();
-		pUserRet->ResetOnlyAuth(true,false);
-		GSIOTUserMgr::usermapInsert( mapUserDest, pUserRet );
-	}
-
-	IQ re( IQ::Result, iq.from(), iq.id());
-	re.addExtension( new XmppGSAuth(false, pExXmppGSAuth->GetSrcMethod(), mapUserDest, struTagParam(), true ) );
-	XmppClientSend(re,"handleIq Send(Get ExtIotAuthority ACK)");
-}
-
-
-
 void GSIOTClient::handleIq_Get_XmppGSAuth_User( const XmppGSAuth_User *pExXmppGSAuth_User, const IQ& iq, const GSIOTUser *pUser )
 {
 	defmapGSIOTUser mapUserDest;
@@ -2526,6 +2488,57 @@ void GSIOTClient::handleIq_Get_XmppGSAuth_User( const XmppGSAuth_User *pExXmppGS
 	re.addExtension( new XmppGSAuth_User(pExXmppGSAuth_User->GetSrcMethod(), mapUserDest, struTagParam(), true) );
 	XmppClientSend(re,"handleIq Send(Get ExtIotAuthority_User ACK)");
 }
+
+
+void GSIOTClient::handleIq_Get_XmppGSAuth( const XmppGSAuth *pExXmppGSAuth, const IQ& iq, const GSIOTUser *pUser )
+{
+#if !defined(defTest_defCfgOprt_GetSelf)
+	defUserAuth curAuth = m_cfg->m_UserMgr.check_Auth( pUser, IOT_Module_authority, defAuth_ModuleDefaultID );
+	if( !GSIOTUser::JudgeAuth( curAuth, defUserAuth_RO ) )
+	{
+		IQ re( IQ::Result, iq.from(), iq.id());
+		re.addExtension( new XmppGSResult( XMLNS_GSIOT_AUTHORITY, defGSReturn_NoAuth ) );
+		XmppClientSend(re,"handleIq Send(Get ExtIotAuthority ACK)");
+		return ;
+	}
+#endif
+
+	//const std::string DefaultNoticeJid = m_cfg->GetNoticeJid();
+	//if( !DefaultNoticeJid.empty() )
+	//{
+	//	GSIOTUser *pUser = m_cfg->m_UserMgr.GetUser( DefaultNoticeJid );
+
+	//	if( !pUser->get_UserFlag(defUserFlag_NoticeGroup) )
+	//	{
+	//		pUser->set_UserFlag( defUserFlag_NoticeGroup, true );
+	//	}
+	//}
+
+	const defmapGSIOTUser& needGetUser = pExXmppGSAuth->GetList_User();
+
+	defmapGSIOTUser mapUserDest;
+	const defmapGSIOTUser &mapUser = m_cfg->m_UserMgr.GetList_User();
+	for( defmapGSIOTUser::const_iterator it=mapUser.begin(); it!=mapUser.end(); ++it )
+	{
+		const GSIOTUser *pUser = it->second;
+
+		if( defUserAuth_RO == curAuth && !pUser->GetEnable() )
+		{
+			continue;
+		}
+
+		GSIOTUser *pUserRet = pUser->clone();
+		pUserRet->ResetOnlyAuth(true,false);
+		GSIOTUserMgr::usermapInsert( mapUserDest, pUserRet );
+	}
+
+	IQ re( IQ::Result, iq.from(), iq.id());
+	re.addExtension( new XmppGSAuth(false, pExXmppGSAuth->GetSrcMethod(), mapUserDest, struTagParam(), true ) );
+	XmppClientSend(re,"handleIq Send(Get ExtIotAuthority ACK)");
+}
+
+
+
 
 void GSIOTClient::handleIq_Set_XmppGSAuth( const GSMessage *pMsg )
 {
@@ -3379,7 +3392,7 @@ void GSIOTClient::handleIq_Get_XmppGSReport( const XmppGSReport *pXmpp, const IQ
 void GSIOTClient::handleSubscription( const Subscription& subscription )
 {
 	if(subscription.subtype() == Subscription::Subscribe){
-		//xmppClient->rosterManager()->ackSubscriptionRequest(subscription.from(),true);
+		xmppClient->rosterManager()->ackSubscriptionRequest(subscription.from(),true);
 	}
 }
 
@@ -3531,9 +3544,17 @@ void GSIOTClient::Connect()
 	timer->registerTimer(this,4,60);	// 间隔发ping
 	timer->registerTimer(this,5,300);	// check system
 	
-	JID jid("000c2988989d@gsss.cn");
+	//JID jid("000c2988989d@gsss.cn");
+	//jid.setResource("gsiot");
+	//xmppClient = new Client(jid,"cfqgleukxk");
+
+	//JID jid("000c29066dd5@gsss.cn");
+	//jid.setResource("gsiot");
+	//xmppClient = new Client(jid,"ljlhnqiiev");
+
+	JID jid(m_cfg->getJid());
 	jid.setResource("gsiot");
-	xmppClient = new Client(jid,"cfqgleukxk");
+	xmppClient = new Client(jid,m_cfg->getPassword());
 	
 	//注册物联网协议
 	xmppClient->disco()->addFeature(XMLNS_GSIOT);
@@ -3545,9 +3566,10 @@ void GSIOTClient::Connect()
 	xmppClient->disco()->addFeature(XMLNS_GSIOT_EVENT);
 	xmppClient->disco()->addFeature(XMLNS_GSIOT_STATE);
 	xmppClient->disco()->addFeature(XMLNS_GSIOT_Change);
-	xmppClient->disco()->addFeature(XMLNS_GSIOT_MESSAGE);
-	xmppClient->disco()->addFeature(XMLNS_GSIOT_VObj);
+	xmppClient->disco()->addFeature(XMLNS_GSIOT_RELATION);
+	//xmppClient->disco()->addFeature(XMLNS_GSIOT_VObj);
 	xmppClient->disco()->addFeature(XMLNS_GSIOT_Report);
+	xmppClient->disco()->addFeature(XMLNS_GSIOT_MESSAGE);
 
 
 	xmppClient->registerStanzaExtension(new GSIOTInfo());
@@ -3561,9 +3583,10 @@ void GSIOTClient::Connect()
 	xmppClient->registerStanzaExtension(new XmppGSEvent(NULL)); //jyc20160921
 	xmppClient->registerStanzaExtension(new XmppGSState(NULL));
 	xmppClient->registerStanzaExtension(new XmppGSChange(NULL));
-	xmppClient->registerStanzaExtension(new XmppGSMessage(NULL));
-	xmppClient->registerStanzaExtension(new XmppGSVObj(NULL));
+	xmppClient->registerStanzaExtension(new XmppGSRelation(NULL));
+	//xmppClient->registerStanzaExtension(new XmppGSVObj(NULL));
 	xmppClient->registerStanzaExtension(new XmppGSReport(NULL));
+	xmppClient->registerStanzaExtension(new XmppGSMessage(NULL));
 
 	
 	xmppClient->registerIqHandler(this, ExtIot);
@@ -3575,10 +3598,11 @@ void GSIOTClient::Connect()
 	xmppClient->registerIqHandler(this, ExtIotManager);
 	xmppClient->registerIqHandler(this, ExtIotEvent);
 	xmppClient->registerIqHandler(this, ExtIotState); //dev red or green
-	xmppClient->registerIqHandler(this, ExtIotChange);
-	xmppClient->registerIqHandler(this, ExtIotMessage);
-	xmppClient->registerIqHandler(this, ExtIotVObj);
+	xmppClient->registerIqHandler(this, ExtIotChange);	
+	xmppClient->registerIqHandler(this, ExtIotRelation);
+	//xmppClient->registerIqHandler(this, ExtIotVObj);
 	xmppClient->registerIqHandler(this, ExtIotReport);
+	xmppClient->registerIqHandler(this, ExtIotMessage);
 
 
 	xmppClient->registerConnectionListener( this );
@@ -4206,7 +4230,9 @@ bool GSIOTClient::DataProc()
 
 						const GSIOTAddrObjKey AddrObjKey( iotdevice->getType(), iotdevice->getId(), address->GetType(), address->GetAddress() );
 						//jyc20160929 trouble in here no data insert
-						if( m_DataStoreMgr->insertdata_CheckSaveInvalid( AddrObjKey, useable>0 ) )
+						//if( m_DataStoreMgr->insertdata_CheckSaveInvalid( AddrObjKey, useable>0 ) )
+						//if( m_DataStoreMgr->insertdata_CheckSaveInvalid( AddrObjKey, 0 ) )
+						if( 1 )
 						{
 							gloox::util::MutexGuard mutexguard( m_mutex_DataStore );
 
@@ -4678,11 +4704,10 @@ defGSReturn GSIOTClient::SendControl( const IOTDeviceType DevType, const GSIOTDe
 				const GSRemoteCtl_AC *acctl = (GSRemoteCtl_AC*)device->getControl();
 				if( acctl && defFactory_ZK == acctl->get_factory() )
 				{
-					//jyc20160823
-					//if( m_IGSMessageHandler )
-					//{
-					//	return m_IGSMessageHandler->OnControlOperate( defCtrlOprt_SendControl, device->getExType(), device, obj );
-					//}
+					if( m_IGSMessageHandler )
+					{
+						return m_IGSMessageHandler->OnControlOperate( defCtrlOprt_SendControl, device->getExType(), device, obj );
+					}
 
 					return defGSReturn_Err;
 				}
@@ -4706,7 +4731,6 @@ defGSReturn GSIOTClient::SendControl( const IOTDeviceType DevType, const GSIOTDe
 		{
 			struGSTime curdt;
 			g_struGSTime_GetCurTime( curdt );
-			//jyc20160823
 			this->DoAlarmDevice( device, true, 1, true, device->GetStrAlmBody( true, curdt ), device->GetStrAlmSubject( true ) );
 			break;
 		}

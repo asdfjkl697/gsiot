@@ -123,7 +123,7 @@ void *CommLink_Thread(LPVOID lpPara) //jyc20160826 test
 		CCommLinkAuto_Run_Proc_Get AutoCommLink( device->m_CommLinkMgr, allowConnect );
 		CCommLinkRun *pCommLink = AutoCommLink.p();
 		
-		if( !pCommLink ) //jyc20160913 here comes trouble
+		if( !pCommLink ) 
 		{
 			macHeartbeatGuard_step(100);			
 			usleep(100000);

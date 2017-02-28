@@ -1146,7 +1146,7 @@ int DeviceManager::SaveToDB_rfsignal( const RFSignal &signal )
 
 	query.bind(col++, (int)signal.original_headflag);
 	query.bind(col++, (int)signal.original_headtime);
-	//query.bind(col++, signal.Get_original() );
+	query.bind(col++, signal.Get_original() );
 
 	query.exec();
 	return db->execAndGet("SELECT id FROM rfsignal ORDER BY id DESC LIMIT 1");

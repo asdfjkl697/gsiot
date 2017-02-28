@@ -1,8 +1,8 @@
 #pragma once
 
 #include "typedef.h"
-#include "stanzaextension.h"
-#include "tag.h"
+#include "gloox/stanzaextension.h"
+#include "gloox/tag.h"
 #include "ControlEvent.h"
 #include "GSIOTDevice.h"
 #include "EditAttrMgr.h"
@@ -27,7 +27,9 @@ public:
 		return new XmppGSEvent( tag );
 	}
 
-	void PrintTag( const Tag* tag, const Stanza *stanza ) const;
+	//void PrintTag( const Tag* tag, const Stanza *stanza ) const;
+	//void PrintTag( const Tag* tag, const Stanza *stanza );
+	void PrintTag(  Tag* tag, Stanza *stanza );
 
 	// reimplemented from StanzaExtension
 	virtual StanzaExtension* clone() const

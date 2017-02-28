@@ -528,10 +528,11 @@ bool RFSignal::SaveToFile( const std::string &filename ) const
 {
 	char buf[256] = {0};
 
-	//* 写入信息
-	//macRFFSave_Str( "ver", defRFSignalFile_Ver ); //jyc20160921
+	// 写入信息
+	/*
+	macRFFSave_Str( "ver", defRFSignalFile_Ver );
 
-	//macRFFSave_Int( "signal_type", this->signal_type ); //jyc20160921
+	macRFFSave_Int( "signal_type", this->signal_type );
 	macRFFSave_Int( "freq", this->freq );
 	macRFFSave_Int( "code", this->code );
 	macRFFSave_Int( "codeValidLen", this->codeValidLen );
@@ -572,7 +573,7 @@ bool RFSignal::SaveToFile( const std::string &filename ) const
 
 //#define macRFFLoad_Str(key) ::GetPrivateProfileStringA( defRFSignalFile_AppName, key, "", buf, sizeof(buf), filename.c_str() )
 //#define macRFFLoad_Int(key) ::GetPrivateProfileIntA( defRFSignalFile_AppName, key, 0, filename.c_str() )
-bool RFSignal::LoadFromFile( const std::string &filename )
+bool RFSignal::LoadFromFile( const std::string &filename ) //jyc20170224 notice
 {
 	char buf[1024] = {0};
 

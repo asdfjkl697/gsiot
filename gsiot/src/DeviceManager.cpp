@@ -850,7 +850,7 @@ bool DeviceManager::LoadDB_rfsignal()
 		signal.original_headflag = query.getColumn(col++).getInt();
 		signal.original_headtime = query.getColumn(col++).getInt();
 		std::string stroriginal = query.getColumn(col++);
-		signal.Set_original( stroriginal ); //jyc20160921 un note
+		signal.Set_original( stroriginal ); 
 
 		m_mapRFSignal[signal.id] = signal;
 	}

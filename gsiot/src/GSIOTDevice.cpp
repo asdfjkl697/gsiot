@@ -158,13 +158,9 @@ bool GSIOTDevice::IsSupportAlarm( const GSIOTDevice *device )
 	{
 	case IOT_DEVICE_Trigger:
 		return true;
-	/*jyc20160527
 	case IOT_DEVICE_Camera:
-		{
-			const IPCameraBase *ctl = (const IPCameraBase*)device->getControl();
-			return ctl->GetAdvAttrSafe().get_AdvAttr(defCamAdvAttr_SupportAlarm);
-		}
-		break;*/
+
+		break;
 
 	default:
 		break;

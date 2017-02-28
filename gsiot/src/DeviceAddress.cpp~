@@ -63,7 +63,7 @@ DeviceAddress::DeviceAddress(const Tag* tag)
 
 DeviceAddress::~DeviceAddress(void)
 {
-	//macCheckAndDel_Array(m_dataObject); //jyc20160603
+	macCheckAndDel_Array(m_dataObject);
 
 	if( m_pmutex_addr )
 	{
@@ -156,7 +156,7 @@ uint8_t *DeviceAddress::GetObjectData(uint8_t *data)
 
 void DeviceAddress::SetObjectData(uint8_t *data,uint32_t len)
 {
-	//macCheckAndDel_Array(m_dataObject); //jyc20160603
+	macCheckAndDel_Array(m_dataObject);
 
 	if(len>0){
 		//this->m_dataObject = (uint8_t *)malloc(len);
@@ -394,7 +394,9 @@ bool DeviceAddress::SetCurValue( const std::string& newValue, const time_t newVa
 // 温湿度等常规监测量是发生变化存储，判断门限参考SYS_VChgRng_***。
 // 风速这种按照窗口化处理后判断变化存储，门限参考SYS_WinTime_Wind，并对小值做合并处理参考SYS_MergeWindLevel/g_WindSpeedLevel()等。
 // 存储时间点的判断，在时间点之前2分钟以内已经存储的，认为这个存储已经接近时间点，算作时间点存储，算完成了时间点存储。从时间点整点开始记，一个时间范围内都算作时间点存储。相关参考g_isTimePoint、g_TransToTimePoint等。
-void DeviceAddress::DataAnalyse( const std::string& newValue, const time_t newValTime, bool *doSave, time_t *SaveTime, std::string *SaveValue, defDataFlag_* dataflag, std::string *strlog )
+void DeviceAddress::DataAnalyse( const std::string& newValue, const time_t newValTime, bool *doSave, 
+                                time_t *SaveTime, std::string *SaveValue, defDataFlag_* dataflag, 
+                                std::string *strlog )
 {
 	gloox::util::MutexGuard( this->m_pmutex_addr );
 
@@ -409,8 +411,7 @@ void DeviceAddress::DataAnalyse( const std::string& newValue, const time_t newVa
 			{
 				std::string WindowFinishValue;
 
-				// 此类型的数据，采集到的值先做窗口化处理
-				// 窗口化数值处理：找到这段时间内更符合的值
+				//jyc20170227 notice
 				if( ValueWindow( newValue, newValTime, WindowFinishValue, RUNCODE_Get(defCodeIndex_SYS_WinTime_Wind), RUNCODE_Get(defCodeIndex_SYS_WinTime_Wind,defRunCodeValIndex_2) ) )
 				{
 					isFinishValue = true;
@@ -423,7 +424,7 @@ void DeviceAddress::DataAnalyse( const std::string& newValue, const time_t newVa
 		case IOT_DEVICE_Humidity:
 		default:
 			{
-				// 此类型的数据，采集到的值直接可用
+				// direct use jyc trans
 				isFinishValue = true;
 			}
 			break;

@@ -49,10 +49,10 @@ GSIOTDevice::GSIOTDevice( const Tag* tag)
 		this->m_ver= tag->findAttribute("ver");
 
 	this->UntagEditAttr( tag );
-	/*/20160527
+	/*/jyc20160527
 	Tag *t = tag->findChild(defDeviceTypeTag_media);
 	if(t){
-	    	this->m_control = new MediaControl(t); //20160527
+	    	this->m_control = new MediaControl(t); //jyc20160527
 		return;
 	}
 
@@ -158,7 +158,7 @@ bool GSIOTDevice::IsSupportAlarm( const GSIOTDevice *device )
 	{
 	case IOT_DEVICE_Trigger:
 		return true;
-	/*20160527
+	/*jyc20160527
 	case IOT_DEVICE_Camera:
 		{
 			const IPCameraBase *ctl = (const IPCameraBase*)device->getControl();

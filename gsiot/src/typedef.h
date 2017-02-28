@@ -6,6 +6,13 @@
 
 #define OS_UBUNTU_FLAG 1
 
+#ifdef OS_UBUNTU_FLAG
+#define ROOTDIR  "/home/chen/"
+#else
+#define ROOTDIR  "/root/"
+#endif
+	
+
 #ifdef WIN32  
 #include <WinSock2.h>
 #include <Windows.h>  

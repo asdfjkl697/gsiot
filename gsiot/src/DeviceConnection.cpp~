@@ -461,7 +461,7 @@ int DeviceConnection::GetAllCommunicationState( const bool getCommLink )
 
 	//locallink or remotelink
 	//return ( (allConnectState && 1==PortState) ? 1:0 );
-	return ( (allConnectState && 1==PortState) ? 1:0 );
+	return ( allConnectState ? 1:0 ); //jyc20170223 modify must connect
 }
 
 int DeviceConnection::Get_CommLinkThread_id()

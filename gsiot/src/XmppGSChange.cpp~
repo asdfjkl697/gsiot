@@ -14,10 +14,9 @@ XmppGSChange::XmppGSChange( const Tag* tag )
 	if( !tag || tag->name() != "gsiot" || tag->xmlns() != XMLNS_GSIOT_Change )
 		return;
 
-	//Tag *tmgr = tag->findChild("change");
-	//if( tmgr )
-	//{
-	//}
+	//XmppGSChange::PrintTag( tag, ExtIotChange); //jyc20170227 debug
+	GSIOTClient::XmppPrint( tag, "recv", ExtIotChange, false );
+
 }
 
 XmppGSChange::~XmppGSChange(void)
@@ -46,7 +45,7 @@ Tag* XmppGSChange::tag() const
 
 	Tag *tglobal = new Tag(tmgr, "global");
 
-	sprintf_s( buf, sizeof(buf), "%08X%08X", m_change_count, m_change_ts );
+	snprintf( buf, sizeof(buf), "%08X%08X", m_change_count, m_change_ts );
 	tglobal->addAttribute( "cfg", std::string(buf) );
 
 	return i;
