@@ -7,9 +7,9 @@
 #define OS_UBUNTU_FLAG 1
 
 #ifdef OS_UBUNTU_FLAG
-#define ROOTDIR = "/home/chen/"
+#define ROOTDIR  "/home/chen/"
 #else
-#define ROOTDIR = "/root/"
+#define ROOTDIR  "/root/"
 #endif
 	
 

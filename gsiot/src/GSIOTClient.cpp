@@ -28,6 +28,8 @@
 
 #define defcheckNetUseable_timeMax (5*60*1000)
 
+//#define defForceDataSave  //jyc20170228 debug
+
 
 std::string g_IOTGetVersion()
 {
@@ -506,11 +508,11 @@ void GSIOTClient::OnDeviceData_ProcOne( defLinkID LinkID, GSIOTDevice *iotdevice
 	//const int thisThreadId = ::GetCurrentThreadId(); //jyc20160919
 	const int thisThreadId = ::pthread_self();
 	const time_t curUTCTime = g_GetUTCTime();
-
+	
 
 	switch(ctl->GetType())
 	{
-	case IOT_DEVICE_Trigger:
+		case IOT_DEVICE_Trigger:
 		{
 			TriggerControl *tctl = (TriggerControl *)ctl;
 
@@ -521,9 +523,8 @@ void GSIOTClient::OnDeviceData_ProcOne( defLinkID LinkID, GSIOTDevice *iotdevice
 				m_ITriggerDebugHandler->OnTriggerDebug( LinkID, iotdevice?iotdevice->getType():IOT_DEVICE_Unknown, iotdevice?iotdevice->getName():"", tctl->GetAGRunState(), this->GetAlarmGuardGlobalFlag(), g_IsValidCurTimeInAlarmGuardState(), curdt, iotdevice->GetStrAlmBody( true, curdt ), iotdevice->GetStrAlmSubject( true ) );
 			}
 
-			tctl->CompareTick();
+			tctl->CompareTick();		
 			if(tctl->IsTrigger(true)){
-
 				LOGMSG( "TriggerControl(id=%d,name=%s) isTrigger true, CurTriggerCount=%d -ThId%d\r\n",
 					iotdevice?iotdevice->getId():0, iotdevice?iotdevice->getName().c_str():"", tctl->GetCurTriggerCount(), thisThreadId );
 
@@ -641,7 +642,9 @@ void GSIOTClient::OnDeviceData_ProcOne( defLinkID LinkID, GSIOTDevice *iotdevice
 							const size_t DataSaveBufSize = m_lstDataSaveBuf.size();
 							if( DataSaveBufSize<10000 )
 							{
-								m_lstDataSaveBuf.push_back( new struDataSave( SaveTime, pCurDev->getType(), pCurDev->getId(), pCurAddr->GetType(), pCurAddr->GetAddress(), dataflag, SaveValue, pCurDev->getName() + "-" + pCurAddr->GetName() ) );
+								m_lstDataSaveBuf.push_back( new struDataSave( SaveTime, pCurDev->getType(),
+								          pCurDev->getId(), pCurAddr->GetType(), pCurAddr->GetAddress(),
+								          dataflag, SaveValue, pCurDev->getName()+"-"+pCurAddr->GetName()));
 							}
 							else if( DataSaveBufSize > 100 )
 							{
@@ -1470,7 +1473,7 @@ bool GSIOTClient::handleIq( const IQ& iq )
 		return true;
 	}
 
-	XmppPrint( iq, "test recv.......\n" );
+	//XmppPrint( iq, "test recv.......\n" );  //jyc20170227 debug recv message
 
 	switch( iq.subtype() ){
         	case IQ::Get:

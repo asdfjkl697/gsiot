@@ -422,10 +422,8 @@ void DeviceAddress::DataAnalyse( const std::string& newValue, const time_t newVa
 		case IOT_DEVICE_Temperature:
 		case IOT_DEVICE_Humidity:
 		default:
-			{
 				// direct use jyc trans
 				isFinishValue = true;
-			}
 			break;
 		}
 
@@ -435,7 +433,9 @@ void DeviceAddress::DataAnalyse( const std::string& newValue, const time_t newVa
 			{
 				// 先进行存储时间点相关的判断
 				// 当前时间所在时间点和上次存储的时间所在时间点不同。即，当前存储时间点还未存储过值。
-				if( g_TransToTimePoint(newValTime, m_type, false)!=g_TransToTimePoint(m_lastSaveTime, m_type, true) )
+				time_t newtimepointf = g_TransToTimePoint(newValTime, m_type, false);
+				time_t lasttimepoint = g_TransToTimePoint(m_lastSaveTime, m_type, true); //jyc20170228 modify
+				//if( newtimepointf != lasttimepoint ) //jyc20170228 debug 5s one time
 				{
 					*doSave = true;
 
@@ -453,7 +453,7 @@ void DeviceAddress::DataAnalyse( const std::string& newValue, const time_t newVa
 					}
 				}
 
-				// 是否达到需要存储的变化量
+				// change save 
 				if( !(*doSave) )
 				{
 					const float oldSaveValueF = atof(m_lastSaveValue.c_str());

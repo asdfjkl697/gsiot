@@ -38,6 +38,16 @@
 #define LPVOID void*
 #define LPCVOID const void*
 
+class nullptr_tt
+{
+public:
+    template<class _Tx> operator _Tx*() const { return 0; }
+    template<class _Tx, class _Ty> operator _Ty _Tx::*() const{ return 0; }
+private:
+    void operator& () const; //not allowed address
+};
+const nullptr_tt nullptr;  //jyc20160824 add nullptr
+
 
 typedef struct  //jyc20160919 for time
 {
@@ -95,6 +105,9 @@ enum defTimeToStrFmt_
 
 
 #define macOperator_Less( A, B, v ) if( A.v != B.v ) { return (A.v < B.v); }
+
+uint32_t Reversebytes_uint32(unsigned int value); //jyc20170228 add
+unsigned short Reversebytes_uint16(unsigned int value); //jyc20170228 add
 
 struct stru_vobj_config
 {

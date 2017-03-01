@@ -122,29 +122,31 @@ bool RFSignal::IsNear( const RFSignal &other ) const
 {
 	if( !other.isValid() || !this->isValid() )
 		return false;
-
+	printf("trigger test 91...\n");
 	if( other.signal_type != this->signal_type )
 		return false;
-
+	printf("trigger test 92...\n");
 	if( other.freq != this->freq )
 		return false;
-
+	printf("trigger test 93...\n");
 	switch( signal_type )
 	{
 	case defRFSignalType_code:
 		{
+			printf("trigger test 94...other.code=%d  this->code=%d\n",other.code,this->code);
 			if( other.code != this->code )
 				return false;
-
+			printf("trigger test 101...other.codeValidLen=%d this->codeValidLen=%d\n",
+			       other.codeValidLen,this->codeValidLen);
 			if( other.codeValidLen != this->codeValidLen )
 				return false;
-
+			printf("trigger test 102...\n");
 			if( other.headlen != this->headlen )
 				return false;
-
+			printf("trigger test 103...\n");
 			if( other.taillen != this->taillen )
 				return false;
-
+			printf("trigger test 95...\n");
 			return true;
 		}
 		break;
@@ -152,6 +154,7 @@ bool RFSignal::IsNear( const RFSignal &other ) const
 	case defRFSignalType_original:
 	case defRFSignalType_IR_original:
 		{
+			printf("trigger test 96...\n");
 			if( other.original_headflag != this->original_headflag )
 				return false;
 
@@ -160,7 +163,7 @@ bool RFSignal::IsNear( const RFSignal &other ) const
 
 			if( abs( (int)other.original_headtime-(int)this->original_headtime ) > 200 )
 				return false;
-
+			printf("trigger test 97...\n");
 			const int originallen = this->original_len <= defRFSignalOriginalMax ? this->original_len : defRFSignalOriginalMax;
 
 			for( int i=0; i<originallen; ++i )
@@ -168,7 +171,7 @@ bool RFSignal::IsNear( const RFSignal &other ) const
 				if( abs( (int)other.original[i]-(int)this->original[i] ) > 200 )
 					return false;
 			}
-
+			printf("trigger test 98...\n");
 			return true;
 		}
 	break;
@@ -402,8 +405,11 @@ bool RFSignal::Set_original( const std::string &stroriginal, const bool isByteSt
 			stopstring = NULL;
 			uint16_t val2 = (uint16_t)strtoul( msg, &stopstring, 16 );
 			pc += 2;
-
+#ifdef OS_UBUNTU_FLAG  
 			this->original[count] = val2<<8 | val1&0xFF;
+#else
+			this->original[count] = val1<<8 | val2&0xFF;  //jyc20170228 add
+#endif
 
 			++count;
 			if( count>=defRFSignalOriginalMax )
@@ -524,7 +530,7 @@ std::string RFSignal::Get_original( int format, const bool isByteStr ) const
 
 //#define macRFFSave_Str(key,strval) if( !::WritePrivateProfileStringA( defRFSignalFile_AppName, key, strval, filename.c_str() ) ) { return false; }
 //#define macRFFSave_Int(key,intval) _ultoa_s(intval, buf, sizeof(buf), 10); macRFFSave_Str( key, buf );
-bool RFSignal::SaveToFile( const std::string &filename ) const
+bool RFSignal::SaveToFile( const std::string &filename ) const //jyc20170224 notice
 {
 	char buf[256] = {0};
 

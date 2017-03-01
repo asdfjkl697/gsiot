@@ -28,6 +28,8 @@
 
 #define defcheckNetUseable_timeMax (5*60*1000)
 
+//#define defForceDataSave  //jyc20170228 debug
+
 
 std::string g_IOTGetVersion()
 {
@@ -506,12 +508,14 @@ void GSIOTClient::OnDeviceData_ProcOne( defLinkID LinkID, GSIOTDevice *iotdevice
 	//const int thisThreadId = ::GetCurrentThreadId(); //jyc20160919
 	const int thisThreadId = ::pthread_self();
 	const time_t curUTCTime = g_GetUTCTime();
-
+	
 
 	switch(ctl->GetType())
 	{
-	case IOT_DEVICE_Trigger:
+		printf("trigger test03....%d\n",ctl->GetType());
+		case IOT_DEVICE_Trigger:
 		{
+			printf("trigger test1....\n");
 			TriggerControl *tctl = (TriggerControl *)ctl;
 
 			struGSTime curdt;
@@ -521,9 +525,9 @@ void GSIOTClient::OnDeviceData_ProcOne( defLinkID LinkID, GSIOTDevice *iotdevice
 				m_ITriggerDebugHandler->OnTriggerDebug( LinkID, iotdevice?iotdevice->getType():IOT_DEVICE_Unknown, iotdevice?iotdevice->getName():"", tctl->GetAGRunState(), this->GetAlarmGuardGlobalFlag(), g_IsValidCurTimeInAlarmGuardState(), curdt, iotdevice->GetStrAlmBody( true, curdt ), iotdevice->GetStrAlmSubject( true ) );
 			}
 
-			tctl->CompareTick();
+			tctl->CompareTick();		
 			if(tctl->IsTrigger(true)){
-
+				printf("trigger test2....\n");
 				LOGMSG( "TriggerControl(id=%d,name=%s) isTrigger true, CurTriggerCount=%d -ThId%d\r\n",
 					iotdevice?iotdevice->getId():0, iotdevice?iotdevice->getName().c_str():"", tctl->GetCurTriggerCount(), thisThreadId );
 
@@ -641,7 +645,9 @@ void GSIOTClient::OnDeviceData_ProcOne( defLinkID LinkID, GSIOTDevice *iotdevice
 							const size_t DataSaveBufSize = m_lstDataSaveBuf.size();
 							if( DataSaveBufSize<10000 )
 							{
-								m_lstDataSaveBuf.push_back( new struDataSave( SaveTime, pCurDev->getType(), pCurDev->getId(), pCurAddr->GetType(), pCurAddr->GetAddress(), dataflag, SaveValue, pCurDev->getName() + "-" + pCurAddr->GetName() ) );
+								m_lstDataSaveBuf.push_back( new struDataSave( SaveTime, pCurDev->getType(),
+								          pCurDev->getId(), pCurAddr->GetType(), pCurAddr->GetAddress(),
+								          dataflag, SaveValue, pCurDev->getName()+"-"+pCurAddr->GetName()));
 							}
 							else if( DataSaveBufSize > 100 )
 							{
@@ -730,15 +736,18 @@ void GSIOTClient::DoAlarmDevice( const GSIOTDevice *iotdevice, const bool AGRunS
 			&& (*it)->GetDeviceID() == iotdevice->getId()
 			)
 		{
+			printf("trigger test3....\n");
 			if( (*it)->isForce()
 				|| ( AlarmGuardGlobalFlag && AGRunState && IsValidCurTime ) // 
 				)	
 			{
+				printf("trigger test4....\n");
 				// interval action
 				bool needDoInterval = DoControlEvent( iotdevice->getType(), iotdevice->getId(), (*it), true, strAlmBody, strAlmSubject, (*it)->isForce()?"Force Trigger doevent":"Trigger doevent" );
 
 				if( needDoInterval )
 				{
+					printf("trigger test5....\n");
 					uint32_t DoInterval = (*it)->GetDoInterval();
 					DoInterval = DoInterval>3000 ? 3000:DoInterval;
 
@@ -1470,7 +1479,7 @@ bool GSIOTClient::handleIq( const IQ& iq )
 		return true;
 	}
 
-	XmppPrint( iq, "test recv.......\n" );
+	//XmppPrint( iq, "test recv.......\n" );  //jyc20170227 debug recv message
 
 	switch( iq.subtype() ){
         	case IQ::Get:
@@ -4230,9 +4239,7 @@ bool GSIOTClient::DataProc()
 
 						const GSIOTAddrObjKey AddrObjKey( iotdevice->getType(), iotdevice->getId(), address->GetType(), address->GetAddress() );
 						//jyc20160929 trouble in here no data insert
-						//if( m_DataStoreMgr->insertdata_CheckSaveInvalid( AddrObjKey, useable>0 ) )
-						//if( m_DataStoreMgr->insertdata_CheckSaveInvalid( AddrObjKey, 0 ) )
-						if( 1 )
+						if( m_DataStoreMgr->insertdata_CheckSaveInvalid( AddrObjKey, useable>0 ) )
 						{
 							gloox::util::MutexGuard mutexguard( m_mutex_DataStore );
 

@@ -28,6 +28,18 @@
 //#include <regex>  // regular expression 正则表达式
 #include "gloox/md5.h"
 
+uint32_t Reversebytes_uint32(unsigned int value){
+	uint32_t v = value;
+	return (v&0x000000ff)<<24 | (v&0x0000ff00)<<8 |
+		(v&0x00ff0000)>>8 | (v&0xff000000)>>24;
+}
+
+uint16_t Reversebytes_uint16(unsigned int value){
+	unsigned short vv = value;
+	uint16_t vvv = (uint16_t)(vv&0xff)<<8|vv>>8;
+	return vvv;
+}
+
 void GetLocalTime(SYSTEMTIME *st)
 {
     if(st)
@@ -804,10 +816,12 @@ uint16_t crc16_verify( uint8_t *buf, uint16_t len )
 		uchCRCHi = auchCRCLo[uIndex] ; 
 	} 
 //jyc20170224 bigend or smallend UBUNTU DIFF OPENWRT
-if(OS_UBUNTU_FLAG)
+//if(OS_UBUNTU_FLAG)
+#ifdef OS_UBUNTU_FLAG
 	return ( (uchCRCHi << 8)| uchCRCLo );
-else
+#else
 	return ( (uchCRCLo << 8)| uchCRCHi );
+#endif
 }
 
 uint32_t g_StringToBuffer( const std::string &str, uint8_t *buf, uint32_t len, bool hasspace )
@@ -2029,9 +2043,8 @@ time_t g_GetTimePointSecond( const IOTDeviceType type, const bool isPrevSecond )
 bool g_isTimePoint( const time_t utctime, const IOTDeviceType type )
 {
 	const time_t TimePoint = ( utctime / 1800 ) * 1800;
-
 	const time_t PrevSecond = g_GetTimePointSecond( type, true );
-	const time_t AfterSecond = g_GetTimePointSecond( type, false );
+	const time_t AfterSecond = g_GetTimePointSecond( type, false );  //jyc20170228 modify
 
 	return ( utctime > (TimePoint-PrevSecond) ||  utctime < (TimePoint+AfterSecond) );
 }
@@ -2046,7 +2059,8 @@ time_t g_TransToTimePoint( const time_t utctime, const IOTDeviceType type, const
 	{
 		const time_t NextTimePoint = TimePoint + 1800;
 
-		if( utctime > (NextTimePoint-g_GetTimePointSecond(type, true)) )
+		//if( utctime > (NextTimePoint-g_GetTimePointSecond(type, true)) ) //jyc20170228 have problem
+		if( utctime > (NextTimePoint-60) )
 		{
 			struct tm loT;
 			//localtime_s( &loT, &TimePoint );

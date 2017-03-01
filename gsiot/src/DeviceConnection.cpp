@@ -1087,6 +1087,7 @@ defGSReturn DeviceConnection::SendControl( const IOTDeviceType DevType, const GS
 						// 发送次数包含在编码里
 						LOGMSG( "RFRemoteCtrl(%s) Send module=%d, %s", pCurButton->GetObjName().c_str(), \
 						       pCurButton->GetSignal().GetModuleIndex(), pCurButton->GetSignal().Print( "", false ).c_str() );
+
 						m_serial_msg->doMessage( LinkID, sendBuf, pPacketEnd + 1 - sendBuf, \
 						       DevType, DevID, rfCtl, address, overtime, QueueOverTime, \
 						       nextInterval>1 ? nextInterval : pCurButton->GetSignal().GetSendNeedTime() );
@@ -1709,6 +1710,31 @@ void DeviceConnection::GetRFDeviceInfo(uint32_t productID,uint32_t passCode)
 
 }
 
+#ifndef OS_UBUNTU_FLAG
+uint8_t *Reversebuffer16(uint8_t *buffer, unsigned int len){
+	uint8_t *src;
+	unsigned int i;
+	for(i=0;i<len;i+=2){
+		src[i]=buffer[i+1];
+		src[i+1]=buffer[i];
+	}
+	return src;
+}
+
+void Reversememcpy16(uint16_t *src, uint8_t *buffer, unsigned int len){
+	unsigned int i;
+	for(i=0;i<len;i+=2){
+		src[i/2]=buffer[i+1]<<8|buffer[i];
+	}
+}
+
+void Reversememcpy32(uint32_t *src, uint8_t *buffer, unsigned int len){
+	unsigned int i;
+	for(i=0;i<len;i+=4){
+		src[i/4]=buffer[i+3]<<24|buffer[i+2]<<16|buffer[i+1]<<8|buffer[i];
+	}
+}
+#endif
 
 void DeviceConnection::DecodeRxb8Data( CHeartbeatGuard *phbGuard, CCommLinkRun *CommLink, defFreq freq, uint8_t* const srcbuf, const uint32_t srcbufsize )
 {
@@ -1771,17 +1797,12 @@ void DeviceConnection::DecodeRxb8Data( CHeartbeatGuard *phbGuard, CCommLinkRun *
 	// 指令长度					(1 byte)		指令有效位长度
 	signal.codeValidLen = *buffer++;
 
-	// 引导码					0-7 个 uint16
 	if( signal.headlen>0 )
 	{
 		memcpy( &signal.headcode, buffer, sizeof(uint16_t)*signal.headlen );
 		buffer += sizeof(uint16_t)*signal.headlen;
 	}
 
-	// 数据段BIT 1上升沿时间		UIN16_T			时间单位：us
-	// 数据段BIT 1下降沿时间		UIN16_T			时间单位：us
-	// 数据段BIT 0上升沿时间		UIN16_T			时间单位：us
-	// 数据段BIT 0下降沿时间		UIN16_T			时间单位：us
 	memcpy( &signal.one_high_time, buffer, sizeof(uint16_t) );
 	buffer += sizeof(uint16_t);
 
@@ -1794,23 +1815,24 @@ void DeviceConnection::DecodeRxb8Data( CHeartbeatGuard *phbGuard, CCommLinkRun *
 	memcpy( &signal.zero_low_time, buffer, sizeof(uint16_t) );
 	buffer += sizeof(uint16_t);
 
-	// 数据码时序 的 有效长度计算出位掩码
+
 	uint32_t codemask = ~0;
 	if( signal.codeValidLen<32 )
 	{
+#ifdef OS_UBUNTU_FLAG  //jyc20170301 add for notice message
 		codemask >>= 32-signal.codeValidLen;
+#else
+		codemask <<= 32-signal.codeValidLen;
+#endif
 	}
 
-	// 数据码时序
 	memcpy( &signal.code, buffer, 4 );
 	buffer += 4;
 	signal.code &= codemask;
 
-	// silent间隔时间			UIN16_T			时间单位：us
 	memcpy( &signal.silent_interval, buffer, sizeof(uint16_t) );
 	buffer += sizeof(uint16_t);
 
-	// 结束码					0-7 个 uint16
 	if( signal.taillen>0 )
 	{
 		memcpy( &signal.tailcode, buffer, sizeof(uint16_t)*signal.taillen );
@@ -1822,7 +1844,6 @@ void DeviceConnection::DecodeRxb8Data( CHeartbeatGuard *phbGuard, CCommLinkRun *
 		//jyc20160824 debug all off
 		//signal.Print( "recv DecodeRxb8Data" );
 	}
-
 	OnDeviceData_RFSignal( phbGuard, CommLink, signal );
 }
 
@@ -1861,7 +1882,6 @@ void DeviceConnection::OnDeviceData_RFSignal( CHeartbeatGuard *phbGuard, CCommLi
 	}
 
 	macHeartbeatGuard_step(151800);
-
 	std::list<IRFReadHandler *>::const_iterator it = m_RFHandlerQueue.begin();
 	for(;it!=m_RFHandlerQueue.end();it++){
 		(*it)->OnRead(LinkID, signal, isAdd, strAddedName);
