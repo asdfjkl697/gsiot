@@ -34,9 +34,10 @@ uint32_t Reversebytes_uint32(unsigned int value){
 		(v&0x00ff0000)>>8 | (v&0xff000000)>>24;
 }
 
-unsigned short Reversebytes_uint16(unsigned int value){
+uint16_t Reversebytes_uint16(unsigned int value){
 	unsigned short vv = value;
-	return (vv&0x00ff)<<8 | vv>>8 ;
+	uint16_t vvv = (uint16_t)(vv&0xff)<<8|vv>>8;
+	return vvv;
 }
 
 void GetLocalTime(SYSTEMTIME *st)
@@ -1228,7 +1229,7 @@ bool g_CheckEMail( const std::string &email_address )
 
 	if( email_address.empty() )
 		return false;
-	/*
+	
 	std::regex pattern("([0-9A-Za-z\\-_\\.]+)@([0-9a-z]+\\.[a-z]{2,3}(\\.[a-z]{2})?)");
 	// 正则表达式，匹配规则：
 	// 第1组（即用户名），匹配规则：0至9、A至Z、a至z、下划线、点、连字符之中
@@ -1248,7 +1249,7 @@ bool g_CheckEMail( const std::string &email_address )
 		domain_name = regex_replace( email_address, pattern, std::string("$2") );
 
 		return true;
-	}*/
+	}
 
 	return false;
 }
@@ -1365,7 +1366,7 @@ time_t g_GetUTCTime()
 	memset( &st, 0, sizeof(st) );
 	//::GetLocalTime(&st);
 	GetLocalTime(&st);
-	tm temptm = {st.wSecond,st.wMinute,st.wHour,st.wDay,st.wMonth-1,st.wYear-1900,st.wDayOfWeek,0,0};
+	tm temptm = {st.wSecond,st.wMinute,st.wHour,st.wDay,st.wMonth,st.wYear-1900,st.wDayOfWeek,0,0};
 	return mktime(&temptm);
 #else
 	time_t t;

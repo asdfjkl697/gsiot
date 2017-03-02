@@ -1229,28 +1229,19 @@ bool g_CheckEMail( const std::string &email_address )
 
 	if( email_address.empty() )
 		return false;
-	/*
+/*	jyc20170301 remove because no <regex>
 	std::regex pattern("([0-9A-Za-z\\-_\\.]+)@([0-9a-z]+\\.[a-z]{2,3}(\\.[a-z]{2})?)");
-	// 正则表达式，匹配规则：
-	// 第1组（即用户名），匹配规则：0至9、A至Z、a至z、下划线、点、连字符之中
-	// 的任意字符，重复一遍或以上
-	// 中间，一个“@”符号
-	// 第二组（即域名），匹配规则：0至9或a至z之中的任意字符重复一遍或以上，
-	// 接着一个点，接着a至z之中的任意字符重复2至3遍（如com或cn等），
-	// 第二组内部的一组，一个点，接着a至z之中的任意字符重复2遍（如cn或fr等）
-	// 内部一整组重复零次或一次
 
 	if ( regex_match( email_address, pattern ) )
 	{
-		// 截取第一组
+
 		user_name = regex_replace( email_address, pattern, std::string("$1") );
 
-		// 截取第二组
 		domain_name = regex_replace( email_address, pattern, std::string("$2") );
 
 		return true;
-	}*/
-
+	}
+*/
 	return false;
 }
 
@@ -1366,7 +1357,7 @@ time_t g_GetUTCTime()
 	memset( &st, 0, sizeof(st) );
 	//::GetLocalTime(&st);
 	GetLocalTime(&st);
-	tm temptm = {st.wSecond,st.wMinute,st.wHour,st.wDay,st.wMonth-1,st.wYear-1900,st.wDayOfWeek,0,0};
+	tm temptm = {st.wSecond,st.wMinute,st.wHour,st.wDay,st.wMonth,st.wYear-1900,st.wDayOfWeek,0,0};
 	return mktime(&temptm);
 #else
 	time_t t;

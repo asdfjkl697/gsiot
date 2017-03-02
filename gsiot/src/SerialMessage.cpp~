@@ -80,7 +80,6 @@ void SerialMessage::doMessage( defLinkID LinkID, uint8_t *data, uint32_t size, c
 		buffer->nextInterval = nextInterval;
 		buffer->DevType = DevType;
 		buffer->DevID = DevID;
-		//jyc20160824
 		buffer->ctl = GSIOTClient::CloneControl( ctl, false );
 
 		if( address )

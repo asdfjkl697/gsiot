@@ -172,7 +172,8 @@ Tag* DeviceAddress::tag(const struTagParam &TagParam)
 	Tag* i = new Tag( "address" );
 	i->addAttribute("data",(int)this->m_address);
 
-	if( TagParam.isValid && TagParam.isResult )
+	//if( TagParam.isValid && TagParam.isResult )  //jyc20170302 debug
+	if( TagParam.isValid )
 	{
 		this->tagEditAttr( i, TagParam );
 
@@ -435,7 +436,7 @@ void DeviceAddress::DataAnalyse( const std::string& newValue, const time_t newVa
 				// 当前时间所在时间点和上次存储的时间所在时间点不同。即，当前存储时间点还未存储过值。
 				time_t newtimepointf = g_TransToTimePoint(newValTime, m_type, false);
 				time_t lasttimepoint = g_TransToTimePoint(m_lastSaveTime, m_type, true); //jyc20170228 modify
-				//if( newtimepointf != lasttimepoint ) //jyc20170228 debug
+				if( newtimepointf != lasttimepoint ) //jyc20170228 debug 5s one time
 				{
 					*doSave = true;
 

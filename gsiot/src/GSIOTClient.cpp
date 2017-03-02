@@ -303,6 +303,7 @@ void GSIOTClient::Stop(void)
 	//printf( "~GSIOTClient: thread exit wait usetime=%dms\r\n", ::timeGetTime()-dwStart );
 }
 
+/*
 GSIOTClient::~GSIOTClient(void)
 {
 	if(xmppClient){
@@ -321,6 +322,81 @@ GSIOTClient::~GSIOTClient(void)
 	}
 	
 	//CoUninitialize();
+}*/
+
+
+GSIOTClient::~GSIOTClient(void)  //jyc20170302 modify 
+{
+	if(xmppClient){
+		xmppClient->disconnect();
+
+	   xmppClient->removeStanzaExtension(ExtIot);
+	   xmppClient->removeIqHandler(this, ExtIot);
+	   xmppClient->removeStanzaExtension(ExtIotResult);
+	   xmppClient->removeIqHandler(this, ExtIotResult);
+	   xmppClient->removeStanzaExtension(ExtIotControl);
+       xmppClient->removeIqHandler(this, ExtIotControl);
+	   xmppClient->removeStanzaExtension(ExtIotHeartbeat);
+	   xmppClient->removeIqHandler(this, ExtIotHeartbeat);
+	   xmppClient->removeStanzaExtension(ExtIotDeviceInfo);
+       xmppClient->removeIqHandler(this, ExtIotDeviceInfo);
+	   xmppClient->removeStanzaExtension(ExtIotAuthority);
+	   xmppClient->removeIqHandler(this, ExtIotAuthority);
+	   xmppClient->removeStanzaExtension(ExtIotAuthority_User);
+	   xmppClient->removeIqHandler(this, ExtIotAuthority_User);
+	   xmppClient->removeStanzaExtension(ExtIotManager);
+	   xmppClient->removeIqHandler(this, ExtIotManager);
+	   xmppClient->removeStanzaExtension(ExtIotEvent);
+	   xmppClient->removeIqHandler(this, ExtIotEvent);
+	   xmppClient->removeStanzaExtension(ExtIotState);
+	   xmppClient->removeIqHandler(this, ExtIotState);
+	   xmppClient->removeStanzaExtension(ExtIotChange);
+	   xmppClient->removeIqHandler(this, ExtIotChange);
+	   //xmppClient->removeStanzaExtension(ExtIotTalk);
+	   //xmppClient->removeIqHandler(this, ExtIotTalk);
+	   //xmppClient->removeStanzaExtension(ExtIotPlayback);
+	   //xmppClient->removeIqHandler(this, ExtIotPlayback);
+	   xmppClient->removeStanzaExtension(ExtIotRelation);
+	   xmppClient->removeIqHandler(this, ExtIotRelation);
+	   //xmppClient->removeStanzaExtension(ExtIotPreset);
+	   //xmppClient->removeIqHandler(this, ExtIotPreset);
+	   //xmppClient->removeStanzaExtension(ExtIotVObj);
+	   //xmppClient->removeIqHandler(this, ExtIotVObj);
+	   //xmppClient->removeStanzaExtension(ExtIotTrans);
+	   //xmppClient->removeIqHandler(this, ExtIotTrans);
+	   xmppClient->removeStanzaExtension(ExtIotReport);
+	   xmppClient->removeIqHandler(this, ExtIotReport);
+	   xmppClient->removeStanzaExtension(ExtIotMessage);
+	   xmppClient->removeIqHandler(this, ExtIotMessage);
+	   //xmppClient->removeStanzaExtension(ExtIotUpdate);
+	   //xmppClient->removeIqHandler(this, ExtIotUpdate);
+	   xmppClient->removeSubscriptionHandler(this);
+	   xmppClient->removeMessageHandler(this);
+	   xmppClient->removeIqHandler(this,ExtPing);
+	   delete(xmppClient);
+	}
+	
+	//PlaybackCmd_clean();
+	//Playback_DeleteAll();
+
+	//if(ipcamClient){
+	//	delete(ipcamClient);
+	//}
+
+	if(deviceClient){
+		delete(deviceClient);
+	}
+
+	if( m_cfg ) delete(m_cfg);
+    if( m_event ) delete(m_event);
+	if( timer ) delete(timer);
+
+	if( m_DataStoreMgr )
+	{
+		delete m_DataStoreMgr;
+		m_DataStoreMgr = NULL;
+	}
+	//CoUninitialize();  //jyc20170302 comport init for windows
 }
 
 //* jyc20170223 notice
@@ -748,7 +824,7 @@ void GSIOTClient::DoAlarmDevice( const GSIOTDevice *iotdevice, const bool AGRunS
 					if( DoInterval > 0 )
 					{
 						//Sleep( DoInterval );
-						usleep( DoInterval*1000 );
+						usleep( DoInterval*1000 ); //jyc20170302 notice 1000 ->100 ??
 					}
 				}
 			}
@@ -1801,7 +1877,7 @@ bool GSIOTClient::handleIq( const IQ& iq )
 			{
 				GSIOTUser *pUser = m_cfg->m_UserMgr.check_GetUser( iq.from().bare() );
 
-				this->m_cfg->FixOwnerAuth(pUser);
+				this->m_cfg->FixOwnerAuth(pUser); //jyc20170301 note if have authority
 
 				defGSReturn ret = m_cfg->m_UserMgr.check_User(pUser);
 				 if( macGSFailed(ret) )  
@@ -1930,7 +2006,11 @@ bool GSIOTClient::handleIq( const IQ& iq )
 						return true;
 					}
 
-					this->AddGSMessage( new GSMessage(defGSMsgType_Notify, iq.from(), iq.id(), pExXmppGSAuth->clone() ) );
+					//jyc20170301 modify
+					//this->AddGSMessage( new GSMessage(defGSMsgType_Notify, iq.from(), iq.id(), pExXmppGSAuth->clone() ) );
+					GSMessage *pMsg = new GSMessage(defGSMsgType_Notify, iq.from(), iq.id(), pExXmppGSAuth->clone() );			
+					handleIq_Set_XmppGSAuth( pMsg );
+					delete pMsg;
 					return true;
 				}
 
@@ -1945,8 +2025,11 @@ bool GSIOTClient::handleIq( const IQ& iq )
 						XmppClientSend(re,"handleIq Send(Get ExtIotManager ACK)");
 						return true;
 					}
-
-					this->AddGSMessage( new GSMessage(defGSMsgType_Notify, iq.from(), iq.id(), pExXmppGSManager->clone() ) );
+					//jyc20170301 modify
+					//this->AddGSMessage( new GSMessage(defGSMsgType_Notify, iq.from(), iq.id(), pExXmppGSManager->clone() ) );
+					GSMessage *pMsg = new GSMessage(defGSMsgType_Notify, iq.from(), iq.id(), pExXmppGSManager->clone() );			
+					handleIq_Set_XmppGSManager( pMsg );
+					delete pMsg;
 					return true;
 				}
 				
@@ -1990,8 +2073,11 @@ bool GSIOTClient::handleIq( const IQ& iq )
 						XmppClientSend(re,"handleIq Send(Set ExtIotRelation ACK)");
 						return true;
 					}
-
-					this->AddGSMessage( new GSMessage(defGSMsgType_Notify, iq.from(), iq.id(), pExXmppGSRelation->clone() ) );
+					//jyc20170301 modify
+					//this->AddGSMessage( new GSMessage(defGSMsgType_Notify, iq.from(), iq.id(), pExXmppGSRelation->clone() ) );
+					GSMessage *pMsg = new GSMessage(defGSMsgType_Notify, iq.from(), iq.id(), pExXmppGSRelation->clone() );
+					handleIq_Set_XmppGSRelation( pMsg );
+					delete pMsg;
 					return true;
 				}
 
@@ -2539,8 +2625,6 @@ void GSIOTClient::handleIq_Get_XmppGSAuth( const XmppGSAuth *pExXmppGSAuth, cons
 	re.addExtension( new XmppGSAuth(false, pExXmppGSAuth->GetSrcMethod(), mapUserDest, struTagParam(), true ) );
 	XmppClientSend(re,"handleIq Send(Get ExtIotAuthority ACK)");
 }
-
-
 
 
 void GSIOTClient::handleIq_Set_XmppGSAuth( const GSMessage *pMsg )
