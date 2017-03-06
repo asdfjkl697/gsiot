@@ -320,6 +320,9 @@ enum IOTDeviceType
 	IOT_DEVICE_Event,		// 驱动事件
 	IOT_DEVICE_RS485,		// RS485
 	IOT_DEVICE_Wind,		// 风速
+	IOT_DEVICE_CO2,
+	IOT_DEVICE_HCHO,
+	IOT_DEVICE_PM25,		//jyc20170304 add
 	IOT_DEVICE_Custom=100,	// 自定义
 
 	IOTDevice_ExSpec_Begin_		= 500,	//-- 子类型

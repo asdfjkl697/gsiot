@@ -210,9 +210,10 @@ void *AlarmProc_Thread(LPVOID lpPara)
 GSIOTClient::GSIOTClient( IDeviceHandler *handler, const std::string &RunParam )
 	: m_parser(this), m_PreInitState(false), m_cfg(NULL), m_event(NULL), timer(NULL), deviceClient(NULL),
 	xmppClient(NULL),timeCount(0),serverPingCount(0), m_handler(handler), m_running(false), 
-	m_IGSMessageHandler(NULL), m_ITriggerDebugHandler(NULL), m_EnableTriggerDebug(false)
+	m_IGSMessageHandler(NULL), m_ITriggerDebugHandler(NULL), 
+	m_EnableTriggerDebug(false),m_last_checkNetUseable_camid(0)
 {
-	//g_SYS_SetGSIOTClient( this ); //jyc20160826
+	g_SYS_SetGSIOTClient( this ); //jyc20160826
 	this->PreInit( RunParam );
 	
 	m_DataStoreMgr = NULL;
@@ -417,6 +418,7 @@ void GSIOTClient::OnTimeOverForCmdRecv(const defLinkID LinkID,
 			std::list<GSIOTDevice*>::const_iterator it = IotDeviceList.begin();
 			std::list<GSIOTDevice*>::const_iterator itEnd = IotDeviceList.end();
 			for( ; it!=itEnd && addr; ++it )
+			//for( ; it!=itEnd ; ++it )  //jyc20170303 notice 10s
 			{
 				GSIOTDevice *pCurDev = (*it);
 				if( pCurDev->getType() != DevType )
@@ -433,7 +435,7 @@ void GSIOTClient::OnTimeOverForCmdRecv(const defLinkID LinkID,
 					return;
 
 				DeviceAddress *pCurAddr = pCurCtl->GetAddress( addr );
-				if( pCurAddr )
+				if( pCurAddr )  //jyc20170303 remove 
 				{
 					bool isChanged = false;
 					pCurCtl->check_NetUseable_RecvFailed( &isChanged );
@@ -467,7 +469,6 @@ defUseable GSIOTClient::get_all_useable_state_ForLinkID( defLinkID LinkID )
 
 	return defUseable_Err;
 }
-//*/
 
 void GSIOTClient::OnDeviceDisconnect(GSIOTDevice *iotdevice)
 {
@@ -546,9 +547,7 @@ void GSIOTClient::OnDeviceData( defLinkID LinkID, GSIOTDevice *iotdevice, Contro
 {
 	//const int thisThreadId = ::GetCurrentThreadId();
 	const int thisThreadId = ::pthread_self();
-
-	LOGMSG( "OnDeviceData Link%d, ctl(%d,%d)-ThId%d\n", LinkID, ctl->GetType(), iotdevice?iotdevice->getId():0, thisThreadId );
-
+	LOGMSG( "OnDeviceData Link%d, ctl(%d,%d)-ThId%d\n", LinkID, ctl->GetType(), iotdevice?iotdevice->getId():0, thisThreadId );	
 	switch(ctl->GetType())
 	{
 	case IOT_DEVICE_RS485:
@@ -649,12 +648,21 @@ void GSIOTClient::OnDeviceData_ProcOne( defLinkID LinkID, GSIOTDevice *iotdevice
 
 				if( pCurDev->GetLinkID() != LinkID )
 					continue;
-
+		
 				if( iotdevice )
 				{
 					if( !GSIOTClient::Compare_Device( iotdevice, pCurDev ) )
 						continue;
 				}
+				/* //jyc20170305 debug
+				if(pCurDev->getId()==2&&pCurDev->getType()==12){
+					printf("test4 id=%d name=%s getlinkid=%d  linkid=%d......\n",
+					       pCurDev->getId(),pCurDev->getName().c_str(),pCurDev->GetLinkID(),LinkID);
+					printf("pctllinkid=%d ctllinkid=%d..........\n",
+					       pCurCtl->GetLinkID(),ctl->GetLinkID());
+					printf("pctlid=%d ctlid=%d..........\n",
+					       ((RS485DevControl*)pCurCtl)->GetDeviceid(),((RS485DevControl*)ctl)->GetDeviceid());
+				}*/
 
 				if( !GSIOTClient::Compare_Control( pCurCtl, ctl ) )
 					continue;
@@ -746,7 +754,7 @@ void GSIOTClient::OnDeviceData_ProcOne( defLinkID LinkID, GSIOTDevice *iotdevice
 
 	while(1)   //send to network UI  JYC20170220 TRANS
 	{
-		ControlMessage *pCtlMsg = PopControlMesssageQueue( iotdevice, ctl, addr );
+		ControlMessage *pCtlMsg = PopControlMesssageQueue( iotdevice, ctl, addr );  //send is here
 		if( pCtlMsg && addr )
 		{
 			DeviceAddress *reAddr = (DeviceAddress*)pCtlMsg->GetObj();
@@ -1549,7 +1557,7 @@ bool GSIOTClient::handleIq( const IQ& iq )
 		return true;
 	}
 
-	//XmppPrint( iq, "test recv.......\n" );  //jyc20170227 debug recv message
+	XmppPrint( iq, "test recv.......\n" );  //jyc20170227 debug recv message
 
 	switch( iq.subtype() ){
         	case IQ::Get:
@@ -4345,6 +4353,11 @@ bool GSIOTClient::DataProc()
 							}
 							break;
 
+						case IOT_DEVICE_CO2:
+						case IOT_DEVICE_HCHO:
+						case IOT_DEVICE_PM25:
+							//break;
+
 						case IOT_DEVICE_Temperature:
 						case IOT_DEVICE_Humidity:
 						default:
@@ -4363,6 +4376,11 @@ bool GSIOTClient::DataProc()
 
 						switch( address->GetType() )
 						{
+						case IOT_DEVICE_CO2:
+						case IOT_DEVICE_HCHO:
+						case IOT_DEVICE_PM25:
+							//break;
+								
 						case IOT_DEVICE_Temperature:
 						case IOT_DEVICE_Humidity:
 						case IOT_DEVICE_Wind:

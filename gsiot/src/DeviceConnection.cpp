@@ -2279,6 +2279,9 @@ void DeviceConnection::Decode_RS485Data( CHeartbeatGuard *phbGuard, CCommLinkRun
 			{
 				switch( pOneAddr_CurCmd->GetType() )
 				{
+				case IOT_DEVICE_CO2:
+				case IOT_DEVICE_HCHO:
+				case IOT_DEVICE_PM25:						
 				case IOT_DEVICE_Temperature:
 				case IOT_DEVICE_Humidity:
 				case IOT_DEVICE_Wind:
@@ -2288,14 +2291,16 @@ void DeviceConnection::Decode_RS485Data( CHeartbeatGuard *phbGuard, CCommLinkRun
 						float flVal = (float)atoi( strCurValue.c_str() );
 
 						//LOGMSG( "Decode_RS485Data: src devid=%d, addr=%d, val=%.2f, ver=%s\r\n", CurCmd_Ctrl?CurCmd_Ctrl->GetDeviceid():0, pOneAddr_Decode->GetAddress(), flVal, CurCmd_Ctrl->getVer().c_str() );
-
-						if( CurCmd_Ctrl->getVer() == defRS485_Ver_Wind_1601_201501A
-							|| CurCmd_Ctrl->getVer() == defRS485_Ver_Humidity_1601_201506A )
-						{
+						
+						if(CurCmd_Ctrl->getVer() == defRS485_Ver_CO2_201706A || 
+						   CurCmd_Ctrl->getVer() == defRS485_Ver_HCHO_201706A){	 //jyc20170305 add
+							if(pOneAddr_Decode->GetAddress()>2)flVal /= 10.0f;
+						}
+						else if( CurCmd_Ctrl->getVer() == defRS485_Ver_Wind_1601_201501A
+							|| CurCmd_Ctrl->getVer() == defRS485_Ver_Humidity_1601_201506A ){
 							flVal /= 10.0f;
 						}
-						else
-						{
+						else{
 							flVal /= 100.0f;
 						}
 
@@ -2310,7 +2315,7 @@ void DeviceConnection::Decode_RS485Data( CHeartbeatGuard *phbGuard, CCommLinkRun
 
 						pOneAddr_CurCmd->SetDataType( IOT_Float );
 						pOneAddr_CurCmd->SetCurValue( flVal );
-
+						
 						if( isOverRange)
 						{
 							macHeartbeatGuard_step(157780);
@@ -2352,7 +2357,7 @@ void DeviceConnection::Decode_RS485Data( CHeartbeatGuard *phbGuard, CCommLinkRun
 	}
 
 	macHeartbeatGuard_step(157800);
-
+	
 	this->m_handler->OnDeviceData( LinkID, NULL, CurCmd_Ctrl, CurCmd_Addr );
 	CMsgCurCmd::Delete_CurCmd_Content_spec( CurCmd );
 

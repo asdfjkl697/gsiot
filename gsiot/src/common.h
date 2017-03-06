@@ -142,7 +142,7 @@ public:
 	~IGSClientExFunc(void){};
 
 public:
-	virtual CRunCodeMgr& get_RunCodeMgr()=0; //20160526
+	virtual CRunCodeMgr& get_RunCodeMgr()=0; 
 	virtual void OnTimeOverForCmdRecv( const defLinkID LinkID, const IOTDeviceType DevType, const uint32_t DevID, const uint32_t addr )=0;
 	virtual defUseable get_all_useable_state_ForLinkID( defLinkID LinkID )=0;
 };

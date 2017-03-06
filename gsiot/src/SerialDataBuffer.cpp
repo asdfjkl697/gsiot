@@ -385,8 +385,8 @@ bool CMsgCurCmd::Is_CurCmd( ControlBase *DoCtrl )
 	const IOTDeviceType device_type = m_CurCmd->DevType;
 	const uint32_t device_id = m_CurCmd->DevID;
 	const defLinkID LinkID = m_CurCmd->LinkID;
-	const uint32_t addr = m_CurCmd->address?m_CurCmd->address->GetAddress():0;
-
+	const uint32_t addr = m_CurCmd->address?m_CurCmd->address->GetAddress():0;  
+	//jyc20170302 addr=0 have trouble
 	SERIALDATABUFFER *delbuf = NULL;
 
 	// Ê±¼ä³¬Ê±ÅÐ¶Ï
@@ -491,7 +491,7 @@ void CMsgCurCmd::Get_CurCmd( ControlBase *DoCtrl, SERIALDATABUFFER **CurCmd )
 	}
 
 	*CurCmd = m_CurCmd;
-	m_CurCmd = NULL;
+	m_CurCmd = NULL;  
 	m_mutex_CurCmd.unlock();
 }
 

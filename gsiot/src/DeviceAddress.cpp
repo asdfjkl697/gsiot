@@ -51,6 +51,7 @@ DeviceAddress::DeviceAddress(const Tag* tag)
 	this->m_dataType = (DataType)atoi(tag->findAttribute("datatype").c_str());
 	if(tag->hasAttribute("cur_value"))
 	this->m_curValue = tag->findAttribute("cur_value");
+	
 	if(tag->hasAttribute("defualt_value"))
 	this->m_defaultValue = tag->findAttribute("defualt_value");
 	if(tag->hasAttribute("min_value"))
@@ -172,8 +173,8 @@ Tag* DeviceAddress::tag(const struTagParam &TagParam)
 	Tag* i = new Tag( "address" );
 	i->addAttribute("data",(int)this->m_address);
 
-	//if( TagParam.isValid && TagParam.isResult )  //jyc20170302 notice TagParam.isResult always=false
-	if( TagParam.isValid )
+	if( TagParam.isValid && TagParam.isResult )  //jyc20170302 notice TagParam.isResult always=false
+	//if( TagParam.isValid )  //jyc20170305 notice data cannot refresh
 	{
 		this->tagEditAttr( i, TagParam );
 
@@ -185,7 +186,7 @@ Tag* DeviceAddress::tag(const struTagParam &TagParam)
 		i->addAttribute("cur_value",this->GetCurValue());
 		return i;
 	}
-	
+
 	i->addAttribute("name",ASCIIToUTF8(this->m_name));
 	if( IOT_DEVICE_Unknown != this->m_type ) { i->addAttribute("type",this->m_type); }
 	if( IOT_Unknow != this->m_readType ) { i->addAttribute("readtype",this->m_readType); }
@@ -200,6 +201,8 @@ Tag* DeviceAddress::tag(const struTagParam &TagParam)
 		attr = DeviceAddressAttr::defAttr_IsReSwitch;
 	else if( this->GetAttrObj().get_AdvAttr( DeviceAddressAttr::defAttr_IsAutoBackSwitch ) )
 		attr = DeviceAddressAttr::defAttr_IsAutoBackSwitch;
+
+	i->addAttribute("unit",ASCIIToUTF8(g_GetUnitBaseForType (this->m_type))); //jyc20170306 add
 
 	if( attr ) { i->addAttribute( "attr", attr ); }
 
@@ -419,6 +422,11 @@ void DeviceAddress::DataAnalyse( const std::string& newValue, const time_t newVa
 				}
 			}
 			break;
+				
+		case IOT_DEVICE_CO2:
+		case IOT_DEVICE_HCHO:
+		case IOT_DEVICE_PM25:
+			//break;
 
 		case IOT_DEVICE_Temperature:
 		case IOT_DEVICE_Humidity:
@@ -477,6 +485,10 @@ void DeviceAddress::DataAnalyse( const std::string& newValue, const time_t newVa
 						}
 						break;
 
+					case IOT_DEVICE_CO2:
+					case IOT_DEVICE_HCHO:
+					case IOT_DEVICE_PM25:
+						//break;
 					case IOT_DEVICE_Temperature:
 					case IOT_DEVICE_Humidity:
 					default:
@@ -521,17 +533,6 @@ void DeviceAddress::DataAnalyse( const std::string& newValue, const time_t newVa
 				*SaveValue = m_lastSaveValue;
 			}
 		}
-
-//#ifdef _DEBUG
-//		switch( m_type )
-//		{
-//		case IOT_DEVICE_Wind:
-//			{
-//				*dataflag = (defDataFlag_)(g_WindSpeedLevel( atof(newFinishValue.c_str()), false )*100 + (*dataflag));
-//			}
-//			break;
-//		}
-//#endif
 	}
 }
 

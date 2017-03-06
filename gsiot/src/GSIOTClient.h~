@@ -238,8 +238,8 @@ public:
 
 	// --------------------------
 public:
-	//static void XmppPrint( const Tag *ptag, const char *callinfo, const Stanza *stanza, bool dodel=true );
-	static void XmppPrint( const Tag *ptag, const char *callinfo, const Stanza *stanza, bool dodel );
+	static void XmppPrint( const Tag *ptag, const char *callinfo, const Stanza *stanza, bool dodel=true );
+	//static void XmppPrint( const Tag *ptag, const char *callinfo, const Stanza *stanza, bool dodel );
 	static void XmppPrint( const IQ& iq, const char *callinfo );
 	static void XmppPrint( const Message& msg, const char *callinfo );
 	void XmppClientSend( const IQ& iq, const char *callinfo );

@@ -80,7 +80,7 @@ std::string g_IOTGetVersion();
 std::string g_IOTGetBuildInfo();
 
 
-class GSIOTClient: public IDeviceHandler, IqHandler, SubscriptionHandler, ConnectionListener,
+class GSIOTClient: public IGSClientExFunc, public IDeviceHandler, IqHandler, SubscriptionHandler, ConnectionListener,
 	MessageHandler, ITimerHandler, public TagHandler 
 {
 private:

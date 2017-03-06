@@ -1229,28 +1229,19 @@ bool g_CheckEMail( const std::string &email_address )
 
 	if( email_address.empty() )
 		return false;
-	
+/*	jyc20170301 remove because no <regex>
 	std::regex pattern("([0-9A-Za-z\\-_\\.]+)@([0-9a-z]+\\.[a-z]{2,3}(\\.[a-z]{2})?)");
-	// 正则表达式，匹配规则：
-	// 第1组（即用户名），匹配规则：0至9、A至Z、a至z、下划线、点、连字符之中
-	// 的任意字符，重复一遍或以上
-	// 中间，一个“@”符号
-	// 第二组（即域名），匹配规则：0至9或a至z之中的任意字符重复一遍或以上，
-	// 接着一个点，接着a至z之中的任意字符重复2至3遍（如com或cn等），
-	// 第二组内部的一组，一个点，接着a至z之中的任意字符重复2遍（如cn或fr等）
-	// 内部一整组重复零次或一次
 
 	if ( regex_match( email_address, pattern ) )
 	{
-		// 截取第一组
+
 		user_name = regex_replace( email_address, pattern, std::string("$1") );
 
-		// 截取第二组
 		domain_name = regex_replace( email_address, pattern, std::string("$2") );
 
 		return true;
 	}
-
+*/
 	return false;
 }
 
@@ -2003,6 +1994,9 @@ bool g_isNeedSaveType( const IOTDeviceType type )
 {
 	switch( type )
 	{
+	case IOT_DEVICE_CO2:
+	case IOT_DEVICE_HCHO:
+	case IOT_DEVICE_PM25:
 	case IOT_DEVICE_Wind:
 	case IOT_DEVICE_Temperature:
 	case IOT_DEVICE_Humidity:
@@ -2029,6 +2023,9 @@ time_t g_GetTimePointSecond( const IOTDeviceType type, const bool isPrevSecond )
 		case IOT_DEVICE_Wind:
 			return (5*60);
 
+		case IOT_DEVICE_CO2:
+		case IOT_DEVICE_HCHO:
+		case IOT_DEVICE_PM25:
 		case IOT_DEVICE_Temperature:
 		case IOT_DEVICE_Humidity:
 		default:
@@ -2093,6 +2090,22 @@ float g_SYS_VChgRng( const IOTDeviceType type )
 	case IOT_DEVICE_Wind:
 		break;
 
+	case IOT_DEVICE_CO2:
+		{
+			rng = (float)RUNCODE_Get(defCodeIndex_SYS_VChgRng_CO2);
+		}
+		break;
+	case IOT_DEVICE_HCHO:
+		{
+			rng = (float)RUNCODE_Get(defCodeIndex_SYS_VChgRng_HCHO);
+		}
+		break;
+	case IOT_DEVICE_PM25:
+		{
+			//rng = (float)RUNCODE_Get(defCodeIndex_SYS_VChgRng_PM25);
+		}
+		break;
+
 	case IOT_DEVICE_Temperature:
 		{
 			rng = (float)RUNCODE_Get(defCodeIndex_SYS_VChgRng_Temperature);
@@ -2117,6 +2130,13 @@ std::string g_GetUnitBaseForType( const IOTDeviceType type )
 {
 	switch( type )
 	{
+	case IOT_DEVICE_CO2:
+		return "ppm";
+	case IOT_DEVICE_HCHO:
+		return "mg/m3";
+	case IOT_DEVICE_PM25:
+		return "ug/m3";
+			
 	case IOT_DEVICE_Temperature:
 		return "℃";
 

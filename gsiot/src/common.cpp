@@ -1994,6 +1994,9 @@ bool g_isNeedSaveType( const IOTDeviceType type )
 {
 	switch( type )
 	{
+	case IOT_DEVICE_CO2:
+	case IOT_DEVICE_HCHO:
+	case IOT_DEVICE_PM25:
 	case IOT_DEVICE_Wind:
 	case IOT_DEVICE_Temperature:
 	case IOT_DEVICE_Humidity:
@@ -2020,6 +2023,9 @@ time_t g_GetTimePointSecond( const IOTDeviceType type, const bool isPrevSecond )
 		case IOT_DEVICE_Wind:
 			return (5*60);
 
+		case IOT_DEVICE_CO2:
+		case IOT_DEVICE_HCHO:
+		case IOT_DEVICE_PM25:
 		case IOT_DEVICE_Temperature:
 		case IOT_DEVICE_Humidity:
 		default:
@@ -2084,6 +2090,22 @@ float g_SYS_VChgRng( const IOTDeviceType type )
 	case IOT_DEVICE_Wind:
 		break;
 
+	case IOT_DEVICE_CO2:
+		{
+			rng = (float)RUNCODE_Get(defCodeIndex_SYS_VChgRng_CO2);
+		}
+		break;
+	case IOT_DEVICE_HCHO:
+		{
+			rng = (float)RUNCODE_Get(defCodeIndex_SYS_VChgRng_HCHO);
+		}
+		break;
+	case IOT_DEVICE_PM25:
+		{
+			//rng = (float)RUNCODE_Get(defCodeIndex_SYS_VChgRng_PM25);
+		}
+		break;
+
 	case IOT_DEVICE_Temperature:
 		{
 			rng = (float)RUNCODE_Get(defCodeIndex_SYS_VChgRng_Temperature);
@@ -2108,6 +2130,13 @@ std::string g_GetUnitBaseForType( const IOTDeviceType type )
 {
 	switch( type )
 	{
+	case IOT_DEVICE_CO2:
+		return "ppm";
+	case IOT_DEVICE_HCHO:
+		return "ug/m3";
+	case IOT_DEVICE_PM25:
+		return "ug/m3";
+			
 	case IOT_DEVICE_Temperature:
 		return "¡æ";
 
