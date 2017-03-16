@@ -3,7 +3,7 @@ Maximized=1
 Geometry=1301x744+65+24
 
 [File Loader]
-Files=../../src/main.c#247%%%../../src/hardware.c#149%%%../../src/packet.c#188%%%../../src/tcpserver.c#98%%%../../src/packet.h#80%%%../../src/obsolete.c#87%%%../../src/hardware.h#1
+Files=../../src/main.c#22%%%../../src/hardware.c#149%%%../../src/packet.c#188%%%../../src/tcpserver.c#98%%%../../src/packet.h#80%%%../../src/obsolete.c#87%%%../../src/hardware.h#1%%%../../src/udpbroadcast.c#11
 
 [Document Manager]
 bookmarks=<?xml version="1.0" encoding="UTF-8"?>\n<bookmarks/>\n

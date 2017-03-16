@@ -523,7 +523,7 @@ IOTDeviceReadType GSIOTDevice::getStaticReadType( const IOTDeviceType type )
 	{
 		case IOT_DEVICE_CO2:// 温度
 		case IOT_DEVICE_HCHO:	// 湿度
-		case IOT_DEVICE_PM25:
+		//case IOT_DEVICE_PM25:
 		case IOT_DEVICE_Temperature:// 温度
 		case IOT_DEVICE_Humidity:	// 湿度
 		case IOT_DEVICE_Wind:		// 风速

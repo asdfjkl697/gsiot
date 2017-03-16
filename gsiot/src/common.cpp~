@@ -2133,7 +2133,7 @@ std::string g_GetUnitBaseForType( const IOTDeviceType type )
 	case IOT_DEVICE_CO2:
 		return "ppm";
 	case IOT_DEVICE_HCHO:
-		return "mg/m3";
+		return "ug/m3";
 	case IOT_DEVICE_PM25:
 		return "ug/m3";
 			

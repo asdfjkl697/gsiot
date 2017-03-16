@@ -2281,7 +2281,7 @@ void DeviceConnection::Decode_RS485Data( CHeartbeatGuard *phbGuard, CCommLinkRun
 				{
 				case IOT_DEVICE_CO2:
 				case IOT_DEVICE_HCHO:
-				case IOT_DEVICE_PM25:						
+				//case IOT_DEVICE_PM25:						
 				case IOT_DEVICE_Temperature:
 				case IOT_DEVICE_Humidity:
 				case IOT_DEVICE_Wind:

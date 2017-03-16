@@ -60,7 +60,7 @@ void g_DeleteRS485MsgQue( defRS485MsgQue &que );
 	pCtrl->AddSpecAddr( DeviceAddress( 2+1, "HCHO", IOT_DEVICE_HCHO, IOT_Float, IOT_READ ) );
 
 #define defSpecAddr_PM25_Read( pCtrl ) \
-	pCtrl->AddSpecAddr( DeviceAddress( 2+1, "PM2.5", IOT_DEVICE_PM25, IOT_Float, IOT_READ ) );
+	pCtrl->AddSpecAddr( DeviceAddress( 1+1, "PM2.5", IOT_DEVICE_PM25, IOT_Float, IOT_READ ) );
 
 #define defSpecAddr_Temperature_Read( pCtrl ) \
 	pCtrl->AddSpecAddr( DeviceAddress( 1+1, "ÎÂ¶È", IOT_DEVICE_Temperature, IOT_Float, IOT_READ ) );

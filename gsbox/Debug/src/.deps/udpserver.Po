@@ -1,0 +1,441 @@
+udpserver.o: /home/chen/projects/gsbox/src/udpserver.cpp \
+ /usr/include/stdc-predef.h /home/chen/projects/gsbox/src/udpserver.h \
+ /home/chen/projects/gsbox/src/sockettask.h \
+ /usr/lib/gcc/i686-linux-gnu/4.8/include/stdint.h /usr/include/stdint.h \
+ /usr/include/features.h /usr/include/i386-linux-gnu/sys/cdefs.h \
+ /usr/include/i386-linux-gnu/bits/wordsize.h \
+ /usr/include/i386-linux-gnu/gnu/stubs.h \
+ /usr/include/i386-linux-gnu/gnu/stubs-32.h \
+ /usr/include/i386-linux-gnu/bits/wchar.h \
+ /home/chen/projects/gsbox/src/task.h \
+ /home/chen/projects/gsbox/src/typedef.h \
+ /usr/local/include/event2/event.h \
+ /usr/local/include/event2/event-config.h \
+ /usr/include/i386-linux-gnu/sys/types.h \
+ /usr/include/i386-linux-gnu/bits/types.h \
+ /usr/include/i386-linux-gnu/bits/typesizes.h /usr/include/time.h \
+ /usr/lib/gcc/i686-linux-gnu/4.8/include/stddef.h /usr/include/endian.h \
+ /usr/include/i386-linux-gnu/bits/endian.h \
+ /usr/include/i386-linux-gnu/bits/byteswap.h \
+ /usr/include/i386-linux-gnu/bits/byteswap-16.h \
+ /usr/include/i386-linux-gnu/sys/select.h \
+ /usr/include/i386-linux-gnu/bits/select.h \
+ /usr/include/i386-linux-gnu/bits/sigset.h \
+ /usr/include/i386-linux-gnu/bits/time.h \
+ /usr/include/i386-linux-gnu/sys/sysmacros.h \
+ /usr/include/i386-linux-gnu/bits/pthreadtypes.h \
+ /usr/include/i386-linux-gnu/sys/time.h /usr/include/stdio.h \
+ /usr/include/libio.h /usr/include/_G_config.h /usr/include/wchar.h \
+ /usr/lib/gcc/i686-linux-gnu/4.8/include/stdarg.h \
+ /usr/include/i386-linux-gnu/bits/stdio_lim.h \
+ /usr/include/i386-linux-gnu/bits/sys_errlist.h \
+ /usr/local/include/event2/util.h /usr/include/netdb.h \
+ /usr/include/netinet/in.h /usr/include/i386-linux-gnu/sys/socket.h \
+ /usr/include/i386-linux-gnu/sys/uio.h \
+ /usr/include/i386-linux-gnu/bits/uio.h \
+ /usr/include/i386-linux-gnu/bits/socket.h \
+ /usr/include/i386-linux-gnu/bits/socket_type.h \
+ /usr/include/i386-linux-gnu/bits/sockaddr.h \
+ /usr/include/i386-linux-gnu/asm/socket.h \
+ /usr/include/asm-generic/socket.h \
+ /usr/include/i386-linux-gnu/asm/sockios.h \
+ /usr/include/asm-generic/sockios.h /usr/include/i386-linux-gnu/bits/in.h \
+ /usr/include/rpc/netdb.h /usr/include/i386-linux-gnu/bits/siginfo.h \
+ /usr/include/i386-linux-gnu/bits/netdb.h /usr/include/errno.h \
+ /usr/include/i386-linux-gnu/bits/errno.h /usr/include/linux/errno.h \
+ /usr/include/i386-linux-gnu/asm/errno.h /usr/include/asm-generic/errno.h \
+ /usr/include/asm-generic/errno-base.h /usr/include/ifaddrs.h \
+ /usr/include/net/if.h /usr/include/arpa/inet.h /usr/include/unistd.h \
+ /usr/include/i386-linux-gnu/bits/posix_opt.h \
+ /usr/include/i386-linux-gnu/bits/environments.h \
+ /usr/include/i386-linux-gnu/bits/confname.h /usr/include/getopt.h \
+ /usr/include/string.h /usr/include/xlocale.h /usr/include/stdlib.h \
+ /usr/include/i386-linux-gnu/bits/waitflags.h \
+ /usr/include/i386-linux-gnu/bits/waitstatus.h /usr/include/alloca.h \
+ /usr/include/i386-linux-gnu/bits/stdlib-float.h /usr/include/ctype.h \
+ /home/chen/projects/gsbox/src/netpacket.h \
+ /home/chen/projects/gsbox/src/packet.h \
+ /usr/local/include/libxml/xmlmemory.h \
+ /usr/local/include/libxml/xmlversion.h \
+ /usr/local/include/libxml/xmlexports.h \
+ /usr/local/include/libxml/threads.h /usr/local/include/libxml/globals.h \
+ /usr/local/include/libxml/parser.h /usr/local/include/libxml/tree.h \
+ /usr/lib/gcc/i686-linux-gnu/4.8/include-fixed/limits.h \
+ /usr/lib/gcc/i686-linux-gnu/4.8/include-fixed/syslimits.h \
+ /usr/include/limits.h /usr/include/i386-linux-gnu/bits/posix1_lim.h \
+ /usr/include/i386-linux-gnu/bits/local_lim.h /usr/include/linux/limits.h \
+ /usr/include/i386-linux-gnu/bits/posix2_lim.h \
+ /usr/include/i386-linux-gnu/bits/xopen_lim.h \
+ /usr/local/include/libxml/xmlstring.h \
+ /usr/local/include/libxml/xmlregexp.h /usr/local/include/libxml/dict.h \
+ /usr/local/include/libxml/hash.h /usr/local/include/libxml/valid.h \
+ /usr/local/include/libxml/xmlerror.h /usr/local/include/libxml/list.h \
+ /usr/local/include/libxml/xmlautomata.h \
+ /usr/local/include/libxml/entities.h \
+ /usr/local/include/libxml/encoding.h /usr/include/iconv.h \
+ /usr/local/include/libxml/xmlIO.h /usr/local/include/libxml/SAX.h \
+ /usr/local/include/libxml/xlink.h /usr/local/include/libxml/SAX2.h \
+ /usr/include/c++/4.8/string \
+ /usr/include/i386-linux-gnu/c++/4.8/bits/c++config.h \
+ /usr/include/i386-linux-gnu/c++/4.8/bits/os_defines.h \
+ /usr/include/i386-linux-gnu/c++/4.8/bits/cpu_defines.h \
+ /usr/include/c++/4.8/bits/stringfwd.h \
+ /usr/include/c++/4.8/bits/memoryfwd.h \
+ /usr/include/c++/4.8/bits/char_traits.h \
+ /usr/include/c++/4.8/bits/stl_algobase.h \
+ /usr/include/c++/4.8/bits/functexcept.h \
+ /usr/include/c++/4.8/bits/exception_defines.h \
+ /usr/include/c++/4.8/bits/cpp_type_traits.h \
+ /usr/include/c++/4.8/ext/type_traits.h \
+ /usr/include/c++/4.8/ext/numeric_traits.h \
+ /usr/include/c++/4.8/bits/stl_pair.h /usr/include/c++/4.8/bits/move.h \
+ /usr/include/c++/4.8/bits/concept_check.h \
+ /usr/include/c++/4.8/bits/stl_iterator_base_types.h \
+ /usr/include/c++/4.8/bits/stl_iterator_base_funcs.h \
+ /usr/include/c++/4.8/debug/debug.h \
+ /usr/include/c++/4.8/bits/stl_iterator.h \
+ /usr/include/c++/4.8/bits/postypes.h /usr/include/c++/4.8/cwchar \
+ /usr/include/c++/4.8/bits/allocator.h \
+ /usr/include/i386-linux-gnu/c++/4.8/bits/c++allocator.h \
+ /usr/include/c++/4.8/ext/new_allocator.h /usr/include/c++/4.8/new \
+ /usr/include/c++/4.8/exception \
+ /usr/include/c++/4.8/bits/atomic_lockfree_defines.h \
+ /usr/include/c++/4.8/bits/localefwd.h \
+ /usr/include/i386-linux-gnu/c++/4.8/bits/c++locale.h \
+ /usr/include/c++/4.8/clocale /usr/include/locale.h \
+ /usr/include/i386-linux-gnu/bits/locale.h /usr/include/c++/4.8/iosfwd \
+ /usr/include/c++/4.8/cctype /usr/include/c++/4.8/bits/ostream_insert.h \
+ /usr/include/c++/4.8/bits/cxxabi_forced.h \
+ /usr/include/c++/4.8/bits/stl_function.h \
+ /usr/include/c++/4.8/backward/binders.h \
+ /usr/include/c++/4.8/bits/range_access.h \
+ /usr/include/c++/4.8/bits/basic_string.h \
+ /usr/include/c++/4.8/ext/atomicity.h \
+ /usr/include/i386-linux-gnu/c++/4.8/bits/gthr.h \
+ /usr/include/i386-linux-gnu/c++/4.8/bits/gthr-default.h \
+ /usr/include/pthread.h /usr/include/sched.h \
+ /usr/include/i386-linux-gnu/bits/sched.h \
+ /usr/include/i386-linux-gnu/bits/timex.h \
+ /usr/include/i386-linux-gnu/bits/setjmp.h \
+ /usr/include/i386-linux-gnu/c++/4.8/bits/atomic_word.h \
+ /usr/include/c++/4.8/bits/basic_string.tcc
+
+/usr/include/stdc-predef.h:
+
+/home/chen/projects/gsbox/src/udpserver.h:
+
+/home/chen/projects/gsbox/src/sockettask.h:
+
+/usr/lib/gcc/i686-linux-gnu/4.8/include/stdint.h:
+
+/usr/include/stdint.h:
+
+/usr/include/features.h:
+
+/usr/include/i386-linux-gnu/sys/cdefs.h:
+
+/usr/include/i386-linux-gnu/bits/wordsize.h:
+
+/usr/include/i386-linux-gnu/gnu/stubs.h:
+
+/usr/include/i386-linux-gnu/gnu/stubs-32.h:
+
+/usr/include/i386-linux-gnu/bits/wchar.h:
+
+/home/chen/projects/gsbox/src/task.h:
+
+/home/chen/projects/gsbox/src/typedef.h:
+
+/usr/local/include/event2/event.h:
+
+/usr/local/include/event2/event-config.h:
+
+/usr/include/i386-linux-gnu/sys/types.h:
+
+/usr/include/i386-linux-gnu/bits/types.h:
+
+/usr/include/i386-linux-gnu/bits/typesizes.h:
+
+/usr/include/time.h:
+
+/usr/lib/gcc/i686-linux-gnu/4.8/include/stddef.h:
+
+/usr/include/endian.h:
+
+/usr/include/i386-linux-gnu/bits/endian.h:
+
+/usr/include/i386-linux-gnu/bits/byteswap.h:
+
+/usr/include/i386-linux-gnu/bits/byteswap-16.h:
+
+/usr/include/i386-linux-gnu/sys/select.h:
+
+/usr/include/i386-linux-gnu/bits/select.h:
+
+/usr/include/i386-linux-gnu/bits/sigset.h:
+
+/usr/include/i386-linux-gnu/bits/time.h:
+
+/usr/include/i386-linux-gnu/sys/sysmacros.h:
+
+/usr/include/i386-linux-gnu/bits/pthreadtypes.h:
+
+/usr/include/i386-linux-gnu/sys/time.h:
+
+/usr/include/stdio.h:
+
+/usr/include/libio.h:
+
+/usr/include/_G_config.h:
+
+/usr/include/wchar.h:
+
+/usr/lib/gcc/i686-linux-gnu/4.8/include/stdarg.h:
+
+/usr/include/i386-linux-gnu/bits/stdio_lim.h:
+
+/usr/include/i386-linux-gnu/bits/sys_errlist.h:
+
+/usr/local/include/event2/util.h:
+
+/usr/include/netdb.h:
+
+/usr/include/netinet/in.h:
+
+/usr/include/i386-linux-gnu/sys/socket.h:
+
+/usr/include/i386-linux-gnu/sys/uio.h:
+
+/usr/include/i386-linux-gnu/bits/uio.h:
+
+/usr/include/i386-linux-gnu/bits/socket.h:
+
+/usr/include/i386-linux-gnu/bits/socket_type.h:
+
+/usr/include/i386-linux-gnu/bits/sockaddr.h:
+
+/usr/include/i386-linux-gnu/asm/socket.h:
+
+/usr/include/asm-generic/socket.h:
+
+/usr/include/i386-linux-gnu/asm/sockios.h:
+
+/usr/include/asm-generic/sockios.h:
+
+/usr/include/i386-linux-gnu/bits/in.h:
+
+/usr/include/rpc/netdb.h:
+
+/usr/include/i386-linux-gnu/bits/siginfo.h:
+
+/usr/include/i386-linux-gnu/bits/netdb.h:
+
+/usr/include/errno.h:
+
+/usr/include/i386-linux-gnu/bits/errno.h:
+
+/usr/include/linux/errno.h:
+
+/usr/include/i386-linux-gnu/asm/errno.h:
+
+/usr/include/asm-generic/errno.h:
+
+/usr/include/asm-generic/errno-base.h:
+
+/usr/include/ifaddrs.h:
+
+/usr/include/net/if.h:
+
+/usr/include/arpa/inet.h:
+
+/usr/include/unistd.h:
+
+/usr/include/i386-linux-gnu/bits/posix_opt.h:
+
+/usr/include/i386-linux-gnu/bits/environments.h:
+
+/usr/include/i386-linux-gnu/bits/confname.h:
+
+/usr/include/getopt.h:
+
+/usr/include/string.h:
+
+/usr/include/xlocale.h:
+
+/usr/include/stdlib.h:
+
+/usr/include/i386-linux-gnu/bits/waitflags.h:
+
+/usr/include/i386-linux-gnu/bits/waitstatus.h:
+
+/usr/include/alloca.h:
+
+/usr/include/i386-linux-gnu/bits/stdlib-float.h:
+
+/usr/include/ctype.h:
+
+/home/chen/projects/gsbox/src/netpacket.h:
+
+/home/chen/projects/gsbox/src/packet.h:
+
+/usr/local/include/libxml/xmlmemory.h:
+
+/usr/local/include/libxml/xmlversion.h:
+
+/usr/local/include/libxml/xmlexports.h:
+
+/usr/local/include/libxml/threads.h:
+
+/usr/local/include/libxml/globals.h:
+
+/usr/local/include/libxml/parser.h:
+
+/usr/local/include/libxml/tree.h:
+
+/usr/lib/gcc/i686-linux-gnu/4.8/include-fixed/limits.h:
+
+/usr/lib/gcc/i686-linux-gnu/4.8/include-fixed/syslimits.h:
+
+/usr/include/limits.h:
+
+/usr/include/i386-linux-gnu/bits/posix1_lim.h:
+
+/usr/include/i386-linux-gnu/bits/local_lim.h:
+
+/usr/include/linux/limits.h:
+
+/usr/include/i386-linux-gnu/bits/posix2_lim.h:
+
+/usr/include/i386-linux-gnu/bits/xopen_lim.h:
+
+/usr/local/include/libxml/xmlstring.h:
+
+/usr/local/include/libxml/xmlregexp.h:
+
+/usr/local/include/libxml/dict.h:
+
+/usr/local/include/libxml/hash.h:
+
+/usr/local/include/libxml/valid.h:
+
+/usr/local/include/libxml/xmlerror.h:
+
+/usr/local/include/libxml/list.h:
+
+/usr/local/include/libxml/xmlautomata.h:
+
+/usr/local/include/libxml/entities.h:
+
+/usr/local/include/libxml/encoding.h:
+
+/usr/include/iconv.h:
+
+/usr/local/include/libxml/xmlIO.h:
+
+/usr/local/include/libxml/SAX.h:
+
+/usr/local/include/libxml/xlink.h:
+
+/usr/local/include/libxml/SAX2.h:
+
+/usr/include/c++/4.8/string:
+
+/usr/include/i386-linux-gnu/c++/4.8/bits/c++config.h:
+
+/usr/include/i386-linux-gnu/c++/4.8/bits/os_defines.h:
+
+/usr/include/i386-linux-gnu/c++/4.8/bits/cpu_defines.h:
+
+/usr/include/c++/4.8/bits/stringfwd.h:
+
+/usr/include/c++/4.8/bits/memoryfwd.h:
+
+/usr/include/c++/4.8/bits/char_traits.h:
+
+/usr/include/c++/4.8/bits/stl_algobase.h:
+
+/usr/include/c++/4.8/bits/functexcept.h:
+
+/usr/include/c++/4.8/bits/exception_defines.h:
+
+/usr/include/c++/4.8/bits/cpp_type_traits.h:
+
+/usr/include/c++/4.8/ext/type_traits.h:
+
+/usr/include/c++/4.8/ext/numeric_traits.h:
+
+/usr/include/c++/4.8/bits/stl_pair.h:
+
+/usr/include/c++/4.8/bits/move.h:
+
+/usr/include/c++/4.8/bits/concept_check.h:
+
+/usr/include/c++/4.8/bits/stl_iterator_base_types.h:
+
+/usr/include/c++/4.8/bits/stl_iterator_base_funcs.h:
+
+/usr/include/c++/4.8/debug/debug.h:
+
+/usr/include/c++/4.8/bits/stl_iterator.h:
+
+/usr/include/c++/4.8/bits/postypes.h:
+
+/usr/include/c++/4.8/cwchar:
+
+/usr/include/c++/4.8/bits/allocator.h:
+
+/usr/include/i386-linux-gnu/c++/4.8/bits/c++allocator.h:
+
+/usr/include/c++/4.8/ext/new_allocator.h:
+
+/usr/include/c++/4.8/new:
+
+/usr/include/c++/4.8/exception:
+
+/usr/include/c++/4.8/bits/atomic_lockfree_defines.h:
+
+/usr/include/c++/4.8/bits/localefwd.h:
+
+/usr/include/i386-linux-gnu/c++/4.8/bits/c++locale.h:
+
+/usr/include/c++/4.8/clocale:
+
+/usr/include/locale.h:
+
+/usr/include/i386-linux-gnu/bits/locale.h:
+
+/usr/include/c++/4.8/iosfwd:
+
+/usr/include/c++/4.8/cctype:
+
+/usr/include/c++/4.8/bits/ostream_insert.h:
+
+/usr/include/c++/4.8/bits/cxxabi_forced.h:
+
+/usr/include/c++/4.8/bits/stl_function.h:
+
+/usr/include/c++/4.8/backward/binders.h:
+
+/usr/include/c++/4.8/bits/range_access.h:
+
+/usr/include/c++/4.8/bits/basic_string.h:
+
+/usr/include/c++/4.8/ext/atomicity.h:
+
+/usr/include/i386-linux-gnu/c++/4.8/bits/gthr.h:
+
+/usr/include/i386-linux-gnu/c++/4.8/bits/gthr-default.h:
+
+/usr/include/pthread.h:
+
+/usr/include/sched.h:
+
+/usr/include/i386-linux-gnu/bits/sched.h:
+
+/usr/include/i386-linux-gnu/bits/timex.h:
+
+/usr/include/i386-linux-gnu/bits/setjmp.h:
+
+/usr/include/i386-linux-gnu/c++/4.8/bits/atomic_word.h:
+
+/usr/include/c++/4.8/bits/basic_string.tcc:

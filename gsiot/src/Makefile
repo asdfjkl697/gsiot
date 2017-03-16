@@ -122,7 +122,8 @@ am_gsiot_OBJECTS = AddressManager.$(OBJEXT) common.$(OBJEXT) \
 	RFDevice.$(OBJEXT) XmppGSChange.$(OBJEXT) \
 	XmppGSEvent.$(OBJEXT) TimerManager.$(OBJEXT) \
 	RFSignalDefine.$(OBJEXT) XmppGSRelation.$(OBJEXT) \
-	XmppGSReport.$(OBJEXT)
+	XmppGSReport.$(OBJEXT) XmppGSVObj.$(OBJEXT) \
+	VObjClass.$(OBJEXT)
 gsiot_OBJECTS = $(am_gsiot_OBJECTS)
 gsiot_DEPENDENCIES =
 AM_V_lt = $(am__v_lt_$(V))
@@ -520,7 +521,11 @@ gsiot_SOURCES = \
 	XmppGSRelation.cpp \
 	XmppGSRelation.h \
 	XmppGSReport.cpp \
-	XmppGSReport.h
+	XmppGSReport.h \
+	XmppGSVObj.cpp \
+	XmppGSVObj.h \
+	VObjClass.cpp \
+	VObjClass.h
 
 gsiot_LDFLAGS = 
 gsiot_LDADD = \
@@ -675,6 +680,7 @@ include ./$(DEPDIR)/Statement.Po
 include ./$(DEPDIR)/TimerManager.Po
 include ./$(DEPDIR)/Transaction.Po
 include ./$(DEPDIR)/TriggerControl.Po
+include ./$(DEPDIR)/VObjClass.Po
 include ./$(DEPDIR)/XmppGSAuth.Po
 include ./$(DEPDIR)/XmppGSChange.Po
 include ./$(DEPDIR)/XmppGSEvent.Po
@@ -684,6 +690,7 @@ include ./$(DEPDIR)/XmppGSRelation.Po
 include ./$(DEPDIR)/XmppGSReport.Po
 include ./$(DEPDIR)/XmppGSResult.Po
 include ./$(DEPDIR)/XmppGSState.Po
+include ./$(DEPDIR)/XmppGSVObj.Po
 include ./$(DEPDIR)/XmppRegister.Po
 include ./$(DEPDIR)/common.Po
 include ./$(DEPDIR)/gsiot.Po

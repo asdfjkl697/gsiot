@@ -429,8 +429,7 @@ ControlBase* RS485DevControl::clone( bool CreateLock ) const
 
 std::string RS485DevControl::Print( const char *info, bool doPrint, DeviceAddress *const pSpecAddr ) const
 {
-	/**/
-		//jyc20160824
+	//jyc20160824
 	//const int thisThreadId = ::GetCurrentThreadId();
 	//pthread_t pthread_self();
 	const int thisThreadId = ::pthread_self(); //jyc20160825add get threadid must test later
@@ -473,7 +472,6 @@ std::string RS485DevControl::Print( const char *info, bool doPrint, DeviceAddres
 	}
 
 	return std::string(buf);
-	//*/
 }
 
 bool RS485DevControl::GetBtachReadParam( uint16_t &addressStart, uint16_t &addressCount, uint16_t &addressEnableCount ) const
@@ -631,7 +629,7 @@ bool RS485DevControl::Encode( defRS485MsgQue &que, DeviceAddress *const pSpecAdd
 			{
 			case IOT_DEVICE_CO2:
 			case IOT_DEVICE_HCHO:
-			case IOT_DEVICE_PM25:
+			//case IOT_DEVICE_PM25:
 				//break;
 			case IOT_DEVICE_Switch:
 			case IOT_DEVICE_Temperature:

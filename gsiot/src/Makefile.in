@@ -122,7 +122,8 @@ am_gsiot_OBJECTS = AddressManager.$(OBJEXT) common.$(OBJEXT) \
 	RFDevice.$(OBJEXT) XmppGSChange.$(OBJEXT) \
 	XmppGSEvent.$(OBJEXT) TimerManager.$(OBJEXT) \
 	RFSignalDefine.$(OBJEXT) XmppGSRelation.$(OBJEXT) \
-	XmppGSReport.$(OBJEXT)
+	XmppGSReport.$(OBJEXT) XmppGSVObj.$(OBJEXT) \
+	VObjClass.$(OBJEXT)
 gsiot_OBJECTS = $(am_gsiot_OBJECTS)
 gsiot_DEPENDENCIES =
 AM_V_lt = $(am__v_lt_@AM_V@)
@@ -520,7 +521,11 @@ gsiot_SOURCES = \
 	XmppGSRelation.cpp \
 	XmppGSRelation.h \
 	XmppGSReport.cpp \
-	XmppGSReport.h
+	XmppGSReport.h \
+	XmppGSVObj.cpp \
+	XmppGSVObj.h \
+	VObjClass.cpp \
+	VObjClass.h
 
 gsiot_LDFLAGS = 
 gsiot_LDADD = \
@@ -675,6 +680,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TimerManager.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Transaction.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TriggerControl.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/VObjClass.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/XmppGSAuth.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/XmppGSChange.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/XmppGSEvent.Po@am__quote@
@@ -684,6 +690,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/XmppGSReport.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/XmppGSResult.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/XmppGSState.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/XmppGSVObj.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/XmppRegister.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/common.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gsiot.Po@am__quote@

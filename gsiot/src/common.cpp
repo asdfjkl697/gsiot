@@ -2025,7 +2025,7 @@ time_t g_GetTimePointSecond( const IOTDeviceType type, const bool isPrevSecond )
 
 		case IOT_DEVICE_CO2:
 		case IOT_DEVICE_HCHO:
-		case IOT_DEVICE_PM25:
+		//case IOT_DEVICE_PM25:
 		case IOT_DEVICE_Temperature:
 		case IOT_DEVICE_Humidity:
 		default:

@@ -159,7 +159,11 @@ gsiot_SOURCES = \
 	XmppGSRelation.cpp \
 	XmppGSRelation.h \
 	XmppGSReport.cpp \
-	XmppGSReport.h
+	XmppGSReport.h \
+	XmppGSVObj.cpp \
+	XmppGSVObj.h \
+	VObjClass.cpp \
+	VObjClass.h
 
 gsiot_LDFLAGS = 
 

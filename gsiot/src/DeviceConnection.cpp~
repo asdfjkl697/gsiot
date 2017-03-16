@@ -2315,8 +2315,7 @@ void DeviceConnection::Decode_RS485Data( CHeartbeatGuard *phbGuard, CCommLinkRun
 
 						pOneAddr_CurCmd->SetDataType( IOT_Float );
 						pOneAddr_CurCmd->SetCurValue( flVal );
-						pOneAddr_CurCmd->SetUnit( "ppm" ); //jyc20170306 add
-
+						
 						if( isOverRange)
 						{
 							macHeartbeatGuard_step(157780);

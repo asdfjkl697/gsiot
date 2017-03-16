@@ -246,7 +246,8 @@ RS485DevControl* RS485DevControl::CreateRS485DevControl_ModifyDevAddr( IOTDevice
 	snprintf( chID, sizeof(chID), "%d", newDevID );
 
 	RS485DevControl *prs485 = new RS485DevControl( oldDevID, defModbusCmd_Write, defProtocol_Unknown, ver );
-	//prs485->AddSpecAddr( DeviceAddress( address, "", DeviceType, IOT_Byte, IOT_WRITE, chID ) ); //20160614
+	//jyc20170306 notice 
+	//prs485->AddSpecAddr( DeviceAddress( address, "", DeviceType, IOT_Byte, IOT_WRITE, chID ) ); 
 
 	return prs485;
 }
@@ -428,8 +429,7 @@ ControlBase* RS485DevControl::clone( bool CreateLock ) const
 
 std::string RS485DevControl::Print( const char *info, bool doPrint, DeviceAddress *const pSpecAddr ) const
 {
-	/**/
-		//jyc20160824
+	//jyc20160824
 	//const int thisThreadId = ::GetCurrentThreadId();
 	//pthread_t pthread_self();
 	const int thisThreadId = ::pthread_self(); //jyc20160825add get threadid must test later
@@ -472,7 +472,6 @@ std::string RS485DevControl::Print( const char *info, bool doPrint, DeviceAddres
 	}
 
 	return std::string(buf);
-	//*/
 }
 
 bool RS485DevControl::GetBtachReadParam( uint16_t &addressStart, uint16_t &addressCount, uint16_t &addressEnableCount ) const

@@ -180,7 +180,7 @@ Tag* DeviceAddress::tag(const struTagParam &TagParam)
 
 		return i;
 	}
-
+	
 	if( 1==TagParam.fmt )
 	{
 		i->addAttribute("cur_value",this->GetCurValue());
@@ -196,14 +196,14 @@ Tag* DeviceAddress::tag(const struTagParam &TagParam)
 	if( this->m_minValue != "0" ) { i->addAttribute("min_value",this->m_minValue); }
 	if( this->m_maxValue != "0" ) { i->addAttribute("max_value",this->m_maxValue); }
 
+	i->addAttribute("unit",ASCIIToUTF8(g_GetUnitBaseForType (this->m_type))); //jyc20170306 add
+	
 	int attr = 0;
 	if( this->GetAttrObj().get_AdvAttr( DeviceAddressAttr::defAttr_IsReSwitch ) )
 		attr = DeviceAddressAttr::defAttr_IsReSwitch;
 	else if( this->GetAttrObj().get_AdvAttr( DeviceAddressAttr::defAttr_IsAutoBackSwitch ) )
 		attr = DeviceAddressAttr::defAttr_IsAutoBackSwitch;
-
-	i->addAttribute("unit",ASCIIToUTF8(g_GetUnitBaseForType (this->m_type))); //jyc20170306 add
-
+	
 	if( attr ) { i->addAttribute( "attr", attr ); }
 
 	return i;
@@ -425,7 +425,7 @@ void DeviceAddress::DataAnalyse( const std::string& newValue, const time_t newVa
 				
 		case IOT_DEVICE_CO2:
 		case IOT_DEVICE_HCHO:
-		case IOT_DEVICE_PM25:
+		//case IOT_DEVICE_PM25:
 			//break;
 
 		case IOT_DEVICE_Temperature:
@@ -487,7 +487,7 @@ void DeviceAddress::DataAnalyse( const std::string& newValue, const time_t newVa
 
 					case IOT_DEVICE_CO2:
 					case IOT_DEVICE_HCHO:
-					case IOT_DEVICE_PM25:
+					//case IOT_DEVICE_PM25:
 						//break;
 					case IOT_DEVICE_Temperature:
 					case IOT_DEVICE_Humidity:
