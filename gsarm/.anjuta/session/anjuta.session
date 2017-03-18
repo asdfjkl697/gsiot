@@ -1,0 +1,30 @@
+[Anjuta]
+Maximized=1
+Geometry=1301x744+65+24
+
+[Execution]
+Program uri=../../src/gsarm%%%../../src/gsiot
+Run in terminal=2
+Working directories=../../../gsarm%%%../../../gsiot
+
+[File Loader]
+Files=../../src/gsarm.cc#42%%%../../src/XmppGSPlayback.h#4%%%../../src/XmppGSPlayback.cpp#3%%%../../src/XmppGSPreset.cpp#2%%%../../src/XmppGSTalk.h#4%%%../../src/XmppGSTalk.cpp#3%%%../../src/XmppGSUpdate.cpp#5%%%../../src/Makefile.am#166%%%../../src/GSIOTConfig.cpp#104%%%../../src/Statement.cpp#34%%%../../src/RunCode.cpp#869%%%../../src/SQLiteHelper.cpp#27%%%../../src/common.h#150%%%../../src/common.cpp#77%%%../../src/GSIOTClient.cpp#471%%%../../src/GSIOTClient.h#16
+
+[Document Manager]
+bookmarks=<?xml version="1.0" encoding="UTF-8"?>\n<bookmarks/>\n
+
+[Project Manager]
+Shortcut=gsarm//src//gsarm
+Expand=gsarm
+
+[Debugger]
+Watch=val1
+Stop at beginning=2
+
+[Build]
+Configuration list=1:Default:%%%1:Debug:Debug%%%1:Profiling:Profiling%%%1:Optimized:Optimized
+Selected Configuration=Default
+BuildArgs/Default=--enable-maintainer-mode
+BuildArgs/Debug=--enable-maintainer-mode 'CFLAGS=-g -O0' 'CXXFLAGS=-g -O0' 'JFLAGS=-g -O0' 'FFLAGS=-g -O0'
+BuildArgs/Profiling=--enable-maintainer-mode 'CFLAGS=-g -pg' 'CXXFLAGS=-g -pg' 'JFLAGS=-g -pg' 'FFLAGS=-g -pg'
+BuildArgs/Optimized=--enable-maintainer-mode 'CFLAGS=-O2' 'CXXFLAGS=-O2' 'JFLAGS=-O2' 'FFLAGS=-O2'
