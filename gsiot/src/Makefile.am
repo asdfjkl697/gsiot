@@ -163,7 +163,11 @@ gsiot_SOURCES = \
 	XmppGSVObj.cpp \
 	XmppGSVObj.h \
 	VObjClass.cpp \
-	VObjClass.h
+	VObjClass.h \
+	HttpRequest.cpp \
+	HttpRequest.h \
+	XmppGSUpdate.cpp \
+	XmppGSUpdate.h
 
 gsiot_LDFLAGS = 
 

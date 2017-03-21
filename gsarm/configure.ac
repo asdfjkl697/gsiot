@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl Created by Anjuta application wizard.
 
-AC_INIT(gsarm, 0.1)
+AC_INIT(gsiot, 0.1)
 
 AC_CONFIG_HEADERS([config.h])
 
@@ -19,7 +19,7 @@ dnl Internationalization
 dnl ***************************************************************************
 IT_PROG_INTLTOOL([0.35.0])
 
-GETTEXT_PACKAGE=gsarm
+GETTEXT_PACKAGE=gsiot
 AC_SUBST(GETTEXT_PACKAGE)
 AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE,"$GETTEXT_PACKAGE", [GETTEXT package name])
 AM_GLIB_GNU_GETTEXT
@@ -33,6 +33,10 @@ LT_INIT
 
 
 
+
+PKG_CHECK_MODULES(SQLITE3,sqlite3)
+
+PKG_CHECK_MODULES(GLOOX,gloox)
 
 AC_OUTPUT([
 Makefile

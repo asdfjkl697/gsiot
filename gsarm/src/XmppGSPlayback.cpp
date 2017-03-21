@@ -1,6 +1,6 @@
 #include "XmppGSPlayback.h"
 #include "GSIOTClient.h"
-#include "gloox/util.h"
+#include "util.h"
 
 
 XmppGSPlayback::XmppGSPlayback( const struTagParam &TagParam, uint32_t camera_id, const std::string &url, const std::string &peerid, const std::string &streamid, const std::string &key, defPBState state, uint32_t startdt, uint32_t enddt, int m_sound )

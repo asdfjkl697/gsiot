@@ -4,19 +4,115 @@
 
 AM_CPPFLAGS = \
 	-DPACKAGE_LOCALE_DIR=\""$(localedir)"\" \
-	-DPACKAGE_SRC_DIR=\""$(srcdir)"\" \
+	-DPACKAGE_SRC_DIR=\""$(srcdir). \
+	$(SQLITE3_CFLAGS)"\" \
 	-DPACKAGE_DATA_DIR=\""$(pkgdatadir)"\"
 
 AM_CFLAGS =\
 	 -Wall\
 	 -g
 
-bin_PROGRAMS = gsarm
+bin_PROGRAMS = gsarm \
+	gsarm
 
 gsarm_SOURCES = \
-	gsarm.cc \
 	AddressManager.cpp \
 	AddressManager.h \
+	common.cpp \
+	common.h \
+	ControlBase.h \
+	DeviceAddress.cpp \
+	DeviceAddress.h \
+	EditAttrMgr.cpp \
+	EditAttrMgr.h \
+	GSIOTClient.cpp \
+	GSIOTClient.h \
+	GSIOTControl.cpp \
+	GSIOTControl.h \
+	GSIOTDevice.cpp \
+	GSIOTDevice.h \
+	GSIOTDeviceInfo.cpp \
+	GSIOTDeviceInfo.h \
+	GSIOTInfo.cpp \
+	GSIOTInfo.h \
+	GSIOTObjBase.h \
+	GSObjLocker.h \
+	typedef.h \
+	XmppGSResult.cpp \
+	XmppGSResult.h \
+	gsarm.cc \
+	Makefile.am \
+	SQLiteHelper.cpp \
+	SQLiteHelper.h \
+	SQLiteC++.h \
+	Column.cpp \
+	Column.h \
+	Database.cpp \
+	Database.h \
+	Exception.h \
+	Statement.cpp \
+	Statement.h \
+	Transaction.cpp \
+	Transaction.h \
+	GSIOTConfig.cpp \
+	GSIOTConfig.h \
+	DBUpdate.cpp \
+	DBUpdate.h \
+	GSIOTUser.cpp \
+	GSIOTUser.h \
+	GSIOTUserMgr.cpp \
+	GSIOTUserMgr.h \
+	XmppGSAuth.cpp \
+	XmppGSAuth.h \
+	XmppGSMessage.cpp \
+	XmppGSMessage.h \
+	DataStoreMgr.cpp \
+	DataStoreMgr.h \
+	RunCode.cpp \
+	RunCode.h \
+	GSIOTHeartbeat.cpp \
+	GSIOTHeartbeat.h \
+	XmppGSState.cpp \
+	XmppGSState.h \
+	XmppGSManager.cpp \
+	XmppGSManager.h \
+	DeviceConnection.cpp \
+	DeviceConnection.h \
+	TriggerControl.cpp \
+	TriggerControl.h \
+	ControlEvent.cpp \
+	ControlEvent.h \
+	IDeviceHandler.h \
+	ICANDeviceHandler.h \
+	IGSMessageHandler.cpp \
+	IGSMessageHandler.h \
+	IRFReadHandler.h \
+	ISerialPortHandler.h \
+	ITimerHandler.h \
+	CANDeviceControl.cpp \
+	CANDeviceControl.h \
+	DeviceManager.cpp \
+	DeviceManager.h \
+	PresetManager.cpp \
+	PresetManager.h \
+	CommLinkManager.cpp \
+	CommLinkManager.h \
+	rs232.cpp \
+	rs232.h \
+	RS485DevControl.cpp \
+	RS485DevControl.h \
+	ModbusProc.cpp \
+	ModbusProc.h \
+	RFRemoteControl.cpp \
+	RFRemoteControl.h \
+	RemoteButtonManager.cpp \
+	RemoteButtonManager.h \
+	RemoteButtonClass.cpp \
+	RemoteButtonClass.h \
+	ControlMessage.cpp \
+	ControlMessage.h \
+	GSIOTEvent.cpp \
+	GSIOTEvent.h \
 	AutoCallEvent.cpp \
 	AutoCallEvent.h \
 	AutoControlEvent.cpp \
@@ -27,72 +123,17 @@ gsarm_SOURCES = \
 	AutoNoticeEvent.h \
 	AutoSendSMSEvent.cpp \
 	AutoSendSMSEvent.h \
-	CANDeviceControl.cpp \
-	CANDeviceControl.h \
-	Column.cpp \
-	Column.h \
-	CommLink.cpp \
-	CommLink.h \
-	CommLinkManager.cpp \
-	CommLinkManager.h \
-	common.cpp \
-	common.h \
-	ControlBase.h \
-	ControlEvent.cpp \
-	ControlEvent.h \
-	ControlMessage.cpp \
-	ControlMessage.h \
-	Database.cpp \
-	Database.h \
-	DataStoreMgr.cpp \
-	DataStoreMgr.h \
-	DBUpdate.cpp \
-	DBUpdate.h \
-	DeviceAddress.cpp \
-	DeviceAddress.h \
-	DeviceConnection.cpp \
-	DeviceConnection.h \
-	DeviceManager.cpp \
-	DeviceManager.h \
-	EditAttrMgr.cpp \
-	EditAttrMgr.h \
-	Exception.h \
-	GSIOTClient.cpp \
-	GSIOTClient.h \
-	GSIOTConfig.cpp \
-	GSIOTConfig.h \
-	GSIOTControl.cpp \
-	GSIOTControl.h \
-	GSIOTDevice.cpp \
-	GSIOTDevice.h \
-	GSIOTDeviceInfo.cpp \
-	GSIOTDeviceInfo.h \
-	GSIOTEvent.cpp \
-	GSIOTEvent.h \
-	GSIOTHeartbeat.cpp \
-	GSIOTHeartbeat.h \
-	GSIOTInfo.cpp \
-	GSIOTInfo.h \
-	GSIOTObjBase.h \
-	GSIOTUser.cpp \
-	GSIOTUser.h \
-	GSIOTUserMgr.cpp \
-	GSIOTUserMgr.h \
-	GSObjLocker.h \
+	XmppRegister.cpp \
+	XmppRegister.h \
+	SerialDataBuffer.cpp \
+	SerialDataBuffer.h \
+	SerialMessage.cpp \
+	SerialMessage.h \
+	memmacro.h \
 	HeartbeatMon.cpp \
 	HeartbeatMon.h \
-	ICANDeviceHandler.h \
-	IDeviceHandler.h \
-	IGSMessageHandler.cpp \
-	IGSMessageHandler.h \
-	IRFDeviceHandler.h \
-	IRFReadHandler.h \
-	ISerialPortHandler.h \
-	ITimerHandler.h \
-	Makefile.am \
-	memmacro.h \
-	ModbusProc.cpp \
-	ModbusProc.h \
+	CommLink.cpp \
+	CommLink.h \
 	NetBaseClient.cpp \
 	NetBaseClient.h \
 	NetMan.cpp \
@@ -103,74 +144,30 @@ gsarm_SOURCES = \
 	NetTcpClient.h \
 	NetUdpClient.cpp \
 	NetUdpClient.h \
-	PresetManager.cpp \
-	PresetManager.h \
-	RemoteButtonClass.cpp \
-	RemoteButtonClass.h \
-	RemoteButtonManager.cpp \
-	RemoteButtonManager.h \
-	RFDevice.cpp \
-	RFDevice.h \
 	RFDeviceControl.cpp \
 	RFDeviceControl.h \
-	RFRemoteControl.cpp \
-	RFRemoteControl.h \
-	RFSignalDefine.cpp \
-	RFSignalDefine.h \
-	rs232.cpp \
-	rs232.h \
-	RS485DevControl.cpp \
-	RS485DevControl.h \
-	RunCode.cpp \
-	RunCode.h \
-	SerialDataBuffer.cpp \
-	SerialDataBuffer.h \
-	SerialMessage.cpp \
-	SerialMessage.h \
-	SQLiteC++.h \
-	SQLiteHelper.cpp \
-	SQLiteHelper.h \
-	Statement.cpp \
-	Statement.h \
-	TimerManager.cpp \
-	TimerManager.h \
-	Transaction.cpp \
-	Transaction.h \
-	TriggerControl.cpp \
-	TriggerControl.h \
-	typedef.h \
-	VObjClass.cpp \
-	VObjClass.h \
-	XmppGSAuth.cpp \
-	XmppGSAuth.h \
+	RFDevice.cpp \
+	RFDevice.h \
 	XmppGSChange.cpp \
 	XmppGSChange.h \
 	XmppGSEvent.cpp \
 	XmppGSEvent.h \
-	XmppGSManager.cpp \
-	XmppGSManager.h \
-	XmppGSMessage.cpp \
-	XmppGSMessage.h \
-	XmppGSPlayback.cpp \
-	XmppGSPlayback.h \
-	XmppGSPreset.cpp \
-	XmppGSPreset.h \
+	TimerManager.cpp \
+	TimerManager.h \
+	RFSignalDefine.cpp \
+	RFSignalDefine.h \
 	XmppGSRelation.cpp \
 	XmppGSRelation.h \
 	XmppGSReport.cpp \
 	XmppGSReport.h \
-	XmppGSResult.cpp \
-	XmppGSResult.h \
-	XmppGSState.cpp \
-	XmppGSState.h \
-	XmppGSTalk.cpp \
-	XmppGSTalk.h \
-	XmppGSUpdate.cpp \
-	XmppGSUpdate.h \
 	XmppGSVObj.cpp \
 	XmppGSVObj.h \
-	XmppRegister.cpp \
-	XmppRegister.h
+	VObjClass.cpp \
+	VObjClass.h \
+	HttpRequest.cpp \
+	HttpRequest.h \
+	XmppGSUpdate.cpp \
+	XmppGSUpdate.h
 
 gsarm_LDFLAGS = 
 
@@ -178,6 +175,5 @@ gsarm_LDADD = \
 	-lgloox \
 	-lpthread \
 	-lsqlite3
-	
 
 

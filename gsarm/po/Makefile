@@ -17,8 +17,8 @@
 # We have the following line for use by intltoolize:
 # INTLTOOL_MAKEFILE
 
-GETTEXT_PACKAGE = gsarm
-PACKAGE = gsarm
+GETTEXT_PACKAGE = gsiot
+PACKAGE = gsiot
 VERSION = 0.1
 
 SHELL = /bin/bash
@@ -36,7 +36,7 @@ libdir = ${exec_prefix}/lib
 DATADIRNAME = share
 itlocaledir = $(prefix)/$(DATADIRNAME)/locale
 subdir = po
-install_sh = ${SHELL} /home/chen/projects/gsarm/install-sh
+install_sh = ${SHELL} /home/chen/projects/gsiot/install-sh
 # Automake >= 1.8 provides $(MKDIR_P).
 # Until it can be supposed, use the safe fallback:
 mkdir_p = $(install_sh) -d

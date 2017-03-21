@@ -1,16 +1,16 @@
 [Anjuta]
 Geometry=1301x716+65+24
 
-[File Loader]
-Files=../../src/main.cc#26%%%../../src/tcpserver.cpp#98%%%../../src/Makefile.am#52%%%../../src/hardware.cpp#144%%%../../src/typedef.h#30%%%../../src/hardware.h#34%%%../../src/udpserver.h#35%%%../../src/udpserver.cpp#318%%%../../src/packet.h#19%%%../../src/packet.cpp#234%%%../../src/netpacket.cpp#60%%%../../src/netpacket.h#1%%%../../src/boardhandler.h#7%%%../../src/taskmanager.cpp#84%%%../../src/radionetwork.cpp#1%%%../../src/obsolete.cpp#290%%%../../src/timerhandler.h#1%%%../../src/tcpservertask.h#1%%%../../src/tcpserver.h#1%%%../../src/discoveryhandler.h#1%%%../../src/client.cpp#60
-
-[Document Manager]
-bookmarks=<?xml version="1.0" encoding="UTF-8"?>\n<bookmarks/>\n
-
 [Execution]
 Program uri=../../Debug/src/gsbox
 Run in terminal=2
 Working directories=../../../gsbox
+
+[File Loader]
+Files=../../src/main.cc#26%%%../../src/tcpserver.cpp#98%%%../../src/Makefile.am#52%%%../../src/hardware.cpp#144%%%../../src/typedef.h#30%%%../../src/hardware.h#34%%%../../src/udpserver.h#35%%%../../src/udpserver.cpp#116%%%../../src/packet.h#19%%%../../src/packet.cpp#234%%%../../src/netpacket.cpp#60%%%../../src/netpacket.h#1%%%../../src/boardhandler.h#7%%%../../src/taskmanager.cpp#84%%%../../src/radionetwork.cpp#1%%%../../src/obsolete.cpp#290%%%../../src/timerhandler.h#1%%%../../src/tcpservertask.h#1%%%../../src/tcpserver.h#1%%%../../src/discoveryhandler.h#1%%%../../src/client.cpp#60
+
+[Document Manager]
+bookmarks=<?xml version="1.0" encoding="UTF-8"?>\n<bookmarks/>\n
 
 [Project Manager]
 Shortcut=gsbox//src//gsbox

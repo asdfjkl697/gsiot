@@ -1,5 +1,5 @@
 #include "XmppGSPreset.h"
-#include "gloox/util.h"
+#include "util.h"
 #include "GSIOTClient.h"
 
 XmppGSPreset::XmppGSPreset( const struTagParam &TagParam, const std::string &srcmethod, IOTDeviceType device_type, int device_id, const defPresetQueue &PresetList, defGSReturn result )

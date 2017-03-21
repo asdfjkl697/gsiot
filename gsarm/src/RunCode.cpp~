@@ -130,7 +130,7 @@ static struRunCode s_RunCode[defCodeIndex_MAX_+1] =
 
 	{ 19005, 20000, 0, 0, 0, 0,0,0,0, "SYS_VChgRng_CO2", StrNull, StrNull },	
 	{ 19006, 100, 0, 0, 0, 0,0,0,0, "SYS_VChgRng_HCHO", StrNull, StrNull },	
-	//{ 19007, 10000, 0, 0, 0, 0,0,0,0, "SYS_WinTime_PM25", StrNull, StrNull },		
+	{ 19007, 10000, 0, 0, 0, 0,0,0,0, "SYS_WinTime_PM25", StrNull, StrNull },		
 	
 	{ 19101, 0, 0, 0, 0, 0,0,0,0, "SYS_MergeWindLevel", StrNull, StrNull },			// 合并风速级别，1级和2级合并
 	{ 19102, 1, 0, 0, 0, 0,0,0,0, "SYS_DataSamp_DoBatch", StrNull, StrNull },		// DataSample采集时采用批量读取值方式，否则，单个值分别读取
@@ -865,8 +865,7 @@ void CRunCodeMgr::LoadDB_code()
 		int val4 = query.getColumn(col++).getInt();
 
 		//jyc20160825 can not run have trouble
-		std::string str_val;
-		str_val = query.getColumn(col++);
+		std::string str_val = query.getColumn(col++);
 		//std::string str_val = "jyc20160825";
 		
 		s_RunCode[RUNCODE_Index(code, codestr.c_str())].str_val = str_val;

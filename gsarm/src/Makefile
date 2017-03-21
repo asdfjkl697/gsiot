@@ -60,10 +60,10 @@ am__make_running_with_option = \
   test $$has_opt = yes
 am__make_dryrun = (target_option=n; $(am__make_running_with_option))
 am__make_keepgoing = (target_option=k; $(am__make_running_with_option))
-pkgdatadir = $(datadir)/gsarm
-pkgincludedir = $(includedir)/gsarm
-pkglibdir = $(libdir)/gsarm
-pkglibexecdir = $(libexecdir)/gsarm
+pkgdatadir = $(datadir)/gsiot
+pkgincludedir = $(includedir)/gsiot
+pkglibdir = $(libdir)/gsiot
+pkglibexecdir = $(libexecdir)/gsiot
 am__cd = CDPATH="$${ZSH_VERSION+.}$(PATH_SEPARATOR)" && cd
 install_sh_DATA = $(install_sh) -c -m 644
 install_sh_PROGRAM = $(install_sh) -c
@@ -78,7 +78,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = i686-pc-linux-gnu
 host_triplet = i686-pc-linux-gnu
-bin_PROGRAMS = gsarm$(EXEEXT)
+bin_PROGRAMS = gsarm$(EXEEXT) gsarm$(EXEEXT)
 subdir = src
 DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
 	$(top_srcdir)/depcomp
@@ -92,41 +92,39 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
-am_gsarm_OBJECTS = gsarm.$(OBJEXT) AddressManager.$(OBJEXT) \
-	AutoCallEvent.$(OBJEXT) AutoControlEvent.$(OBJEXT) \
-	AutoEventthing.$(OBJEXT) AutoNoticeEvent.$(OBJEXT) \
-	AutoSendSMSEvent.$(OBJEXT) CANDeviceControl.$(OBJEXT) \
-	Column.$(OBJEXT) CommLink.$(OBJEXT) CommLinkManager.$(OBJEXT) \
-	common.$(OBJEXT) ControlEvent.$(OBJEXT) \
-	ControlMessage.$(OBJEXT) Database.$(OBJEXT) \
-	DataStoreMgr.$(OBJEXT) DBUpdate.$(OBJEXT) \
-	DeviceAddress.$(OBJEXT) DeviceConnection.$(OBJEXT) \
-	DeviceManager.$(OBJEXT) EditAttrMgr.$(OBJEXT) \
-	GSIOTClient.$(OBJEXT) GSIOTConfig.$(OBJEXT) \
-	GSIOTControl.$(OBJEXT) GSIOTDevice.$(OBJEXT) \
-	GSIOTDeviceInfo.$(OBJEXT) GSIOTEvent.$(OBJEXT) \
-	GSIOTHeartbeat.$(OBJEXT) GSIOTInfo.$(OBJEXT) \
-	GSIOTUser.$(OBJEXT) GSIOTUserMgr.$(OBJEXT) \
-	HeartbeatMon.$(OBJEXT) IGSMessageHandler.$(OBJEXT) \
-	ModbusProc.$(OBJEXT) NetBaseClient.$(OBJEXT) NetMan.$(OBJEXT) \
+am_gsarm_OBJECTS = AddressManager.$(OBJEXT) common.$(OBJEXT) \
+	DeviceAddress.$(OBJEXT) EditAttrMgr.$(OBJEXT) \
+	GSIOTClient.$(OBJEXT) GSIOTControl.$(OBJEXT) \
+	GSIOTDevice.$(OBJEXT) GSIOTDeviceInfo.$(OBJEXT) \
+	GSIOTInfo.$(OBJEXT) XmppGSResult.$(OBJEXT) gsarm.$(OBJEXT) \
+	SQLiteHelper.$(OBJEXT) Column.$(OBJEXT) Database.$(OBJEXT) \
+	Statement.$(OBJEXT) Transaction.$(OBJEXT) \
+	GSIOTConfig.$(OBJEXT) DBUpdate.$(OBJEXT) GSIOTUser.$(OBJEXT) \
+	GSIOTUserMgr.$(OBJEXT) XmppGSAuth.$(OBJEXT) \
+	XmppGSMessage.$(OBJEXT) DataStoreMgr.$(OBJEXT) \
+	RunCode.$(OBJEXT) GSIOTHeartbeat.$(OBJEXT) \
+	XmppGSState.$(OBJEXT) XmppGSManager.$(OBJEXT) \
+	DeviceConnection.$(OBJEXT) TriggerControl.$(OBJEXT) \
+	ControlEvent.$(OBJEXT) IGSMessageHandler.$(OBJEXT) \
+	CANDeviceControl.$(OBJEXT) DeviceManager.$(OBJEXT) \
+	PresetManager.$(OBJEXT) CommLinkManager.$(OBJEXT) \
+	rs232.$(OBJEXT) RS485DevControl.$(OBJEXT) ModbusProc.$(OBJEXT) \
+	RFRemoteControl.$(OBJEXT) RemoteButtonManager.$(OBJEXT) \
+	RemoteButtonClass.$(OBJEXT) ControlMessage.$(OBJEXT) \
+	GSIOTEvent.$(OBJEXT) AutoCallEvent.$(OBJEXT) \
+	AutoControlEvent.$(OBJEXT) AutoEventthing.$(OBJEXT) \
+	AutoNoticeEvent.$(OBJEXT) AutoSendSMSEvent.$(OBJEXT) \
+	XmppRegister.$(OBJEXT) SerialDataBuffer.$(OBJEXT) \
+	SerialMessage.$(OBJEXT) HeartbeatMon.$(OBJEXT) \
+	CommLink.$(OBJEXT) NetBaseClient.$(OBJEXT) NetMan.$(OBJEXT) \
 	NetModule.$(OBJEXT) NetTcpClient.$(OBJEXT) \
-	NetUdpClient.$(OBJEXT) PresetManager.$(OBJEXT) \
-	RemoteButtonClass.$(OBJEXT) RemoteButtonManager.$(OBJEXT) \
-	RFDevice.$(OBJEXT) RFDeviceControl.$(OBJEXT) \
-	RFRemoteControl.$(OBJEXT) RFSignalDefine.$(OBJEXT) \
-	rs232.$(OBJEXT) RS485DevControl.$(OBJEXT) RunCode.$(OBJEXT) \
-	SerialDataBuffer.$(OBJEXT) SerialMessage.$(OBJEXT) \
-	SQLiteHelper.$(OBJEXT) Statement.$(OBJEXT) \
-	TimerManager.$(OBJEXT) Transaction.$(OBJEXT) \
-	TriggerControl.$(OBJEXT) VObjClass.$(OBJEXT) \
-	XmppGSAuth.$(OBJEXT) XmppGSChange.$(OBJEXT) \
-	XmppGSEvent.$(OBJEXT) XmppGSManager.$(OBJEXT) \
-	XmppGSMessage.$(OBJEXT) XmppGSPlayback.$(OBJEXT) \
-	XmppGSPreset.$(OBJEXT) XmppGSRelation.$(OBJEXT) \
-	XmppGSReport.$(OBJEXT) XmppGSResult.$(OBJEXT) \
-	XmppGSState.$(OBJEXT) XmppGSTalk.$(OBJEXT) \
-	XmppGSUpdate.$(OBJEXT) XmppGSVObj.$(OBJEXT) \
-	XmppRegister.$(OBJEXT)
+	NetUdpClient.$(OBJEXT) RFDeviceControl.$(OBJEXT) \
+	RFDevice.$(OBJEXT) XmppGSChange.$(OBJEXT) \
+	XmppGSEvent.$(OBJEXT) TimerManager.$(OBJEXT) \
+	RFSignalDefine.$(OBJEXT) XmppGSRelation.$(OBJEXT) \
+	XmppGSReport.$(OBJEXT) XmppGSVObj.$(OBJEXT) \
+	VObjClass.$(OBJEXT) HttpRequest.$(OBJEXT) \
+	XmppGSUpdate.$(OBJEXT)
 gsarm_OBJECTS = $(am_gsarm_OBJECTS)
 gsarm_DEPENDENCIES =
 AM_V_lt = $(am__v_lt_$(V))
@@ -215,14 +213,14 @@ am__define_uniq_tagged_files = \
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
-ACLOCAL = ${SHELL} /home/chen/projects/gsarm/missing aclocal-1.14
+ACLOCAL = ${SHELL} /home/chen/projects/gsiot/missing aclocal-1.14
 ALL_LINGUAS = 
 AMTAR = $${TAR-tar}
 AM_DEFAULT_VERBOSITY = 0
 AR = ar
-AUTOCONF = ${SHELL} /home/chen/projects/gsarm/missing autoconf
-AUTOHEADER = ${SHELL} /home/chen/projects/gsarm/missing autoheader
-AUTOMAKE = ${SHELL} /home/chen/projects/gsarm/missing automake-1.14
+AUTOCONF = ${SHELL} /home/chen/projects/gsiot/missing autoconf
+AUTOHEADER = ${SHELL} /home/chen/projects/gsiot/missing autoheader
+AUTOMAKE = ${SHELL} /home/chen/projects/gsiot/missing automake-1.14
 AWK = gawk
 CATALOGS = 
 CATOBJEXT = .gmo
@@ -248,7 +246,9 @@ ECHO_T =
 EGREP = /bin/grep -E
 EXEEXT = 
 FGREP = /bin/grep -F
-GETTEXT_PACKAGE = gsarm
+GETTEXT_PACKAGE = gsiot
+GLOOX_CFLAGS = -pthread -I/usr/local/include  
+GLOOX_LIBS = -L/usr/local/lib -lgloox -lresolv -lssl -lcrypto -lz  
 GMOFILES = 
 GMSGFMT = /usr/bin/msgfmt
 GREP = /bin/grep
@@ -275,7 +275,7 @@ LIBTOOL = $(SHELL) $(top_builddir)/libtool
 LIPO = 
 LN_S = ln -s
 LTLIBOBJS = 
-MAKEINFO = ${SHELL} /home/chen/projects/gsarm/missing makeinfo
+MAKEINFO = ${SHELL} /home/chen/projects/gsiot/missing makeinfo
 MANIFEST_TOOL = :
 MKDIR_P = /bin/mkdir -p
 MKINSTALLDIRS = ./mkinstalldirs
@@ -288,14 +288,17 @@ OBJDUMP = objdump
 OBJEXT = o
 OTOOL = 
 OTOOL64 = 
-PACKAGE = gsarm
+PACKAGE = gsiot
 PACKAGE_BUGREPORT = 
-PACKAGE_NAME = gsarm
-PACKAGE_STRING = gsarm 0.1
-PACKAGE_TARNAME = gsarm
+PACKAGE_NAME = gsiot
+PACKAGE_STRING = gsiot 0.1
+PACKAGE_TARNAME = gsiot
 PACKAGE_URL = 
 PACKAGE_VERSION = 0.1
 PATH_SEPARATOR = :
+PKG_CONFIG = /usr/bin/pkg-config
+PKG_CONFIG_LIBDIR = 
+PKG_CONFIG_PATH = 
 POFILES = 
 POSUB = po
 PO_IN_DATADIR_FALSE = 
@@ -304,14 +307,16 @@ RANLIB = ranlib
 SED = /bin/sed
 SET_MAKE = 
 SHELL = /bin/bash
+SQLITE3_CFLAGS = -I/usr/local/include  
+SQLITE3_LIBS = -L/usr/local/lib -lsqlite3  
 STRIP = strip
 USE_NLS = yes
 VERSION = 0.1
 XGETTEXT = /usr/bin/xgettext
-abs_builddir = /home/chen/projects/gsarm/src
-abs_srcdir = /home/chen/projects/gsarm/src
-abs_top_builddir = /home/chen/projects/gsarm
-abs_top_srcdir = /home/chen/projects/gsarm
+abs_builddir = /home/chen/projects/gsiot/src
+abs_srcdir = /home/chen/projects/gsiot/src
+abs_top_builddir = /home/chen/projects/gsiot
+abs_top_srcdir = /home/chen/projects/gsiot
 ac_ct_AR = ar
 ac_ct_CC = gcc
 ac_ct_CXX = g++
@@ -341,7 +346,7 @@ host_vendor = pc
 htmldir = ${docdir}
 includedir = ${prefix}/include
 infodir = ${datarootdir}/info
-install_sh = ${SHELL} /home/chen/projects/gsarm/install-sh
+install_sh = ${SHELL} /home/chen/projects/gsiot/install-sh
 intltool__v_merge_options_ = $(intltool__v_merge_options_$(AM_DEFAULT_VERBOSITY))
 intltool__v_merge_options_0 = -q
 libdir = ${exec_prefix}/lib
@@ -365,7 +370,8 @@ top_builddir = ..
 top_srcdir = ..
 AM_CPPFLAGS = \
 	-DPACKAGE_LOCALE_DIR=\""$(localedir)"\" \
-	-DPACKAGE_SRC_DIR=\""$(srcdir)"\" \
+	-DPACKAGE_SRC_DIR=\""$(srcdir). \
+	$(SQLITE3_CFLAGS)"\" \
 	-DPACKAGE_DATA_DIR=\""$(pkgdatadir)"\"
 
 AM_CFLAGS = \
@@ -373,9 +379,103 @@ AM_CFLAGS = \
 	 -g
 
 gsarm_SOURCES = \
-	gsarm.cc \
 	AddressManager.cpp \
 	AddressManager.h \
+	common.cpp \
+	common.h \
+	ControlBase.h \
+	DeviceAddress.cpp \
+	DeviceAddress.h \
+	EditAttrMgr.cpp \
+	EditAttrMgr.h \
+	GSIOTClient.cpp \
+	GSIOTClient.h \
+	GSIOTControl.cpp \
+	GSIOTControl.h \
+	GSIOTDevice.cpp \
+	GSIOTDevice.h \
+	GSIOTDeviceInfo.cpp \
+	GSIOTDeviceInfo.h \
+	GSIOTInfo.cpp \
+	GSIOTInfo.h \
+	GSIOTObjBase.h \
+	GSObjLocker.h \
+	typedef.h \
+	XmppGSResult.cpp \
+	XmppGSResult.h \
+	gsarm.cc \
+	Makefile.am \
+	SQLiteHelper.cpp \
+	SQLiteHelper.h \
+	SQLiteC++.h \
+	Column.cpp \
+	Column.h \
+	Database.cpp \
+	Database.h \
+	Exception.h \
+	Statement.cpp \
+	Statement.h \
+	Transaction.cpp \
+	Transaction.h \
+	GSIOTConfig.cpp \
+	GSIOTConfig.h \
+	DBUpdate.cpp \
+	DBUpdate.h \
+	GSIOTUser.cpp \
+	GSIOTUser.h \
+	GSIOTUserMgr.cpp \
+	GSIOTUserMgr.h \
+	XmppGSAuth.cpp \
+	XmppGSAuth.h \
+	XmppGSMessage.cpp \
+	XmppGSMessage.h \
+	DataStoreMgr.cpp \
+	DataStoreMgr.h \
+	RunCode.cpp \
+	RunCode.h \
+	GSIOTHeartbeat.cpp \
+	GSIOTHeartbeat.h \
+	XmppGSState.cpp \
+	XmppGSState.h \
+	XmppGSManager.cpp \
+	XmppGSManager.h \
+	DeviceConnection.cpp \
+	DeviceConnection.h \
+	TriggerControl.cpp \
+	TriggerControl.h \
+	ControlEvent.cpp \
+	ControlEvent.h \
+	IDeviceHandler.h \
+	ICANDeviceHandler.h \
+	IGSMessageHandler.cpp \
+	IGSMessageHandler.h \
+	IRFReadHandler.h \
+	ISerialPortHandler.h \
+	ITimerHandler.h \
+	CANDeviceControl.cpp \
+	CANDeviceControl.h \
+	DeviceManager.cpp \
+	DeviceManager.h \
+	PresetManager.cpp \
+	PresetManager.h \
+	CommLinkManager.cpp \
+	CommLinkManager.h \
+	rs232.cpp \
+	rs232.h \
+	RS485DevControl.cpp \
+	RS485DevControl.h \
+	ModbusProc.cpp \
+	ModbusProc.h \
+	RFRemoteControl.cpp \
+	RFRemoteControl.h \
+	RemoteButtonManager.cpp \
+	RemoteButtonManager.h \
+	RemoteButtonClass.cpp \
+	RemoteButtonClass.h \
+	ControlMessage.cpp \
+	ControlMessage.h \
+	GSIOTEvent.cpp \
+	GSIOTEvent.h \
 	AutoCallEvent.cpp \
 	AutoCallEvent.h \
 	AutoControlEvent.cpp \
@@ -386,72 +486,17 @@ gsarm_SOURCES = \
 	AutoNoticeEvent.h \
 	AutoSendSMSEvent.cpp \
 	AutoSendSMSEvent.h \
-	CANDeviceControl.cpp \
-	CANDeviceControl.h \
-	Column.cpp \
-	Column.h \
-	CommLink.cpp \
-	CommLink.h \
-	CommLinkManager.cpp \
-	CommLinkManager.h \
-	common.cpp \
-	common.h \
-	ControlBase.h \
-	ControlEvent.cpp \
-	ControlEvent.h \
-	ControlMessage.cpp \
-	ControlMessage.h \
-	Database.cpp \
-	Database.h \
-	DataStoreMgr.cpp \
-	DataStoreMgr.h \
-	DBUpdate.cpp \
-	DBUpdate.h \
-	DeviceAddress.cpp \
-	DeviceAddress.h \
-	DeviceConnection.cpp \
-	DeviceConnection.h \
-	DeviceManager.cpp \
-	DeviceManager.h \
-	EditAttrMgr.cpp \
-	EditAttrMgr.h \
-	Exception.h \
-	GSIOTClient.cpp \
-	GSIOTClient.h \
-	GSIOTConfig.cpp \
-	GSIOTConfig.h \
-	GSIOTControl.cpp \
-	GSIOTControl.h \
-	GSIOTDevice.cpp \
-	GSIOTDevice.h \
-	GSIOTDeviceInfo.cpp \
-	GSIOTDeviceInfo.h \
-	GSIOTEvent.cpp \
-	GSIOTEvent.h \
-	GSIOTHeartbeat.cpp \
-	GSIOTHeartbeat.h \
-	GSIOTInfo.cpp \
-	GSIOTInfo.h \
-	GSIOTObjBase.h \
-	GSIOTUser.cpp \
-	GSIOTUser.h \
-	GSIOTUserMgr.cpp \
-	GSIOTUserMgr.h \
-	GSObjLocker.h \
+	XmppRegister.cpp \
+	XmppRegister.h \
+	SerialDataBuffer.cpp \
+	SerialDataBuffer.h \
+	SerialMessage.cpp \
+	SerialMessage.h \
+	memmacro.h \
 	HeartbeatMon.cpp \
 	HeartbeatMon.h \
-	ICANDeviceHandler.h \
-	IDeviceHandler.h \
-	IGSMessageHandler.cpp \
-	IGSMessageHandler.h \
-	IRFDeviceHandler.h \
-	IRFReadHandler.h \
-	ISerialPortHandler.h \
-	ITimerHandler.h \
-	Makefile.am \
-	memmacro.h \
-	ModbusProc.cpp \
-	ModbusProc.h \
+	CommLink.cpp \
+	CommLink.h \
 	NetBaseClient.cpp \
 	NetBaseClient.h \
 	NetMan.cpp \
@@ -462,74 +507,30 @@ gsarm_SOURCES = \
 	NetTcpClient.h \
 	NetUdpClient.cpp \
 	NetUdpClient.h \
-	PresetManager.cpp \
-	PresetManager.h \
-	RemoteButtonClass.cpp \
-	RemoteButtonClass.h \
-	RemoteButtonManager.cpp \
-	RemoteButtonManager.h \
-	RFDevice.cpp \
-	RFDevice.h \
 	RFDeviceControl.cpp \
 	RFDeviceControl.h \
-	RFRemoteControl.cpp \
-	RFRemoteControl.h \
-	RFSignalDefine.cpp \
-	RFSignalDefine.h \
-	rs232.cpp \
-	rs232.h \
-	RS485DevControl.cpp \
-	RS485DevControl.h \
-	RunCode.cpp \
-	RunCode.h \
-	SerialDataBuffer.cpp \
-	SerialDataBuffer.h \
-	SerialMessage.cpp \
-	SerialMessage.h \
-	SQLiteC++.h \
-	SQLiteHelper.cpp \
-	SQLiteHelper.h \
-	Statement.cpp \
-	Statement.h \
-	TimerManager.cpp \
-	TimerManager.h \
-	Transaction.cpp \
-	Transaction.h \
-	TriggerControl.cpp \
-	TriggerControl.h \
-	typedef.h \
-	VObjClass.cpp \
-	VObjClass.h \
-	XmppGSAuth.cpp \
-	XmppGSAuth.h \
+	RFDevice.cpp \
+	RFDevice.h \
 	XmppGSChange.cpp \
 	XmppGSChange.h \
 	XmppGSEvent.cpp \
 	XmppGSEvent.h \
-	XmppGSManager.cpp \
-	XmppGSManager.h \
-	XmppGSMessage.cpp \
-	XmppGSMessage.h \
-	XmppGSPlayback.cpp \
-	XmppGSPlayback.h \
-	XmppGSPreset.cpp \
-	XmppGSPreset.h \
+	TimerManager.cpp \
+	TimerManager.h \
+	RFSignalDefine.cpp \
+	RFSignalDefine.h \
 	XmppGSRelation.cpp \
 	XmppGSRelation.h \
 	XmppGSReport.cpp \
 	XmppGSReport.h \
-	XmppGSResult.cpp \
-	XmppGSResult.h \
-	XmppGSState.cpp \
-	XmppGSState.h \
-	XmppGSTalk.cpp \
-	XmppGSTalk.h \
-	XmppGSUpdate.cpp \
-	XmppGSUpdate.h \
 	XmppGSVObj.cpp \
 	XmppGSVObj.h \
-	XmppRegister.cpp \
-	XmppRegister.h
+	VObjClass.cpp \
+	VObjClass.h \
+	HttpRequest.cpp \
+	HttpRequest.h \
+	XmppGSUpdate.cpp \
+	XmppGSUpdate.h
 
 gsarm_LDFLAGS = 
 gsarm_LDADD = \
@@ -661,6 +662,7 @@ include ./$(DEPDIR)/GSIOTInfo.Po
 include ./$(DEPDIR)/GSIOTUser.Po
 include ./$(DEPDIR)/GSIOTUserMgr.Po
 include ./$(DEPDIR)/HeartbeatMon.Po
+include ./$(DEPDIR)/HttpRequest.Po
 include ./$(DEPDIR)/IGSMessageHandler.Po
 include ./$(DEPDIR)/ModbusProc.Po
 include ./$(DEPDIR)/NetBaseClient.Po
@@ -690,13 +692,10 @@ include ./$(DEPDIR)/XmppGSChange.Po
 include ./$(DEPDIR)/XmppGSEvent.Po
 include ./$(DEPDIR)/XmppGSManager.Po
 include ./$(DEPDIR)/XmppGSMessage.Po
-include ./$(DEPDIR)/XmppGSPlayback.Po
-include ./$(DEPDIR)/XmppGSPreset.Po
 include ./$(DEPDIR)/XmppGSRelation.Po
 include ./$(DEPDIR)/XmppGSReport.Po
 include ./$(DEPDIR)/XmppGSResult.Po
 include ./$(DEPDIR)/XmppGSState.Po
-include ./$(DEPDIR)/XmppGSTalk.Po
 include ./$(DEPDIR)/XmppGSUpdate.Po
 include ./$(DEPDIR)/XmppGSVObj.Po
 include ./$(DEPDIR)/XmppRegister.Po

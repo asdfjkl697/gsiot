@@ -123,7 +123,8 @@ am_gsiot_OBJECTS = AddressManager.$(OBJEXT) common.$(OBJEXT) \
 	XmppGSEvent.$(OBJEXT) TimerManager.$(OBJEXT) \
 	RFSignalDefine.$(OBJEXT) XmppGSRelation.$(OBJEXT) \
 	XmppGSReport.$(OBJEXT) XmppGSVObj.$(OBJEXT) \
-	VObjClass.$(OBJEXT)
+	VObjClass.$(OBJEXT) HttpRequest.$(OBJEXT) \
+	XmppGSUpdate.$(OBJEXT)
 gsiot_OBJECTS = $(am_gsiot_OBJECTS)
 gsiot_DEPENDENCIES =
 AM_V_lt = $(am__v_lt_$(V))
@@ -525,7 +526,11 @@ gsiot_SOURCES = \
 	XmppGSVObj.cpp \
 	XmppGSVObj.h \
 	VObjClass.cpp \
-	VObjClass.h
+	VObjClass.h \
+	HttpRequest.cpp \
+	HttpRequest.h \
+	XmppGSUpdate.cpp \
+	XmppGSUpdate.h
 
 gsiot_LDFLAGS = 
 gsiot_LDADD = \
@@ -657,6 +662,7 @@ include ./$(DEPDIR)/GSIOTInfo.Po
 include ./$(DEPDIR)/GSIOTUser.Po
 include ./$(DEPDIR)/GSIOTUserMgr.Po
 include ./$(DEPDIR)/HeartbeatMon.Po
+include ./$(DEPDIR)/HttpRequest.Po
 include ./$(DEPDIR)/IGSMessageHandler.Po
 include ./$(DEPDIR)/ModbusProc.Po
 include ./$(DEPDIR)/NetBaseClient.Po
@@ -690,6 +696,7 @@ include ./$(DEPDIR)/XmppGSRelation.Po
 include ./$(DEPDIR)/XmppGSReport.Po
 include ./$(DEPDIR)/XmppGSResult.Po
 include ./$(DEPDIR)/XmppGSState.Po
+include ./$(DEPDIR)/XmppGSUpdate.Po
 include ./$(DEPDIR)/XmppGSVObj.Po
 include ./$(DEPDIR)/XmppRegister.Po
 include ./$(DEPDIR)/common.Po

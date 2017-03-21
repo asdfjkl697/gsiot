@@ -1,7 +1,7 @@
 #! /bin/bash
 
 # libtool - Provide generalized library-building support services.
-# Generated automatically by config.status (gsarm) 0.1
+# Generated automatically by config.status (gsiot) 0.1
 # Libtool was configured on host chen-X450CC:
 # NOTE: Changes made to this file will be lost: look at ltmain.sh.
 #

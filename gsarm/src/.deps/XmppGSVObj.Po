@@ -162,7 +162,20 @@ XmppGSVObj.o: XmppGSVObj.cpp /usr/include/stdc-predef.h XmppGSVObj.h \
  /usr/local/include/gloox/messagehandler.h TimerManager.h \
  ControlMessage.h XmppGSAuth.h XmppGSManager.h XmppGSEvent.h \
  XmppGSState.h XmppGSRelation.h XmppGSPreset.h XmppGSReport.h \
- DataStoreMgr.h XmppGSUpdate.h HttpRequest.h VObjClass.h
+ DataStoreMgr.h XmppGSUpdate.h HttpRequest.h \
+ /usr/include/i386-linux-gnu/sys/socket.h \
+ /usr/include/i386-linux-gnu/sys/uio.h \
+ /usr/include/i386-linux-gnu/bits/socket.h \
+ /usr/include/i386-linux-gnu/bits/socket_type.h \
+ /usr/include/i386-linux-gnu/bits/sockaddr.h \
+ /usr/include/i386-linux-gnu/asm/socket.h \
+ /usr/include/asm-generic/socket.h \
+ /usr/include/i386-linux-gnu/asm/sockios.h \
+ /usr/include/asm-generic/sockios.h \
+ /usr/include/i386-linux-gnu/bits/socket2.h /usr/include/netdb.h \
+ /usr/include/netinet/in.h /usr/include/i386-linux-gnu/bits/in.h \
+ /usr/include/rpc/netdb.h /usr/include/i386-linux-gnu/bits/siginfo.h \
+ /usr/include/i386-linux-gnu/bits/netdb.h VObjClass.h
 
 /usr/include/stdc-predef.h:
 
@@ -687,5 +700,37 @@ DataStoreMgr.h:
 XmppGSUpdate.h:
 
 HttpRequest.h:
+
+/usr/include/i386-linux-gnu/sys/socket.h:
+
+/usr/include/i386-linux-gnu/sys/uio.h:
+
+/usr/include/i386-linux-gnu/bits/socket.h:
+
+/usr/include/i386-linux-gnu/bits/socket_type.h:
+
+/usr/include/i386-linux-gnu/bits/sockaddr.h:
+
+/usr/include/i386-linux-gnu/asm/socket.h:
+
+/usr/include/asm-generic/socket.h:
+
+/usr/include/i386-linux-gnu/asm/sockios.h:
+
+/usr/include/asm-generic/sockios.h:
+
+/usr/include/i386-linux-gnu/bits/socket2.h:
+
+/usr/include/netdb.h:
+
+/usr/include/netinet/in.h:
+
+/usr/include/i386-linux-gnu/bits/in.h:
+
+/usr/include/rpc/netdb.h:
+
+/usr/include/i386-linux-gnu/bits/siginfo.h:
+
+/usr/include/i386-linux-gnu/bits/netdb.h:
 
 VObjClass.h:

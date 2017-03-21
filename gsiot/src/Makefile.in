@@ -123,7 +123,8 @@ am_gsiot_OBJECTS = AddressManager.$(OBJEXT) common.$(OBJEXT) \
 	XmppGSEvent.$(OBJEXT) TimerManager.$(OBJEXT) \
 	RFSignalDefine.$(OBJEXT) XmppGSRelation.$(OBJEXT) \
 	XmppGSReport.$(OBJEXT) XmppGSVObj.$(OBJEXT) \
-	VObjClass.$(OBJEXT)
+	VObjClass.$(OBJEXT) HttpRequest.$(OBJEXT) \
+	XmppGSUpdate.$(OBJEXT)
 gsiot_OBJECTS = $(am_gsiot_OBJECTS)
 gsiot_DEPENDENCIES =
 AM_V_lt = $(am__v_lt_@AM_V@)
@@ -525,7 +526,11 @@ gsiot_SOURCES = \
 	XmppGSVObj.cpp \
 	XmppGSVObj.h \
 	VObjClass.cpp \
-	VObjClass.h
+	VObjClass.h \
+	HttpRequest.cpp \
+	HttpRequest.h \
+	XmppGSUpdate.cpp \
+	XmppGSUpdate.h
 
 gsiot_LDFLAGS = 
 gsiot_LDADD = \
@@ -657,6 +662,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/GSIOTUser.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/GSIOTUserMgr.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/HeartbeatMon.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/HttpRequest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/IGSMessageHandler.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ModbusProc.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/NetBaseClient.Po@am__quote@
@@ -690,6 +696,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/XmppGSReport.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/XmppGSResult.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/XmppGSState.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/XmppGSUpdate.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/XmppGSVObj.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/XmppRegister.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/common.Po@am__quote@

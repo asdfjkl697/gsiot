@@ -171,13 +171,26 @@ GSIOTClient.o: GSIOTClient.cpp /usr/include/stdc-predef.h \
  /usr/local/include/gloox/messagehandler.h TimerManager.h \
  ControlMessage.h XmppGSAuth.h XmppGSManager.h XmppGSEvent.h \
  XmppGSState.h XmppGSRelation.h XmppGSPreset.h XmppGSVObj.h \
- XmppGSReport.h DataStoreMgr.h XmppGSUpdate.h HttpRequest.h GSIOTInfo.h \
- GSIOTControl.h GSIOTDeviceInfo.h GSIOTHeartbeat.h XmppGSResult.h \
- XmppGSMessage.h XmppRegister.h /usr/local/include/gloox/registration.h \
+ XmppGSReport.h DataStoreMgr.h XmppGSUpdate.h HttpRequest.h \
+ /usr/include/i386-linux-gnu/sys/socket.h \
+ /usr/include/i386-linux-gnu/sys/uio.h \
+ /usr/include/i386-linux-gnu/bits/socket.h \
+ /usr/include/i386-linux-gnu/bits/socket_type.h \
+ /usr/include/i386-linux-gnu/bits/sockaddr.h \
+ /usr/include/i386-linux-gnu/asm/socket.h \
+ /usr/include/asm-generic/socket.h \
+ /usr/include/i386-linux-gnu/asm/sockios.h \
+ /usr/include/asm-generic/sockios.h \
+ /usr/include/i386-linux-gnu/bits/socket2.h /usr/include/netdb.h \
+ /usr/include/netinet/in.h /usr/include/i386-linux-gnu/bits/in.h \
+ /usr/include/rpc/netdb.h /usr/include/i386-linux-gnu/bits/siginfo.h \
+ /usr/include/i386-linux-gnu/bits/netdb.h GSIOTInfo.h GSIOTControl.h \
+ GSIOTDeviceInfo.h GSIOTHeartbeat.h XmppGSResult.h XmppGSMessage.h \
+ XmppRegister.h /usr/local/include/gloox/registration.h \
  /usr/local/include/gloox/registrationhandler.h \
  /usr/local/include/gloox/oob.h /usr/local/include/gloox/dataform.h \
  /usr/local/include/gloox/dataformfieldcontainer.h \
- /usr/local/include/gloox/dataformfield.h XmppGSChange.h
+ /usr/local/include/gloox/dataformfield.h XmppGSChange.h HttpRequest.cpp
 
 /usr/include/stdc-predef.h:
 
@@ -719,6 +732,38 @@ XmppGSUpdate.h:
 
 HttpRequest.h:
 
+/usr/include/i386-linux-gnu/sys/socket.h:
+
+/usr/include/i386-linux-gnu/sys/uio.h:
+
+/usr/include/i386-linux-gnu/bits/socket.h:
+
+/usr/include/i386-linux-gnu/bits/socket_type.h:
+
+/usr/include/i386-linux-gnu/bits/sockaddr.h:
+
+/usr/include/i386-linux-gnu/asm/socket.h:
+
+/usr/include/asm-generic/socket.h:
+
+/usr/include/i386-linux-gnu/asm/sockios.h:
+
+/usr/include/asm-generic/sockios.h:
+
+/usr/include/i386-linux-gnu/bits/socket2.h:
+
+/usr/include/netdb.h:
+
+/usr/include/netinet/in.h:
+
+/usr/include/i386-linux-gnu/bits/in.h:
+
+/usr/include/rpc/netdb.h:
+
+/usr/include/i386-linux-gnu/bits/siginfo.h:
+
+/usr/include/i386-linux-gnu/bits/netdb.h:
+
 GSIOTInfo.h:
 
 GSIOTControl.h:
@@ -746,3 +791,5 @@ XmppRegister.h:
 /usr/local/include/gloox/dataformfield.h:
 
 XmppGSChange.h:
+
+HttpRequest.cpp:

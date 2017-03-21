@@ -1,6 +1,6 @@
 #include "XmppGSTalk.h"
 #include "GSIOTClient.h"
-#include "gloox/util.h"
+#include "util.h"
 
 
 XmppGSTalk::XmppGSTalk( const struTagParam &TagParam, defTalkCmd cmd, const std::string &url, const defvecDevKey &vecdev, const bool result )
