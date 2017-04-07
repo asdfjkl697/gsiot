@@ -1,0 +1,6 @@
+13:05:37 **** Incremental Build of configuration Debug for project gstest ****
+make all 
+make: Nothing to be done for `all'.
+
+13:05:37 Build Finished (took 110ms)
+

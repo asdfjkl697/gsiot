@@ -1,7 +1,7 @@
 #include "GSIOTDevice.h"
 #include "gloox/tag.h"
-//#include "MediaControl.h"
-//#include "IPCameraBase.h"
+#include "MediaControl.h" //jyc20170331 resume
+#include "IPCameraBase.h" //jyc20170331 resume
 #include "RFDeviceControl.h"
 //#include "CANDeviceControl.h"
 #include "RS485DevControl.h"
@@ -49,28 +49,23 @@ GSIOTDevice::GSIOTDevice( const Tag* tag)
 		this->m_ver= tag->findAttribute("ver");
 
 	this->UntagEditAttr( tag );
-	/*/jyc20160527
-	Tag *t = tag->findChild(defDeviceTypeTag_media);
-	if(t){
-	    	this->m_control = new MediaControl(t); //jyc20160527
-		return;
-	}
 
-	t = tag->findChild(defDeviceTypeTag_camera);
-	if(t){
-	    	this->m_control = new CameraControl(t);
-		return;
-	}
-
-	t = tag->findChild(defDeviceTypeTag_candevice);
-	if(t){
-	    	this->m_control = new CANDeviceControl(t);
-		return;
-	}*/
 
 	Tag *t = tag->findChild(defDeviceTypeTag_rfdevice);
 	if(t){
 	    	this->m_control = new RFDeviceControl(t);
+		return;
+	}
+
+	t = tag->findChild(defDeviceTypeTag_media);
+	if(t){
+	    	this->m_control = new MediaControl(t); //jyc20170331 resume
+		return;
+	}
+
+	t = tag->findChild(defDeviceTypeTag_camera); //jyc20170331 resume
+	if(t){
+	    	this->m_control = new CameraControl(t);
 		return;
 	}
 
@@ -85,6 +80,13 @@ GSIOTDevice::GSIOTDevice( const Tag* tag)
 		this->m_control = new RFRemoteControl(t);
 		return;
 	}
+
+	/*/jyc20160527 remove
+	t = tag->findChild(defDeviceTypeTag_candevice);
+	if(t){
+	    	this->m_control = new CANDeviceControl(t);
+		return;
+	}*/
 
 	if( m_control )
 	{
@@ -159,7 +161,10 @@ bool GSIOTDevice::IsSupportAlarm( const GSIOTDevice *device )
 	case IOT_DEVICE_Trigger:
 		return true;
 	case IOT_DEVICE_Camera:
-
+		{
+			const IPCameraBase *ctl = (const IPCameraBase*)device->getControl();
+			return ctl->GetAdvAttrSafe().get_AdvAttr(defCamAdvAttr_SupportAlarm);
+		}
 		break;
 
 	default:
@@ -585,8 +590,11 @@ defUseable GSIOTDevice::get_all_useable_state() const
 	switch( this->getType() )
 	{
 	case IOT_DEVICE_Camera:
-		{
-
+		{   //jyc20170331 resume
+			if( this->getControl() && ((CameraControl*)this->getControl())->hasCamBase() )
+			{
+				return ((IPCameraBase*)this->getControl())->get_all_useable_state();
+			}
 		}
 		break;
 
@@ -639,8 +647,9 @@ defAlarmState GSIOTDevice::GetCurAlarmState() const
 		return defAlarmState_UnInit;
 
 	case IOT_DEVICE_Camera:
-		{
-
+		{   //jyc20170331 resume
+			const IPCameraBase *ctl = (IPCameraBase*)this->getControl();
+			return ctl->GetCurAlarmState();
 		}
 		break;
 
@@ -704,8 +713,11 @@ std::string GSIOTDevice::GetPrePicChangeCode() const
 	switch( this->getType() )
 	{
 	case IOT_DEVICE_Camera:
-	{
-
+	{   //jyc20170331 resume
+		if( this->getControl() && ((CameraControl*)this->getControl())->hasCamBase() )
+		{
+			return ((IPCameraBase*)this->getControl())->GetPrePicChangeCode();
+		}
 	}
 	break;
 	}

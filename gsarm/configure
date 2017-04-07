@@ -636,6 +636,14 @@ GLOOX_LIBS
 GLOOX_CFLAGS
 SQLITE3_LIBS
 SQLITE3_CFLAGS
+LIBAVCODEC_LIBS
+LIBAVCODEC_CFLAGS
+LIBAVFORMAT_LIBS
+LIBAVFORMAT_CFLAGS
+LIBAVUTIL_LIBS
+LIBAVUTIL_CFLAGS
+ZLIB_LIBS
+ZLIB_CFLAGS
 PKG_CONFIG_LIBDIR
 PKG_CONFIG_PATH
 PKG_CONFIG
@@ -836,6 +844,14 @@ CXXCPP
 PKG_CONFIG
 PKG_CONFIG_PATH
 PKG_CONFIG_LIBDIR
+ZLIB_CFLAGS
+ZLIB_LIBS
+LIBAVUTIL_CFLAGS
+LIBAVUTIL_LIBS
+LIBAVFORMAT_CFLAGS
+LIBAVFORMAT_LIBS
+LIBAVCODEC_CFLAGS
+LIBAVCODEC_LIBS
 SQLITE3_CFLAGS
 SQLITE3_LIBS
 GLOOX_CFLAGS
@@ -1497,6 +1513,20 @@ Some influential environment variables:
               directories to add to pkg-config's search path
   PKG_CONFIG_LIBDIR
               path overriding pkg-config's built-in search path
+  ZLIB_CFLAGS C compiler flags for ZLIB, overriding pkg-config
+  ZLIB_LIBS   linker flags for ZLIB, overriding pkg-config
+  LIBAVUTIL_CFLAGS
+              C compiler flags for LIBAVUTIL, overriding pkg-config
+  LIBAVUTIL_LIBS
+              linker flags for LIBAVUTIL, overriding pkg-config
+  LIBAVFORMAT_CFLAGS
+              C compiler flags for LIBAVFORMAT, overriding pkg-config
+  LIBAVFORMAT_LIBS
+              linker flags for LIBAVFORMAT, overriding pkg-config
+  LIBAVCODEC_CFLAGS
+              C compiler flags for LIBAVCODEC, overriding pkg-config
+  LIBAVCODEC_LIBS
+              linker flags for LIBAVCODEC, overriding pkg-config
   SQLITE3_CFLAGS
               C compiler flags for SQLITE3, overriding pkg-config
   SQLITE3_LIBS
@@ -16703,6 +16733,374 @@ $as_echo "no" >&6; }
 		PKG_CONFIG=""
 	fi
 fi
+
+pkg_failed=no
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for ZLIB" >&5
+$as_echo_n "checking for ZLIB... " >&6; }
+
+if test -n "$ZLIB_CFLAGS"; then
+    pkg_cv_ZLIB_CFLAGS="$ZLIB_CFLAGS"
+ elif test -n "$PKG_CONFIG"; then
+    if test -n "$PKG_CONFIG" && \
+    { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"zlib\""; } >&5
+  ($PKG_CONFIG --exists --print-errors "zlib") 2>&5
+  ac_status=$?
+  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; }; then
+  pkg_cv_ZLIB_CFLAGS=`$PKG_CONFIG --cflags "zlib" 2>/dev/null`
+		      test "x$?" != "x0" && pkg_failed=yes
+else
+  pkg_failed=yes
+fi
+ else
+    pkg_failed=untried
+fi
+if test -n "$ZLIB_LIBS"; then
+    pkg_cv_ZLIB_LIBS="$ZLIB_LIBS"
+ elif test -n "$PKG_CONFIG"; then
+    if test -n "$PKG_CONFIG" && \
+    { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"zlib\""; } >&5
+  ($PKG_CONFIG --exists --print-errors "zlib") 2>&5
+  ac_status=$?
+  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; }; then
+  pkg_cv_ZLIB_LIBS=`$PKG_CONFIG --libs "zlib" 2>/dev/null`
+		      test "x$?" != "x0" && pkg_failed=yes
+else
+  pkg_failed=yes
+fi
+ else
+    pkg_failed=untried
+fi
+
+
+
+if test $pkg_failed = yes; then
+   	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+
+if $PKG_CONFIG --atleast-pkgconfig-version 0.20; then
+        _pkg_short_errors_supported=yes
+else
+        _pkg_short_errors_supported=no
+fi
+        if test $_pkg_short_errors_supported = yes; then
+	        ZLIB_PKG_ERRORS=`$PKG_CONFIG --short-errors --print-errors --cflags --libs "zlib" 2>&1`
+        else
+	        ZLIB_PKG_ERRORS=`$PKG_CONFIG --print-errors --cflags --libs "zlib" 2>&1`
+        fi
+	# Put the nasty error message in config.log where it belongs
+	echo "$ZLIB_PKG_ERRORS" >&5
+
+	as_fn_error $? "Package requirements (zlib) were not met:
+
+$ZLIB_PKG_ERRORS
+
+Consider adjusting the PKG_CONFIG_PATH environment variable if you
+installed software in a non-standard prefix.
+
+Alternatively, you may set the environment variables ZLIB_CFLAGS
+and ZLIB_LIBS to avoid the need to call pkg-config.
+See the pkg-config man page for more details." "$LINENO" 5
+elif test $pkg_failed = untried; then
+     	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+	{ { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
+$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
+as_fn_error $? "The pkg-config script could not be found or is too old.  Make sure it
+is in your PATH or set the PKG_CONFIG environment variable to the full
+path to pkg-config.
+
+Alternatively, you may set the environment variables ZLIB_CFLAGS
+and ZLIB_LIBS to avoid the need to call pkg-config.
+See the pkg-config man page for more details.
+
+To get pkg-config, see <http://pkg-config.freedesktop.org/>.
+See \`config.log' for more details" "$LINENO" 5; }
+else
+	ZLIB_CFLAGS=$pkg_cv_ZLIB_CFLAGS
+	ZLIB_LIBS=$pkg_cv_ZLIB_LIBS
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+
+fi
+
+
+pkg_failed=no
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for LIBAVUTIL" >&5
+$as_echo_n "checking for LIBAVUTIL... " >&6; }
+
+if test -n "$LIBAVUTIL_CFLAGS"; then
+    pkg_cv_LIBAVUTIL_CFLAGS="$LIBAVUTIL_CFLAGS"
+ elif test -n "$PKG_CONFIG"; then
+    if test -n "$PKG_CONFIG" && \
+    { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"libavutil\""; } >&5
+  ($PKG_CONFIG --exists --print-errors "libavutil") 2>&5
+  ac_status=$?
+  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; }; then
+  pkg_cv_LIBAVUTIL_CFLAGS=`$PKG_CONFIG --cflags "libavutil" 2>/dev/null`
+		      test "x$?" != "x0" && pkg_failed=yes
+else
+  pkg_failed=yes
+fi
+ else
+    pkg_failed=untried
+fi
+if test -n "$LIBAVUTIL_LIBS"; then
+    pkg_cv_LIBAVUTIL_LIBS="$LIBAVUTIL_LIBS"
+ elif test -n "$PKG_CONFIG"; then
+    if test -n "$PKG_CONFIG" && \
+    { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"libavutil\""; } >&5
+  ($PKG_CONFIG --exists --print-errors "libavutil") 2>&5
+  ac_status=$?
+  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; }; then
+  pkg_cv_LIBAVUTIL_LIBS=`$PKG_CONFIG --libs "libavutil" 2>/dev/null`
+		      test "x$?" != "x0" && pkg_failed=yes
+else
+  pkg_failed=yes
+fi
+ else
+    pkg_failed=untried
+fi
+
+
+
+if test $pkg_failed = yes; then
+   	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+
+if $PKG_CONFIG --atleast-pkgconfig-version 0.20; then
+        _pkg_short_errors_supported=yes
+else
+        _pkg_short_errors_supported=no
+fi
+        if test $_pkg_short_errors_supported = yes; then
+	        LIBAVUTIL_PKG_ERRORS=`$PKG_CONFIG --short-errors --print-errors --cflags --libs "libavutil" 2>&1`
+        else
+	        LIBAVUTIL_PKG_ERRORS=`$PKG_CONFIG --print-errors --cflags --libs "libavutil" 2>&1`
+        fi
+	# Put the nasty error message in config.log where it belongs
+	echo "$LIBAVUTIL_PKG_ERRORS" >&5
+
+	as_fn_error $? "Package requirements (libavutil) were not met:
+
+$LIBAVUTIL_PKG_ERRORS
+
+Consider adjusting the PKG_CONFIG_PATH environment variable if you
+installed software in a non-standard prefix.
+
+Alternatively, you may set the environment variables LIBAVUTIL_CFLAGS
+and LIBAVUTIL_LIBS to avoid the need to call pkg-config.
+See the pkg-config man page for more details." "$LINENO" 5
+elif test $pkg_failed = untried; then
+     	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+	{ { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
+$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
+as_fn_error $? "The pkg-config script could not be found or is too old.  Make sure it
+is in your PATH or set the PKG_CONFIG environment variable to the full
+path to pkg-config.
+
+Alternatively, you may set the environment variables LIBAVUTIL_CFLAGS
+and LIBAVUTIL_LIBS to avoid the need to call pkg-config.
+See the pkg-config man page for more details.
+
+To get pkg-config, see <http://pkg-config.freedesktop.org/>.
+See \`config.log' for more details" "$LINENO" 5; }
+else
+	LIBAVUTIL_CFLAGS=$pkg_cv_LIBAVUTIL_CFLAGS
+	LIBAVUTIL_LIBS=$pkg_cv_LIBAVUTIL_LIBS
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+
+fi
+
+
+pkg_failed=no
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for LIBAVFORMAT" >&5
+$as_echo_n "checking for LIBAVFORMAT... " >&6; }
+
+if test -n "$LIBAVFORMAT_CFLAGS"; then
+    pkg_cv_LIBAVFORMAT_CFLAGS="$LIBAVFORMAT_CFLAGS"
+ elif test -n "$PKG_CONFIG"; then
+    if test -n "$PKG_CONFIG" && \
+    { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"libavformat\""; } >&5
+  ($PKG_CONFIG --exists --print-errors "libavformat") 2>&5
+  ac_status=$?
+  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; }; then
+  pkg_cv_LIBAVFORMAT_CFLAGS=`$PKG_CONFIG --cflags "libavformat" 2>/dev/null`
+		      test "x$?" != "x0" && pkg_failed=yes
+else
+  pkg_failed=yes
+fi
+ else
+    pkg_failed=untried
+fi
+if test -n "$LIBAVFORMAT_LIBS"; then
+    pkg_cv_LIBAVFORMAT_LIBS="$LIBAVFORMAT_LIBS"
+ elif test -n "$PKG_CONFIG"; then
+    if test -n "$PKG_CONFIG" && \
+    { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"libavformat\""; } >&5
+  ($PKG_CONFIG --exists --print-errors "libavformat") 2>&5
+  ac_status=$?
+  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; }; then
+  pkg_cv_LIBAVFORMAT_LIBS=`$PKG_CONFIG --libs "libavformat" 2>/dev/null`
+		      test "x$?" != "x0" && pkg_failed=yes
+else
+  pkg_failed=yes
+fi
+ else
+    pkg_failed=untried
+fi
+
+
+
+if test $pkg_failed = yes; then
+   	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+
+if $PKG_CONFIG --atleast-pkgconfig-version 0.20; then
+        _pkg_short_errors_supported=yes
+else
+        _pkg_short_errors_supported=no
+fi
+        if test $_pkg_short_errors_supported = yes; then
+	        LIBAVFORMAT_PKG_ERRORS=`$PKG_CONFIG --short-errors --print-errors --cflags --libs "libavformat" 2>&1`
+        else
+	        LIBAVFORMAT_PKG_ERRORS=`$PKG_CONFIG --print-errors --cflags --libs "libavformat" 2>&1`
+        fi
+	# Put the nasty error message in config.log where it belongs
+	echo "$LIBAVFORMAT_PKG_ERRORS" >&5
+
+	as_fn_error $? "Package requirements (libavformat) were not met:
+
+$LIBAVFORMAT_PKG_ERRORS
+
+Consider adjusting the PKG_CONFIG_PATH environment variable if you
+installed software in a non-standard prefix.
+
+Alternatively, you may set the environment variables LIBAVFORMAT_CFLAGS
+and LIBAVFORMAT_LIBS to avoid the need to call pkg-config.
+See the pkg-config man page for more details." "$LINENO" 5
+elif test $pkg_failed = untried; then
+     	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+	{ { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
+$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
+as_fn_error $? "The pkg-config script could not be found or is too old.  Make sure it
+is in your PATH or set the PKG_CONFIG environment variable to the full
+path to pkg-config.
+
+Alternatively, you may set the environment variables LIBAVFORMAT_CFLAGS
+and LIBAVFORMAT_LIBS to avoid the need to call pkg-config.
+See the pkg-config man page for more details.
+
+To get pkg-config, see <http://pkg-config.freedesktop.org/>.
+See \`config.log' for more details" "$LINENO" 5; }
+else
+	LIBAVFORMAT_CFLAGS=$pkg_cv_LIBAVFORMAT_CFLAGS
+	LIBAVFORMAT_LIBS=$pkg_cv_LIBAVFORMAT_LIBS
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+
+fi
+
+
+pkg_failed=no
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for LIBAVCODEC" >&5
+$as_echo_n "checking for LIBAVCODEC... " >&6; }
+
+if test -n "$LIBAVCODEC_CFLAGS"; then
+    pkg_cv_LIBAVCODEC_CFLAGS="$LIBAVCODEC_CFLAGS"
+ elif test -n "$PKG_CONFIG"; then
+    if test -n "$PKG_CONFIG" && \
+    { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"libavcodec\""; } >&5
+  ($PKG_CONFIG --exists --print-errors "libavcodec") 2>&5
+  ac_status=$?
+  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; }; then
+  pkg_cv_LIBAVCODEC_CFLAGS=`$PKG_CONFIG --cflags "libavcodec" 2>/dev/null`
+		      test "x$?" != "x0" && pkg_failed=yes
+else
+  pkg_failed=yes
+fi
+ else
+    pkg_failed=untried
+fi
+if test -n "$LIBAVCODEC_LIBS"; then
+    pkg_cv_LIBAVCODEC_LIBS="$LIBAVCODEC_LIBS"
+ elif test -n "$PKG_CONFIG"; then
+    if test -n "$PKG_CONFIG" && \
+    { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"libavcodec\""; } >&5
+  ($PKG_CONFIG --exists --print-errors "libavcodec") 2>&5
+  ac_status=$?
+  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; }; then
+  pkg_cv_LIBAVCODEC_LIBS=`$PKG_CONFIG --libs "libavcodec" 2>/dev/null`
+		      test "x$?" != "x0" && pkg_failed=yes
+else
+  pkg_failed=yes
+fi
+ else
+    pkg_failed=untried
+fi
+
+
+
+if test $pkg_failed = yes; then
+   	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+
+if $PKG_CONFIG --atleast-pkgconfig-version 0.20; then
+        _pkg_short_errors_supported=yes
+else
+        _pkg_short_errors_supported=no
+fi
+        if test $_pkg_short_errors_supported = yes; then
+	        LIBAVCODEC_PKG_ERRORS=`$PKG_CONFIG --short-errors --print-errors --cflags --libs "libavcodec" 2>&1`
+        else
+	        LIBAVCODEC_PKG_ERRORS=`$PKG_CONFIG --print-errors --cflags --libs "libavcodec" 2>&1`
+        fi
+	# Put the nasty error message in config.log where it belongs
+	echo "$LIBAVCODEC_PKG_ERRORS" >&5
+
+	as_fn_error $? "Package requirements (libavcodec) were not met:
+
+$LIBAVCODEC_PKG_ERRORS
+
+Consider adjusting the PKG_CONFIG_PATH environment variable if you
+installed software in a non-standard prefix.
+
+Alternatively, you may set the environment variables LIBAVCODEC_CFLAGS
+and LIBAVCODEC_LIBS to avoid the need to call pkg-config.
+See the pkg-config man page for more details." "$LINENO" 5
+elif test $pkg_failed = untried; then
+     	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+	{ { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
+$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
+as_fn_error $? "The pkg-config script could not be found or is too old.  Make sure it
+is in your PATH or set the PKG_CONFIG environment variable to the full
+path to pkg-config.
+
+Alternatively, you may set the environment variables LIBAVCODEC_CFLAGS
+and LIBAVCODEC_LIBS to avoid the need to call pkg-config.
+See the pkg-config man page for more details.
+
+To get pkg-config, see <http://pkg-config.freedesktop.org/>.
+See \`config.log' for more details" "$LINENO" 5; }
+else
+	LIBAVCODEC_CFLAGS=$pkg_cv_LIBAVCODEC_CFLAGS
+	LIBAVCODEC_LIBS=$pkg_cv_LIBAVCODEC_LIBS
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+
+fi
+
 
 pkg_failed=no
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for SQLITE3" >&5

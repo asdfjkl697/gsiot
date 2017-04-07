@@ -146,7 +146,14 @@ GSIOTClient.o: GSIOTClient.cpp /usr/include/stdc-predef.h \
  RFRemoteControl.h RemoteButtonManager.h RS485DevControl.h \
  AddressManager.h ModbusProc.h PresetManager.h CommLinkManager.h \
  IGSMessageHandler.h /usr/local/include/gloox/gloox.h \
- /usr/local/include/gloox/jid.h \
+ /usr/local/include/gloox/jid.h IPCamConnection.h CameraControl.h \
+ CameraPTZ.h CameraFocal.h IPCameraBase.h RTMPSession.h MediaStream.h \
+ H264MediaFile.h RTMPSend.h /usr/include/c++/4.8/queue \
+ /usr/include/c++/4.8/deque /usr/include/c++/4.8/bits/stl_deque.h \
+ /usr/include/c++/4.8/bits/deque.tcc \
+ /usr/include/c++/4.8/bits/stl_queue.h IPublishHandler.h AudioCfg.h \
+ AudioCapBase.h ICameraHandler.h IPCameraManager.h HikCamera.h \
+ Audio_WAV2AAC.h /usr/local/include/faac.h /usr/local/include/faaccfg.h \
  /usr/local/include/gloox/adhoccommandprovider.h \
  /usr/local/include/gloox/adhoc.h /usr/local/include/gloox/adhocplugin.h \
  /usr/local/include/gloox/disco.h \
@@ -170,9 +177,9 @@ GSIOTClient.o: GSIOTClient.cpp /usr/include/stdc-predef.h \
  /usr/local/include/gloox/subscriptionhandler.h \
  /usr/local/include/gloox/messagehandler.h TimerManager.h \
  ControlMessage.h XmppGSAuth.h XmppGSManager.h XmppGSEvent.h \
- XmppGSState.h XmppGSRelation.h XmppGSPreset.h XmppGSVObj.h \
- XmppGSReport.h DataStoreMgr.h XmppGSUpdate.h HttpRequest.h \
- /usr/include/i386-linux-gnu/sys/socket.h \
+ XmppGSState.h XmppGSTalk.h XmppGSPlayback.h XmppGSRelation.h \
+ XmppGSPreset.h XmppGSVObj.h XmppGSReport.h DataStoreMgr.h XmppGSUpdate.h \
+ GSRemoteTalkMgr.h HttpRequest.h /usr/include/i386-linux-gnu/sys/socket.h \
  /usr/include/i386-linux-gnu/sys/uio.h \
  /usr/include/i386-linux-gnu/bits/socket.h \
  /usr/include/i386-linux-gnu/bits/socket_type.h \
@@ -190,7 +197,48 @@ GSIOTClient.o: GSIOTClient.cpp /usr/include/stdc-predef.h \
  /usr/local/include/gloox/registrationhandler.h \
  /usr/local/include/gloox/oob.h /usr/local/include/gloox/dataform.h \
  /usr/local/include/gloox/dataformfieldcontainer.h \
- /usr/local/include/gloox/dataformfield.h XmppGSChange.h HttpRequest.cpp
+ /usr/local/include/gloox/dataformfield.h XmppGSChange.h APlayer.h \
+ /usr/local/include/ao/ao.h /usr/include/errno.h \
+ /usr/include/i386-linux-gnu/bits/errno.h /usr/include/linux/errno.h \
+ /usr/include/i386-linux-gnu/asm/errno.h /usr/include/asm-generic/errno.h \
+ /usr/include/asm-generic/errno-base.h /usr/local/include/ao/os_types.h \
+ /usr/local/include/libavcodec/avcodec.h \
+ /usr/local/include/libavutil/samplefmt.h \
+ /usr/local/include/libavutil/avutil.h \
+ /usr/local/include/libavutil/common.h /usr/include/inttypes.h \
+ /usr/lib/gcc/i686-linux-gnu/4.8/include-fixed/limits.h \
+ /usr/lib/gcc/i686-linux-gnu/4.8/include-fixed/syslimits.h \
+ /usr/include/limits.h /usr/include/i386-linux-gnu/bits/posix1_lim.h \
+ /usr/include/i386-linux-gnu/bits/local_lim.h /usr/include/linux/limits.h \
+ /usr/include/i386-linux-gnu/bits/posix2_lim.h \
+ /usr/include/i386-linux-gnu/bits/xopen_lim.h \
+ /usr/local/include/libavutil/attributes.h \
+ /usr/local/include/libavutil/version.h \
+ /usr/local/include/libavutil/macros.h \
+ /usr/local/include/libavutil/avconfig.h \
+ /usr/local/include/libavutil/mem.h /usr/local/include/libavutil/error.h \
+ /usr/local/include/libavutil/rational.h \
+ /usr/local/include/libavutil/mathematics.h \
+ /usr/local/include/libavutil/intfloat.h \
+ /usr/local/include/libavutil/log.h /usr/local/include/libavutil/pixfmt.h \
+ /usr/local/include/libavutil/old_pix_fmts.h \
+ /usr/local/include/libavutil/attributes.h \
+ /usr/local/include/libavutil/avutil.h \
+ /usr/local/include/libavutil/buffer.h /usr/local/include/libavutil/cpu.h \
+ /usr/local/include/libavutil/channel_layout.h \
+ /usr/local/include/libavutil/dict.h /usr/local/include/libavutil/frame.h \
+ /usr/local/include/libavutil/buffer.h \
+ /usr/local/include/libavutil/dict.h \
+ /usr/local/include/libavutil/samplefmt.h \
+ /usr/local/include/libavutil/log.h /usr/local/include/libavutil/pixfmt.h \
+ /usr/local/include/libavutil/rational.h \
+ /usr/local/include/libavcodec/version.h \
+ /usr/local/include/libavutil/version.h \
+ /usr/local/include/libavcodec/old_codec_ids.h \
+ /usr/local/include/libavformat/avformat.h \
+ /usr/local/include/libavformat/avio.h \
+ /usr/local/include/libavutil/common.h \
+ /usr/local/include/libavformat/version.h HttpRequest.cpp
 
 /usr/include/stdc-predef.h:
 
@@ -650,6 +698,52 @@ IGSMessageHandler.h:
 
 /usr/local/include/gloox/jid.h:
 
+IPCamConnection.h:
+
+CameraControl.h:
+
+CameraPTZ.h:
+
+CameraFocal.h:
+
+IPCameraBase.h:
+
+RTMPSession.h:
+
+MediaStream.h:
+
+H264MediaFile.h:
+
+RTMPSend.h:
+
+/usr/include/c++/4.8/queue:
+
+/usr/include/c++/4.8/deque:
+
+/usr/include/c++/4.8/bits/stl_deque.h:
+
+/usr/include/c++/4.8/bits/deque.tcc:
+
+/usr/include/c++/4.8/bits/stl_queue.h:
+
+IPublishHandler.h:
+
+AudioCfg.h:
+
+AudioCapBase.h:
+
+ICameraHandler.h:
+
+IPCameraManager.h:
+
+HikCamera.h:
+
+Audio_WAV2AAC.h:
+
+/usr/local/include/faac.h:
+
+/usr/local/include/faaccfg.h:
+
 /usr/local/include/gloox/adhoccommandprovider.h:
 
 /usr/local/include/gloox/adhoc.h:
@@ -718,6 +812,10 @@ XmppGSEvent.h:
 
 XmppGSState.h:
 
+XmppGSTalk.h:
+
+XmppGSPlayback.h:
+
 XmppGSRelation.h:
 
 XmppGSPreset.h:
@@ -729,6 +827,8 @@ XmppGSReport.h:
 DataStoreMgr.h:
 
 XmppGSUpdate.h:
+
+GSRemoteTalkMgr.h:
 
 HttpRequest.h:
 
@@ -791,5 +891,113 @@ XmppRegister.h:
 /usr/local/include/gloox/dataformfield.h:
 
 XmppGSChange.h:
+
+APlayer.h:
+
+/usr/local/include/ao/ao.h:
+
+/usr/include/errno.h:
+
+/usr/include/i386-linux-gnu/bits/errno.h:
+
+/usr/include/linux/errno.h:
+
+/usr/include/i386-linux-gnu/asm/errno.h:
+
+/usr/include/asm-generic/errno.h:
+
+/usr/include/asm-generic/errno-base.h:
+
+/usr/local/include/ao/os_types.h:
+
+/usr/local/include/libavcodec/avcodec.h:
+
+/usr/local/include/libavutil/samplefmt.h:
+
+/usr/local/include/libavutil/avutil.h:
+
+/usr/local/include/libavutil/common.h:
+
+/usr/include/inttypes.h:
+
+/usr/lib/gcc/i686-linux-gnu/4.8/include-fixed/limits.h:
+
+/usr/lib/gcc/i686-linux-gnu/4.8/include-fixed/syslimits.h:
+
+/usr/include/limits.h:
+
+/usr/include/i386-linux-gnu/bits/posix1_lim.h:
+
+/usr/include/i386-linux-gnu/bits/local_lim.h:
+
+/usr/include/linux/limits.h:
+
+/usr/include/i386-linux-gnu/bits/posix2_lim.h:
+
+/usr/include/i386-linux-gnu/bits/xopen_lim.h:
+
+/usr/local/include/libavutil/attributes.h:
+
+/usr/local/include/libavutil/version.h:
+
+/usr/local/include/libavutil/macros.h:
+
+/usr/local/include/libavutil/avconfig.h:
+
+/usr/local/include/libavutil/mem.h:
+
+/usr/local/include/libavutil/error.h:
+
+/usr/local/include/libavutil/rational.h:
+
+/usr/local/include/libavutil/mathematics.h:
+
+/usr/local/include/libavutil/intfloat.h:
+
+/usr/local/include/libavutil/log.h:
+
+/usr/local/include/libavutil/pixfmt.h:
+
+/usr/local/include/libavutil/old_pix_fmts.h:
+
+/usr/local/include/libavutil/attributes.h:
+
+/usr/local/include/libavutil/avutil.h:
+
+/usr/local/include/libavutil/buffer.h:
+
+/usr/local/include/libavutil/cpu.h:
+
+/usr/local/include/libavutil/channel_layout.h:
+
+/usr/local/include/libavutil/dict.h:
+
+/usr/local/include/libavutil/frame.h:
+
+/usr/local/include/libavutil/buffer.h:
+
+/usr/local/include/libavutil/dict.h:
+
+/usr/local/include/libavutil/samplefmt.h:
+
+/usr/local/include/libavutil/log.h:
+
+/usr/local/include/libavutil/pixfmt.h:
+
+/usr/local/include/libavutil/rational.h:
+
+/usr/local/include/libavcodec/version.h:
+
+/usr/local/include/libavutil/version.h:
+
+/usr/local/include/libavcodec/old_codec_ids.h:
+
+/usr/local/include/libavformat/avformat.h:
+
+/usr/local/include/libavformat/avio.h:
+
+/usr/local/include/libavutil/common.h:
+
+/usr/local/include/libavformat/version.h:
 
 HttpRequest.cpp:

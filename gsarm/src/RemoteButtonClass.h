@@ -60,8 +60,7 @@ public:
 
 	bool set_AdvAttr_uintfull( const uint32_t fullval )
 	{
-		//std::bitset<defAttr_Max_> attrfv( (_ULonglong)fullval ); //20160614
-		std::bitset<defAttr_Max_> attrfv( (unsigned long long)fullval );
+		std::bitset<defAttr_Max_> attrfv( (_ULonglong)fullval );
 		m_Attribute = attrfv;
 		return true;
 	}

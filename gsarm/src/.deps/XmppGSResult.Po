@@ -132,7 +132,14 @@ XmppGSResult.o: XmppGSResult.cpp /usr/include/stdc-predef.h \
  RFRemoteControl.h RemoteButtonManager.h RS485DevControl.h \
  AddressManager.h ModbusProc.h PresetManager.h CommLinkManager.h \
  IGSMessageHandler.h /usr/local/include/gloox/gloox.h \
- /usr/local/include/gloox/jid.h \
+ /usr/local/include/gloox/jid.h IPCamConnection.h CameraControl.h \
+ CameraPTZ.h CameraFocal.h IPCameraBase.h RTMPSession.h MediaStream.h \
+ H264MediaFile.h RTMPSend.h /usr/include/c++/4.8/queue \
+ /usr/include/c++/4.8/deque /usr/include/c++/4.8/bits/stl_deque.h \
+ /usr/include/c++/4.8/bits/deque.tcc \
+ /usr/include/c++/4.8/bits/stl_queue.h IPublishHandler.h AudioCfg.h \
+ AudioCapBase.h ICameraHandler.h IPCameraManager.h HikCamera.h \
+ Audio_WAV2AAC.h /usr/local/include/faac.h /usr/local/include/faaccfg.h \
  /usr/local/include/gloox/adhoccommandprovider.h \
  /usr/local/include/gloox/tag.h /usr/local/include/gloox/jid.h \
  /usr/local/include/gloox/adhoc.h /usr/local/include/gloox/adhocplugin.h \
@@ -162,9 +169,9 @@ XmppGSResult.o: XmppGSResult.cpp /usr/include/stdc-predef.h \
  /usr/local/include/gloox/subscription.h \
  /usr/local/include/gloox/messagehandler.h TimerManager.h \
  ControlMessage.h XmppGSAuth.h XmppGSManager.h XmppGSEvent.h \
- XmppGSState.h XmppGSRelation.h XmppGSPreset.h XmppGSVObj.h \
- XmppGSReport.h DataStoreMgr.h XmppGSUpdate.h HttpRequest.h \
- /usr/include/i386-linux-gnu/sys/socket.h \
+ XmppGSState.h XmppGSTalk.h XmppGSPlayback.h XmppGSRelation.h \
+ XmppGSPreset.h XmppGSVObj.h XmppGSReport.h DataStoreMgr.h XmppGSUpdate.h \
+ GSRemoteTalkMgr.h HttpRequest.h /usr/include/i386-linux-gnu/sys/socket.h \
  /usr/include/i386-linux-gnu/sys/uio.h \
  /usr/include/i386-linux-gnu/bits/socket.h \
  /usr/include/i386-linux-gnu/bits/socket_type.h \
@@ -604,6 +611,52 @@ IGSMessageHandler.h:
 
 /usr/local/include/gloox/jid.h:
 
+IPCamConnection.h:
+
+CameraControl.h:
+
+CameraPTZ.h:
+
+CameraFocal.h:
+
+IPCameraBase.h:
+
+RTMPSession.h:
+
+MediaStream.h:
+
+H264MediaFile.h:
+
+RTMPSend.h:
+
+/usr/include/c++/4.8/queue:
+
+/usr/include/c++/4.8/deque:
+
+/usr/include/c++/4.8/bits/stl_deque.h:
+
+/usr/include/c++/4.8/bits/deque.tcc:
+
+/usr/include/c++/4.8/bits/stl_queue.h:
+
+IPublishHandler.h:
+
+AudioCfg.h:
+
+AudioCapBase.h:
+
+ICameraHandler.h:
+
+IPCameraManager.h:
+
+HikCamera.h:
+
+Audio_WAV2AAC.h:
+
+/usr/local/include/faac.h:
+
+/usr/local/include/faaccfg.h:
+
 /usr/local/include/gloox/adhoccommandprovider.h:
 
 /usr/local/include/gloox/tag.h:
@@ -690,6 +743,10 @@ XmppGSEvent.h:
 
 XmppGSState.h:
 
+XmppGSTalk.h:
+
+XmppGSPlayback.h:
+
 XmppGSRelation.h:
 
 XmppGSPreset.h:
@@ -701,6 +758,8 @@ XmppGSReport.h:
 DataStoreMgr.h:
 
 XmppGSUpdate.h:
+
+GSRemoteTalkMgr.h:
 
 HttpRequest.h:
 

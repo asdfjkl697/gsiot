@@ -156,7 +156,15 @@ gsarm.o: gsarm.cc /usr/include/stdc-predef.h \
  RFRemoteControl.h RemoteButtonManager.h RS485DevControl.h \
  AddressManager.h ModbusProc.h PresetManager.h CommLinkManager.h \
  IGSMessageHandler.h /usr/local/include/gloox/gloox.h \
- /usr/local/include/gloox/jid.h /usr/local/include/gloox/message.h \
+ /usr/local/include/gloox/jid.h IPCamConnection.h CameraControl.h \
+ CameraPTZ.h CameraFocal.h IPCameraBase.h RTMPSession.h MediaStream.h \
+ H264MediaFile.h RTMPSend.h /usr/include/c++/4.8/queue \
+ /usr/include/c++/4.8/deque /usr/include/c++/4.8/bits/stl_deque.h \
+ /usr/include/c++/4.8/bits/deque.tcc /usr/include/c++/4.8/bits/stl_heap.h \
+ /usr/include/c++/4.8/bits/stl_queue.h IPublishHandler.h AudioCfg.h \
+ AudioCapBase.h ICameraHandler.h IPCameraManager.h HikCamera.h \
+ Audio_WAV2AAC.h /usr/local/include/faac.h /usr/local/include/faaccfg.h \
+ /usr/local/include/gloox/message.h \
  /usr/local/include/gloox/delayeddelivery.h \
  /usr/local/include/gloox/util.h /usr/include/c++/4.8/cmath \
  /usr/include/math.h /usr/include/i386-linux-gnu/bits/huge_val.h \
@@ -169,16 +177,15 @@ gsarm.o: gsarm.cc /usr/include/stdc-predef.h \
  /usr/include/i386-linux-gnu/bits/mathinline.h \
  /usr/include/c++/4.8/algorithm /usr/include/c++/4.8/bits/stl_algo.h \
  /usr/include/c++/4.8/cstdlib /usr/include/c++/4.8/bits/algorithmfwd.h \
- /usr/include/c++/4.8/bits/stl_heap.h \
  /usr/include/c++/4.8/bits/stl_tempbuf.h \
  /usr/local/include/gloox/iqhandler.h \
  /usr/local/include/gloox/subscriptionhandler.h \
  /usr/local/include/gloox/subscription.h \
  /usr/local/include/gloox/messagehandler.h TimerManager.h \
  ControlMessage.h XmppGSAuth.h XmppGSManager.h XmppGSEvent.h \
- XmppGSState.h XmppGSRelation.h XmppGSPreset.h XmppGSVObj.h \
- XmppGSReport.h DataStoreMgr.h XmppGSUpdate.h HttpRequest.h \
- /usr/include/i386-linux-gnu/sys/socket.h \
+ XmppGSState.h XmppGSTalk.h XmppGSPlayback.h XmppGSRelation.h \
+ XmppGSPreset.h XmppGSVObj.h XmppGSReport.h DataStoreMgr.h XmppGSUpdate.h \
+ GSRemoteTalkMgr.h HttpRequest.h /usr/include/i386-linux-gnu/sys/socket.h \
  /usr/include/i386-linux-gnu/sys/uio.h \
  /usr/include/i386-linux-gnu/bits/socket.h \
  /usr/include/i386-linux-gnu/bits/socket_type.h \
@@ -686,6 +693,54 @@ IGSMessageHandler.h:
 
 /usr/local/include/gloox/jid.h:
 
+IPCamConnection.h:
+
+CameraControl.h:
+
+CameraPTZ.h:
+
+CameraFocal.h:
+
+IPCameraBase.h:
+
+RTMPSession.h:
+
+MediaStream.h:
+
+H264MediaFile.h:
+
+RTMPSend.h:
+
+/usr/include/c++/4.8/queue:
+
+/usr/include/c++/4.8/deque:
+
+/usr/include/c++/4.8/bits/stl_deque.h:
+
+/usr/include/c++/4.8/bits/deque.tcc:
+
+/usr/include/c++/4.8/bits/stl_heap.h:
+
+/usr/include/c++/4.8/bits/stl_queue.h:
+
+IPublishHandler.h:
+
+AudioCfg.h:
+
+AudioCapBase.h:
+
+ICameraHandler.h:
+
+IPCameraManager.h:
+
+HikCamera.h:
+
+Audio_WAV2AAC.h:
+
+/usr/local/include/faac.h:
+
+/usr/local/include/faaccfg.h:
+
 /usr/local/include/gloox/message.h:
 
 /usr/local/include/gloox/delayeddelivery.h:
@@ -720,8 +775,6 @@ IGSMessageHandler.h:
 
 /usr/include/c++/4.8/bits/algorithmfwd.h:
 
-/usr/include/c++/4.8/bits/stl_heap.h:
-
 /usr/include/c++/4.8/bits/stl_tempbuf.h:
 
 /usr/local/include/gloox/iqhandler.h:
@@ -744,6 +797,10 @@ XmppGSEvent.h:
 
 XmppGSState.h:
 
+XmppGSTalk.h:
+
+XmppGSPlayback.h:
+
 XmppGSRelation.h:
 
 XmppGSPreset.h:
@@ -755,6 +812,8 @@ XmppGSReport.h:
 DataStoreMgr.h:
 
 XmppGSUpdate.h:
+
+GSRemoteTalkMgr.h:
 
 HttpRequest.h:
 

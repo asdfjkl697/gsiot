@@ -5,7 +5,7 @@
 #include "GSIOTEvent.h"
 #include "IDeviceHandler.h"
 #include "DeviceConnection.h"
-//#include "IPCamConnection.h"
+#include "IPCamConnection.h"  //jyc20170322 resume
 #include "ControlBase.h"
 
 #include "gloox/adhoccommandprovider.h" //jyc20170224 modify
@@ -30,8 +30,8 @@
 #include "XmppGSManager.h"
 #include "XmppGSEvent.h"
 #include "XmppGSState.h"
-//#include "XmppGSTalk.h"
-//#include "XmppGSPlayback.h"
+#include "XmppGSTalk.h" //jyc20170330 resume
+#include "XmppGSPlayback.h" //jyc20170405 resume
 #include "XmppGSRelation.h"
 #include "XmppGSPreset.h"
 #include "XmppGSVObj.h"
@@ -40,7 +40,7 @@
 #include "XmppGSUpdate.h"
 #include "IGSMessageHandler.h"
 //#include "Parser.h"  
-//#include "GSRemoteTalkMgr.h"
+#include "GSRemoteTalkMgr.h"
 #include "RunCode.h"
 #include "DataStoreMgr.h"
 
@@ -51,6 +51,161 @@ namespace httpreq
 
 
 #define LOGMSG printf
+
+// jyc20170405 resume
+struct struCamAlarmRecv_key
+{
+	std::string sDeviceIP;		// 
+	int nPort;					// 
+	int channel;
+
+	struCamAlarmRecv_key( const char *in_sDeviceIP, const int in_nPort, const int in_channel )
+		: nPort(in_nPort), channel(in_channel)
+	{
+		if( in_sDeviceIP )
+		{
+			sDeviceIP = in_sDeviceIP;
+		}
+	}
+
+	bool operator == ( const struCamAlarmRecv_key &other ) const
+	{
+		if( other.sDeviceIP != this->sDeviceIP )
+			return false;
+
+		if( other.channel != this->channel )
+			return false;
+
+		if( other.nPort != this->nPort )
+			return false;
+
+		return true;
+	}
+};
+
+// 
+struct struCamAlarmRecv
+{
+	uint32_t ts;				// 
+	struGSTime dt;				// 
+	struCamAlarmRecv_key key;	// key
+	IPCameraType CameraType;	// 
+	std::string alarmstr;		// 
+
+	struCamAlarmRecv()
+		: ts(0), key(NULL,0,defInvalidCamCh), CameraType(CameraType_Unkown)
+	{
+		memset( &dt, 0, sizeof(struGSTime) );
+	}
+
+	struCamAlarmRecv( const uint32_t in_ts, const struCamAlarmRecv_key &in_key, const IPCameraType in_CameraType, const char *in_alarmstr )
+		:ts(in_ts), key(in_key), CameraType(in_CameraType)
+	{
+		memset( &dt, 0, sizeof(struGSTime) );
+
+		if( in_alarmstr )
+		{
+			alarmstr = in_alarmstr;
+		}
+	}
+
+	struCamAlarmRecv( const uint32_t in_ts, const char *in_sDeviceIP, const int in_nPort, const int in_channel, const IPCameraType in_CameraType, const char *in_alarmstr )
+		: ts(in_ts), key(in_sDeviceIP, in_nPort, in_channel), CameraType(in_CameraType)
+	{
+		memset( &dt, 0, sizeof(struGSTime) );
+
+		if( in_alarmstr )
+		{
+			alarmstr = in_alarmstr;
+		}
+	}
+
+	bool isOverTime( const uint32_t curts ) const
+	{
+		if( curts-ts > 5*60*1000 )
+		{
+			return true;
+		}
+
+		return false;
+	}
+};
+typedef std::list<struCamAlarmRecv> deflstCamAlarmRecv;// 
+
+
+// 
+struct struPlaybackCmd
+{
+	XmppGSPlayback *pXmpp;
+	JID from_Jid;
+	std::string from_id;
+	uint32_t timestamp;
+
+	struPlaybackCmd()
+		: pXmpp(NULL)
+	{
+		timestamp = timeGetTime();
+	}
+
+	struPlaybackCmd( const JID &in_from_Jid, const std::string &in_from_id, const XmppGSPlayback *in_pXmpp )
+		: from_Jid(in_from_Jid), from_id(in_from_id)
+	{
+		pXmpp = (XmppGSPlayback*)in_pXmpp->clone();
+		timestamp = timeGetTime();
+	}
+};
+
+// 
+struct struPlaybackSession
+{
+	uint32_t ts;
+	uint32_t lastUpdateTS;
+	std::string key;
+	std::string from_jid;
+	std::string url;
+	std::string peerid;
+	std::string streamid;
+	std::string devname;
+	GSIOTDevice *dev;
+
+	struPlaybackSession();
+	struPlaybackSession( const std::string &in_key, const std::string &in_from_jid, const std::string &in_url, const std::string &in_peerid, const std::string &in_streamid, const std::string &in_devname, GSIOTDevice *in_dev );
+
+	bool check() const;
+};
+
+enum defPlayMgrCmd_
+{
+	defPlayMgrCmd_Unknown	= 0,
+	defPlayMgrCmd_Start		= 1,
+	defPlayMgrCmd_Stop		= 2,
+	
+	defPlayMgrCmd_CheckNow	= 91,
+};
+struct struPlayMgrCmd
+{
+	uint32_t timestamp;
+	defPlayMgrCmd_ cmd;
+	defUserAuth Auth;
+	JID from_Jid;
+	std::string from_id;
+	int dev_id;
+	std::string url;
+	std::vector<std::string> url_backup; // 
+
+	struPlayMgrCmd()
+		: cmd(defPlayMgrCmd_Unknown), Auth(defUserAuth_Null), dev_id(0)
+	{
+		timestamp = timeGetTime();
+	}
+
+	struPlayMgrCmd( defPlayMgrCmd_ in_cmd, defUserAuth in_Auth, const JID &in_from_Jid, const std::string &in_from_id, const int in_dev_id, const std::string &in_url, const std::vector<std::string> &in_url_backup )
+		: cmd(in_cmd), Auth(in_Auth), from_Jid(in_from_Jid), from_id(in_from_id), dev_id(in_dev_id), url(in_url), url_backup(in_url_backup)
+	{
+		timestamp = timeGetTime();
+	}
+};
+// jyc20170405 resume until here
 
 struct struEventNoticeMsg
 {
@@ -88,7 +243,7 @@ private:
 	std::list<ControlMessage *> ctlMessageList;
 	std::list<GSIOTDevice *> IotDeviceList;
 	DeviceConnection *deviceClient;
-	//IPCamConnection *ipcamClient;
+	IPCamConnection *ipcamClient; //jyc20170322 resume 
 	gloox::Client *xmppClient;
 	TimerManager *timer;
 	IDeviceHandler *m_handler;
@@ -99,13 +254,13 @@ private:
 	ITriggerDebugHandler *m_ITriggerDebugHandler;
 	bool m_EnableTriggerDebug;
 
-	//gloox::util::Mutex m_mutex_lstPlaybackList;
-	//std::map<std::string,struPlaybackSession> m_lstPlaybackList; // <key,value> 录像回放回话队列
-	//std::list<struPlaybackCmd*> m_lstPlaybackCmd; // 录像回放命令队列
+	gloox::util::Mutex m_mutex_lstPlaybackList; //jyc20170405 resume
+	std::map<std::string,struPlaybackSession> m_lstPlaybackList; // <key,value>
+	std::list<struPlaybackCmd*> m_lstPlaybackCmd; // 
 
-	//gloox::util::Mutex m_mutex_PlayMgr;
-	//std::list<struPlayMgrCmd*> m_lstPlayMgrCmd; // 视频播放命令队列
-	//defPlayMgrCmd_ m_PlayMgr_CheckNowFlag;  // 是否立即做一次会话检查
+	gloox::util::Mutex m_mutex_PlayMgr; //jyc20170405 resume
+	std::list<struPlayMgrCmd*> m_lstPlayMgrCmd; // 
+	defPlayMgrCmd_ m_PlayMgr_CheckNowFlag;  // 
 
 	gloox::util::Mutex m_mutex_lstGSMessage;
 	std::list<GSMessage*> m_lstGSMessage;
@@ -134,7 +289,7 @@ public:
 	void RunCodeInit();
 
 	CRunCodeMgr m_RunCodeMgr;
-	//GSRemoteTalkMgr m_TalkMgr;
+	GSRemoteTalkMgr m_TalkMgr; //jyc20170330 resume
 
 	void PreInit( const std::string &RunParam );
 	bool GetPreInitState() const
@@ -159,6 +314,7 @@ public:
 	void OnDeviceConnect(GSIOTDevice *iotdevice);
 	void OnDeviceData( defLinkID LinkID, GSIOTDevice *iotdevice, ControlBase *ctl, GSIOTObjBase *addr );
 	void OnDeviceData_ProcOne( defLinkID LinkID, GSIOTDevice *iotdevice, ControlBase *ctl, DeviceAddress *addr );
+	//jyc20170405 resume have trouble
 	//virtual void* OnTalkNotify( const XmppGSTalk::defTalkCmd cmd, const std::string &url, const std::string &from_Jid, const std::string &from_id, bool isSyncReturn, const defvecDevKey &vecdev, bool result=true, IOTDeviceType getdev_type=IOT_DEVICE_Unknown, int getdev_id=0 );
 
 	void DoAlarmDevice( const GSIOTDevice *iotdevice, const bool AGRunState, const int AlarmGuardGlobalFlag, const bool IsValidCurTime, const std::string &strAlmBody, const std::string &strAlmSubject );
@@ -204,8 +360,8 @@ public:
 	void handleIq_Set_XmppGSAuth( const GSMessage *pMsg );
 	void handleIq_Set_XmppGSManager( const GSMessage *pMsg );
 	void handleIq_Set_XmppGSEvent( const GSMessage *pMsg );
-	//void handleIq_Set_XmppGSTalk( const XmppGSTalk *pXmpp, const IQ& iq, const GSIOTUser *pUser );
-	//void handleIq_Set_XmppGSPlayback( const XmppGSPlayback *pXmpp, const IQ& iq, const GSIOTUser *pUser );
+	void handleIq_Set_XmppGSTalk( const XmppGSTalk *pXmpp, const IQ& iq, const GSIOTUser *pUser ); //jyc20170330 resume
+	void handleIq_Set_XmppGSPlayback( const XmppGSPlayback *pXmpp, const IQ& iq, const GSIOTUser *pUser ); //jyc20170405 resume
 	void handleIq_Set_XmppGSRelation( const GSMessage *pMsg );
 	void handleIq_Get_XmppGSRelation( const XmppGSRelation *pXmpp, const IQ& iq, const GSIOTUser *pUser );
 	void handleIq_Set_XmppGSPreset( const GSMessage *pMsg );
@@ -261,10 +417,10 @@ public:
 		return this->deviceClient;
 	}
 	
-	//IPCamConnection *GetIPCameraConnection() 
-	//{
-	//	return this->ipcamClient;
-	//}
+	IPCamConnection *GetIPCameraConnection() //jyc20170405 resume
+	{
+		return this->ipcamClient;
+	}
 
 	GSIOTEvent *GetEvent()
 	{
@@ -293,51 +449,51 @@ public:
 	void CheckOverTimeControlMesssageQueue();
 	void FinalClearControlMesssageQueue();
 
-	// 录像回放命令队列处理
-	//static void PlaybackCmd_DeleteCmd( struPlaybackCmd *pCmd );
-	//void PlaybackCmd_push( const XmppGSPlayback *pXmpp, const IQ& iq );
-	//struPlaybackCmd* PlaybackCmd_pop();
-	//void PlaybackCmd_clean();
-	//bool PlaybackCmd_OnProc();
-	//void PlaybackCmd_ProcOneCmd( const struPlaybackCmd *pCmd );
+	// 录像回放命令队列处理  jyc20170405 resume
+	static void PlaybackCmd_DeleteCmd( struPlaybackCmd *pCmd );
+	void PlaybackCmd_push( const XmppGSPlayback *pXmpp, const IQ& iq );
+	struPlaybackCmd* PlaybackCmd_pop();
+	void PlaybackCmd_clean();
+	bool PlaybackCmd_OnProc();
+	void PlaybackCmd_ProcOneCmd( const struPlaybackCmd *pCmd );
 
-	//void Playback_ThreadCreate();
-	//void Playback_ThreadCheck();
-	//void Playback_ThreadPrinthb();
+	void Playback_ThreadCreate();
+	void Playback_ThreadCheck();
+	void Playback_ThreadPrinthb();
 
 	// 录像回放回话队列处理
-	//static void Playback_DeleteDevOne( GSIOTDevice *device );
-	//bool Playback_IsLimit();
-	//uint32_t Playback_GetNowCount();
-	//void Playback_GetInfoList( std::map<std::string,struPlaybackSession> &getlstPlaybackList );
-	//bool Playback_Exist( const std::string &key );
-	//bool Playback_Add( const std::string &from_id, const std::string &key, const std::string &url, const std::string &peerid, const std::string &streamid, GSIOTDevice *device );
-	//void Playback_Delete( const std::string &key );
-	//void Playback_DeleteForJid( const std::string &from_jid );
-	//void Playback_DeleteAll();
-	//void Playback_SetForJid( const std::string &from_jid, int sound );
-	//GSPlayBackCode_ Playback_CtrlForJid( const std::string &from_jid, GSPlayBackCode_ ControlCode, void *pInBuffer = NULL, uint32_t InLen = 0, void *pOutBuffer = NULL, uint32_t *pOutLen = NULL );
-	//void Playback_CtrlResult( const JID &from_Jid, const std::string &from_id, const XmppGSPlayback *pXmppSrc, const GSPlayBackCode_ ControlCode, void *pOutBuffer = NULL, uint32_t *pOutLen = NULL );
-	//void Playback_UpdateSession( const std::string &key );
-	//void Playback_CheckSession();
-	//int PlayBackControl_GetCurState_test( GSPlayBackCode_ &curPB_Code, int &curPB_speedlevel, int &curPB_ThrowFrame );
-	//int PlayBackControl_test( GSPlayBackCode_ ControlCode, void *pInBuffer = NULL, uint32_t InLen = 0, void *pOutBuffer = NULL, uint32_t *pOutLen = NULL );
+	static void Playback_DeleteDevOne( GSIOTDevice *device );
+	bool Playback_IsLimit();
+	uint32_t Playback_GetNowCount();
+	void Playback_GetInfoList( std::map<std::string,struPlaybackSession> &getlstPlaybackList );
+	bool Playback_Exist( const std::string &key );
+	bool Playback_Add( const std::string &from_id, const std::string &key, const std::string &url, const std::string &peerid, const std::string &streamid, GSIOTDevice *device );
+	void Playback_Delete( const std::string &key );
+	void Playback_DeleteForJid( const std::string &from_jid );
+	void Playback_DeleteAll();
+	void Playback_SetForJid( const std::string &from_jid, int sound );
+	GSPlayBackCode_ Playback_CtrlForJid( const std::string &from_jid, GSPlayBackCode_ ControlCode, void *pInBuffer = NULL, uint32_t InLen = 0, void *pOutBuffer = NULL, uint32_t *pOutLen = NULL );
+	void Playback_CtrlResult( const JID &from_Jid, const std::string &from_id, const XmppGSPlayback *pXmppSrc, const GSPlayBackCode_ ControlCode, void *pOutBuffer = NULL, uint32_t *pOutLen = NULL );
+	void Playback_UpdateSession( const std::string &key );
+	void Playback_CheckSession();
+	int PlayBackControl_GetCurState_test( GSPlayBackCode_ &curPB_Code, int &curPB_speedlevel, int &curPB_ThrowFrame );
+	int PlayBackControl_test( GSPlayBackCode_ ControlCode, void *pInBuffer = NULL, uint32_t InLen = 0, void *pOutBuffer = NULL, uint32_t *pOutLen = NULL );
 
 private:
-	//int PlayBackControl_nolock( IPCameraBase *pcam, GSPlayBackCode_ ControlCode, void *pInBuffer = NULL, uint32_t InLen = 0, void *pOutBuffer = NULL, uint32_t *pOutLen = NULL );
+	int PlayBackControl_nolock( IPCameraBase *pcam, GSPlayBackCode_ ControlCode, void *pInBuffer = NULL, uint32_t InLen = 0, void *pOutBuffer = NULL, uint32_t *pOutLen = NULL );
 
 public:
 	// 视频播放命令队列处理
-	//void PlayMgrCmd_push( defPlayMgrCmd_ cmd, defUserAuth Auth, const IQ& iq, const int dev_id, const std::string &url, const std::vector<std::string> &url_backup );
-	//void PlayMgrCmd_SetCheckNow( bool CheckNow=true );
-	//bool PlayMgrCmd_IsCheckNow();
-	//void PlayMgrCmd_SetDevtimeNow( IOTDeviceType type=IOT_DEVICE_All, int id=0 );
-	//void PlayMgrCmd_SetDevtimeNowForList( const std::set<int> &NeedIDList );
-	//struPlayMgrCmd* PlayMgrCmd_pop();
-	//void PlayMgrCmd_clean();
-	//bool PlayMgrCmd_OnProc();
-	//void PlayMgrCmd_ProcOneCmd( const struPlayMgrCmd *pCmd );
-	//void PlayMgrCmd_ThreadCreate();
+	void PlayMgrCmd_push( defPlayMgrCmd_ cmd, defUserAuth Auth, const IQ& iq, const int dev_id, const std::string &url, const std::vector<std::string> &url_backup );
+	void PlayMgrCmd_SetCheckNow( bool CheckNow=true );
+	bool PlayMgrCmd_IsCheckNow();
+	void PlayMgrCmd_SetDevtimeNow( IOTDeviceType type=IOT_DEVICE_All, int id=0 );
+	void PlayMgrCmd_SetDevtimeNowForList( const std::set<int> &NeedIDList );
+	struPlayMgrCmd* PlayMgrCmd_pop();
+	void PlayMgrCmd_clean();
+	bool PlayMgrCmd_OnProc();
+	void PlayMgrCmd_ProcOneCmd( const struPlayMgrCmd *pCmd );
+	void PlayMgrCmd_ThreadCreate();  //jyc20170405 resume until here
 
 	bool EventNoticeMsg_Add( struEventNoticeMsg *msg );
 	void EventNoticeMsg_Remove( const std::string &id );
@@ -396,9 +552,9 @@ public:
 
 	// 告警处理相关
 	//virtual void OnCameraAlarmRecv( const bool isAlarm, const IPCameraType CameraType, const char *sDeviceIP, const int nPort, const int channel, const char *alarmstr );
-	//bool CameraAlarmRecvMap_push( const IPCameraType CameraType, const char *sDeviceIP, const int nPort, const int channel, const char *alarmstr );
-	//bool CameraAlarmRecvMap_pop( struCamAlarmRecv &CamAlarmRecv );
-	//int CameraAlarmRecvMap_size();
+	bool CameraAlarmRecvMap_push( const IPCameraType CameraType, const char *sDeviceIP, const int nPort, const int channel, const char *alarmstr );
+	bool CameraAlarmRecvMap_pop( struCamAlarmRecv &CamAlarmRecv );
+	int CameraAlarmRecvMap_size(); //jyc20170405 resume until here
 	void AlarmProc_ThreadCreate();
 	bool AlarmProc();
 	bool AlarmCheck();

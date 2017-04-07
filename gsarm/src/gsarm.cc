@@ -37,7 +37,7 @@ int main( int /*argc*/, char** /*argv*/ )
 {
 	//LOGMSG( ">>>>> GSIOT 程序启动 <<<<<\r\n\r\n" );
 	//LOGMSG( "GSIOT v%s\r\nbuild %s\r\n\r\n", g_IOTGetVersion().c_str(), g_IOTGetBuildInfo().c_str() );
-	printf("gsarm start\n");
+	printf("gsarm start......\n");
 
 	GSIOTClient *client = new GSIOTClient(nullptr, "" );
 

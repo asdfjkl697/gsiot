@@ -109,9 +109,16 @@ GSIOTDevice.o: GSIOTDevice.cpp /usr/include/stdc-predef.h GSIOTDevice.h \
  Statement.h Transaction.h /usr/include/string.h \
  /usr/include/i386-linux-gnu/bits/string3.h GSIOTObjBase.h \
  /usr/include/c++/4.8/bitset RemoteButtonClass.h RFSignalDefine.h \
- GSObjLocker.h RFDeviceControl.h RFDevice.h RS485DevControl.h \
- AddressManager.h ModbusProc.h SerialMessage.h ISerialPortHandler.h \
- CommLink.h SerialDataBuffer.h HeartbeatMon.h RFRemoteControl.h \
+ GSObjLocker.h MediaControl.h IPCameraBase.h \
+ /usr/local/include/gloox/jid.h RTMPSession.h MediaStream.h \
+ H264MediaFile.h RTMPSend.h /usr/include/c++/4.8/queue \
+ /usr/include/c++/4.8/deque /usr/include/c++/4.8/bits/stl_deque.h \
+ /usr/include/c++/4.8/bits/deque.tcc /usr/include/c++/4.8/bits/stl_heap.h \
+ /usr/include/c++/4.8/bits/stl_queue.h IPublishHandler.h AudioCfg.h \
+ CameraControl.h CameraPTZ.h CameraFocal.h AudioCapBase.h PresetManager.h \
+ RFDeviceControl.h RFDevice.h RS485DevControl.h AddressManager.h \
+ ModbusProc.h SerialMessage.h ISerialPortHandler.h CommLink.h \
+ SerialDataBuffer.h HeartbeatMon.h RFRemoteControl.h \
  RemoteButtonManager.h
 
 /usr/include/stdc-predef.h:
@@ -429,6 +436,46 @@ RemoteButtonClass.h:
 RFSignalDefine.h:
 
 GSObjLocker.h:
+
+MediaControl.h:
+
+IPCameraBase.h:
+
+/usr/local/include/gloox/jid.h:
+
+RTMPSession.h:
+
+MediaStream.h:
+
+H264MediaFile.h:
+
+RTMPSend.h:
+
+/usr/include/c++/4.8/queue:
+
+/usr/include/c++/4.8/deque:
+
+/usr/include/c++/4.8/bits/stl_deque.h:
+
+/usr/include/c++/4.8/bits/deque.tcc:
+
+/usr/include/c++/4.8/bits/stl_heap.h:
+
+/usr/include/c++/4.8/bits/stl_queue.h:
+
+IPublishHandler.h:
+
+AudioCfg.h:
+
+CameraControl.h:
+
+CameraPTZ.h:
+
+CameraFocal.h:
+
+AudioCapBase.h:
+
+PresetManager.h:
 
 RFDeviceControl.h:
 

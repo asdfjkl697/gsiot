@@ -3073,7 +3073,7 @@ m4trace:configure.ac:31: -1- _LT_COMPILER_OPTION([if $compiler PIC flag $_LT_TAG
      esac], [_LT_TAGVAR(lt_prog_compiler_pic, CXX)=
      _LT_TAGVAR(lt_prog_compiler_can_build_shared, CXX)=no])
 m4trace:configure.ac:31: -1- _LT_LINKER_OPTION([if $compiler static flag $lt_tmp_static_flag works], [lt_cv_prog_compiler_static_works_CXX], [$lt_tmp_static_flag], [], [_LT_TAGVAR(lt_prog_compiler_static, CXX)=])
-m4trace:configure.ac:37: -1- PKG_CHECK_MODULES([SQLITE3], [sqlite3])
+m4trace:configure.ac:37: -1- PKG_CHECK_MODULES([ZLIB], [zlib])
 m4trace:configure.ac:37: -1- PKG_PROG_PKG_CONFIG
 m4trace:configure.ac:37: -1- m4_pattern_forbid([^_?PKG_[A-Z_]+$])
 m4trace:configure.ac:37: -1- m4_pattern_allow([^PKG_CONFIG(_(PATH|LIBDIR|SYSROOT_DIR|ALLOW_SYSTEM_(CFLAGS|LIBS)))?$])
@@ -3082,30 +3082,62 @@ m4trace:configure.ac:37: -1- m4_pattern_allow([^PKG_CONFIG$])
 m4trace:configure.ac:37: -1- m4_pattern_allow([^PKG_CONFIG_PATH$])
 m4trace:configure.ac:37: -1- m4_pattern_allow([^PKG_CONFIG_LIBDIR$])
 m4trace:configure.ac:37: -1- m4_pattern_allow([^PKG_CONFIG$])
-m4trace:configure.ac:37: -1- m4_pattern_allow([^SQLITE3_CFLAGS$])
-m4trace:configure.ac:37: -1- m4_pattern_allow([^SQLITE3_LIBS$])
-m4trace:configure.ac:37: -1- PKG_CHECK_EXISTS([sqlite3], [pkg_cv_[]SQLITE3_CFLAGS=`$PKG_CONFIG --[]cflags "sqlite3" 2>/dev/null`
+m4trace:configure.ac:37: -1- m4_pattern_allow([^ZLIB_CFLAGS$])
+m4trace:configure.ac:37: -1- m4_pattern_allow([^ZLIB_LIBS$])
+m4trace:configure.ac:37: -1- PKG_CHECK_EXISTS([zlib], [pkg_cv_[]ZLIB_CFLAGS=`$PKG_CONFIG --[]cflags "zlib" 2>/dev/null`
 		      test "x$?" != "x0" && pkg_failed=yes ], [pkg_failed=yes])
-m4trace:configure.ac:37: -1- PKG_CHECK_EXISTS([sqlite3], [pkg_cv_[]SQLITE3_LIBS=`$PKG_CONFIG --[]libs "sqlite3" 2>/dev/null`
+m4trace:configure.ac:37: -1- PKG_CHECK_EXISTS([zlib], [pkg_cv_[]ZLIB_LIBS=`$PKG_CONFIG --[]libs "zlib" 2>/dev/null`
 		      test "x$?" != "x0" && pkg_failed=yes ], [pkg_failed=yes])
 m4trace:configure.ac:37: -1- _PKG_SHORT_ERRORS_SUPPORTED
-m4trace:configure.ac:39: -1- PKG_CHECK_MODULES([GLOOX], [gloox])
-m4trace:configure.ac:39: -1- m4_pattern_allow([^GLOOX_CFLAGS$])
-m4trace:configure.ac:39: -1- m4_pattern_allow([^GLOOX_LIBS$])
-m4trace:configure.ac:39: -1- PKG_CHECK_EXISTS([gloox], [pkg_cv_[]GLOOX_CFLAGS=`$PKG_CONFIG --[]cflags "gloox" 2>/dev/null`
+m4trace:configure.ac:39: -1- PKG_CHECK_MODULES([LIBAVUTIL], [libavutil])
+m4trace:configure.ac:39: -1- m4_pattern_allow([^LIBAVUTIL_CFLAGS$])
+m4trace:configure.ac:39: -1- m4_pattern_allow([^LIBAVUTIL_LIBS$])
+m4trace:configure.ac:39: -1- PKG_CHECK_EXISTS([libavutil], [pkg_cv_[]LIBAVUTIL_CFLAGS=`$PKG_CONFIG --[]cflags "libavutil" 2>/dev/null`
 		      test "x$?" != "x0" && pkg_failed=yes ], [pkg_failed=yes])
-m4trace:configure.ac:39: -1- PKG_CHECK_EXISTS([gloox], [pkg_cv_[]GLOOX_LIBS=`$PKG_CONFIG --[]libs "gloox" 2>/dev/null`
+m4trace:configure.ac:39: -1- PKG_CHECK_EXISTS([libavutil], [pkg_cv_[]LIBAVUTIL_LIBS=`$PKG_CONFIG --[]libs "libavutil" 2>/dev/null`
 		      test "x$?" != "x0" && pkg_failed=yes ], [pkg_failed=yes])
 m4trace:configure.ac:39: -1- _PKG_SHORT_ERRORS_SUPPORTED
-m4trace:configure.ac:41: -1- _m4_warn([obsolete], [AC_OUTPUT should be used without arguments.
+m4trace:configure.ac:41: -1- PKG_CHECK_MODULES([LIBAVFORMAT], [libavformat])
+m4trace:configure.ac:41: -1- m4_pattern_allow([^LIBAVFORMAT_CFLAGS$])
+m4trace:configure.ac:41: -1- m4_pattern_allow([^LIBAVFORMAT_LIBS$])
+m4trace:configure.ac:41: -1- PKG_CHECK_EXISTS([libavformat], [pkg_cv_[]LIBAVFORMAT_CFLAGS=`$PKG_CONFIG --[]cflags "libavformat" 2>/dev/null`
+		      test "x$?" != "x0" && pkg_failed=yes ], [pkg_failed=yes])
+m4trace:configure.ac:41: -1- PKG_CHECK_EXISTS([libavformat], [pkg_cv_[]LIBAVFORMAT_LIBS=`$PKG_CONFIG --[]libs "libavformat" 2>/dev/null`
+		      test "x$?" != "x0" && pkg_failed=yes ], [pkg_failed=yes])
+m4trace:configure.ac:41: -1- _PKG_SHORT_ERRORS_SUPPORTED
+m4trace:configure.ac:43: -1- PKG_CHECK_MODULES([LIBAVCODEC], [libavcodec])
+m4trace:configure.ac:43: -1- m4_pattern_allow([^LIBAVCODEC_CFLAGS$])
+m4trace:configure.ac:43: -1- m4_pattern_allow([^LIBAVCODEC_LIBS$])
+m4trace:configure.ac:43: -1- PKG_CHECK_EXISTS([libavcodec], [pkg_cv_[]LIBAVCODEC_CFLAGS=`$PKG_CONFIG --[]cflags "libavcodec" 2>/dev/null`
+		      test "x$?" != "x0" && pkg_failed=yes ], [pkg_failed=yes])
+m4trace:configure.ac:43: -1- PKG_CHECK_EXISTS([libavcodec], [pkg_cv_[]LIBAVCODEC_LIBS=`$PKG_CONFIG --[]libs "libavcodec" 2>/dev/null`
+		      test "x$?" != "x0" && pkg_failed=yes ], [pkg_failed=yes])
+m4trace:configure.ac:43: -1- _PKG_SHORT_ERRORS_SUPPORTED
+m4trace:configure.ac:45: -1- PKG_CHECK_MODULES([SQLITE3], [sqlite3])
+m4trace:configure.ac:45: -1- m4_pattern_allow([^SQLITE3_CFLAGS$])
+m4trace:configure.ac:45: -1- m4_pattern_allow([^SQLITE3_LIBS$])
+m4trace:configure.ac:45: -1- PKG_CHECK_EXISTS([sqlite3], [pkg_cv_[]SQLITE3_CFLAGS=`$PKG_CONFIG --[]cflags "sqlite3" 2>/dev/null`
+		      test "x$?" != "x0" && pkg_failed=yes ], [pkg_failed=yes])
+m4trace:configure.ac:45: -1- PKG_CHECK_EXISTS([sqlite3], [pkg_cv_[]SQLITE3_LIBS=`$PKG_CONFIG --[]libs "sqlite3" 2>/dev/null`
+		      test "x$?" != "x0" && pkg_failed=yes ], [pkg_failed=yes])
+m4trace:configure.ac:45: -1- _PKG_SHORT_ERRORS_SUPPORTED
+m4trace:configure.ac:47: -1- PKG_CHECK_MODULES([GLOOX], [gloox])
+m4trace:configure.ac:47: -1- m4_pattern_allow([^GLOOX_CFLAGS$])
+m4trace:configure.ac:47: -1- m4_pattern_allow([^GLOOX_LIBS$])
+m4trace:configure.ac:47: -1- PKG_CHECK_EXISTS([gloox], [pkg_cv_[]GLOOX_CFLAGS=`$PKG_CONFIG --[]cflags "gloox" 2>/dev/null`
+		      test "x$?" != "x0" && pkg_failed=yes ], [pkg_failed=yes])
+m4trace:configure.ac:47: -1- PKG_CHECK_EXISTS([gloox], [pkg_cv_[]GLOOX_LIBS=`$PKG_CONFIG --[]libs "gloox" 2>/dev/null`
+		      test "x$?" != "x0" && pkg_failed=yes ], [pkg_failed=yes])
+m4trace:configure.ac:47: -1- _PKG_SHORT_ERRORS_SUPPORTED
+m4trace:configure.ac:49: -1- _m4_warn([obsolete], [AC_OUTPUT should be used without arguments.
 You should run autoupdate.], [])
-m4trace:configure.ac:41: -1- m4_pattern_allow([^LIB@&t@OBJS$])
-m4trace:configure.ac:41: -1- m4_pattern_allow([^LTLIBOBJS$])
-m4trace:configure.ac:41: -1- AM_CONDITIONAL([am__EXEEXT], [test -n "$EXEEXT"])
-m4trace:configure.ac:41: -1- m4_pattern_allow([^am__EXEEXT_TRUE$])
-m4trace:configure.ac:41: -1- m4_pattern_allow([^am__EXEEXT_FALSE$])
-m4trace:configure.ac:41: -1- _AM_SUBST_NOTMAKE([am__EXEEXT_TRUE])
-m4trace:configure.ac:41: -1- _AM_SUBST_NOTMAKE([am__EXEEXT_FALSE])
-m4trace:configure.ac:41: -1- _AC_AM_CONFIG_HEADER_HOOK(["$ac_file"])
-m4trace:configure.ac:41: -1- _AM_OUTPUT_DEPENDENCY_COMMANDS
-m4trace:configure.ac:41: -1- _LT_PROG_LTMAIN
+m4trace:configure.ac:49: -1- m4_pattern_allow([^LIB@&t@OBJS$])
+m4trace:configure.ac:49: -1- m4_pattern_allow([^LTLIBOBJS$])
+m4trace:configure.ac:49: -1- AM_CONDITIONAL([am__EXEEXT], [test -n "$EXEEXT"])
+m4trace:configure.ac:49: -1- m4_pattern_allow([^am__EXEEXT_TRUE$])
+m4trace:configure.ac:49: -1- m4_pattern_allow([^am__EXEEXT_FALSE$])
+m4trace:configure.ac:49: -1- _AM_SUBST_NOTMAKE([am__EXEEXT_TRUE])
+m4trace:configure.ac:49: -1- _AM_SUBST_NOTMAKE([am__EXEEXT_FALSE])
+m4trace:configure.ac:49: -1- _AC_AM_CONFIG_HEADER_HOOK(["$ac_file"])
+m4trace:configure.ac:49: -1- _AM_OUTPUT_DEPENDENCY_COMMANDS
+m4trace:configure.ac:49: -1- _LT_PROG_LTMAIN

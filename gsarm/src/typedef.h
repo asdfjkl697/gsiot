@@ -12,19 +12,12 @@
 #define ROOTDIR  "/root/"
 #endif
 	
-
-#ifdef WIN32  
-#include <WinSock2.h>
-#include <Windows.h>  
-#include <stdio.h>  
-#else   //20160527
 #define  MAX_PATH 260  
 #include <unistd.h>  
 #include <fcntl.h>  
 #include <stdio.h>  
 #include <stdlib.h>  
 #include <stdarg.h>  
-#endif 
 
 #include <stdint.h>
 #include <list>

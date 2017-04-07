@@ -124,7 +124,19 @@ am_gsarm_OBJECTS = AddressManager.$(OBJEXT) common.$(OBJEXT) \
 	RFSignalDefine.$(OBJEXT) XmppGSRelation.$(OBJEXT) \
 	XmppGSReport.$(OBJEXT) XmppGSVObj.$(OBJEXT) \
 	VObjClass.$(OBJEXT) HttpRequest.$(OBJEXT) \
-	XmppGSUpdate.$(OBJEXT)
+	XmppGSUpdate.$(OBJEXT) IPCamConnection.$(OBJEXT) \
+	IPCameraBase.$(OBJEXT) IPCameraManager.$(OBJEXT) \
+	CameraControl.$(OBJEXT) CameraFocal.$(OBJEXT) \
+	CameraPTZ.$(OBJEXT) RTMPSend.$(OBJEXT) RTMPSession.$(OBJEXT) \
+	RTSPConnection.$(OBJEXT) RTSPManager.$(OBJEXT) \
+	MediaControl.$(OBJEXT) MediaStream.$(OBJEXT) \
+	H264MediaFile.$(OBJEXT) H264NalReader.$(OBJEXT) \
+	AudioCap_AAC.$(OBJEXT) AudioCapBase.$(OBJEXT) \
+	AudioCap_File.$(OBJEXT) AudioCap_G711.$(OBJEXT) \
+	AudioCfg.$(OBJEXT) Audio_WAV2AAC.$(OBJEXT) AudioCap.$(OBJEXT) \
+	APlayer.$(OBJEXT) GSRemoteTalkMgr.$(OBJEXT) \
+	XmppGSTalk.$(OBJEXT) XmppGSPreset.$(OBJEXT) \
+	XmppGSPlayback.$(OBJEXT)
 gsarm_OBJECTS = $(am_gsarm_OBJECTS)
 gsarm_DEPENDENCIES =
 AM_V_lt = $(am__v_lt_@AM_V@)
@@ -269,6 +281,12 @@ INTLTOOL__v_MERGE_ = @INTLTOOL__v_MERGE_@
 INTLTOOL__v_MERGE_0 = @INTLTOOL__v_MERGE_0@
 LD = @LD@
 LDFLAGS = @LDFLAGS@
+LIBAVCODEC_CFLAGS = @LIBAVCODEC_CFLAGS@
+LIBAVCODEC_LIBS = @LIBAVCODEC_LIBS@
+LIBAVFORMAT_CFLAGS = @LIBAVFORMAT_CFLAGS@
+LIBAVFORMAT_LIBS = @LIBAVFORMAT_LIBS@
+LIBAVUTIL_CFLAGS = @LIBAVUTIL_CFLAGS@
+LIBAVUTIL_LIBS = @LIBAVUTIL_LIBS@
 LIBOBJS = @LIBOBJS@
 LIBS = @LIBS@
 LIBTOOL = @LIBTOOL@
@@ -313,6 +331,8 @@ STRIP = @STRIP@
 USE_NLS = @USE_NLS@
 VERSION = @VERSION@
 XGETTEXT = @XGETTEXT@
+ZLIB_CFLAGS = @ZLIB_CFLAGS@
+ZLIB_LIBS = @ZLIB_LIBS@
 abs_builddir = @abs_builddir@
 abs_srcdir = @abs_srcdir@
 abs_top_builddir = @abs_top_builddir@
@@ -371,6 +391,11 @@ top_srcdir = @top_srcdir@
 AM_CPPFLAGS = \
 	-DPACKAGE_LOCALE_DIR=\""$(localedir)"\" \
 	-DPACKAGE_SRC_DIR=\""$(srcdir). \
+	$(zlib_CFLAGS). \
+	$(libavutil_CFLAGS). \
+	$(libavformat_CFLAGS). \
+	$(libavcodec_CFLAGS). \
+	$(libhcnetsdk_CFLAGS). \
 	$(SQLITE3_CFLAGS)"\" \
 	-DPACKAGE_DATA_DIR=\""$(pkgdatadir)"\"
 
@@ -492,7 +517,6 @@ gsarm_SOURCES = \
 	SerialDataBuffer.h \
 	SerialMessage.cpp \
 	SerialMessage.h \
-	memmacro.h \
 	HeartbeatMon.cpp \
 	HeartbeatMon.h \
 	CommLink.cpp \
@@ -530,13 +554,73 @@ gsarm_SOURCES = \
 	HttpRequest.cpp \
 	HttpRequest.h \
 	XmppGSUpdate.cpp \
-	XmppGSUpdate.h
+	XmppGSUpdate.h \
+	IPCamConnection.cpp \
+	IPCamConnection.h \
+	IPCameraBase.cpp \
+	IPCameraBase.h \
+	IPCameraManager.cpp \
+	IPCameraManager.h \
+	CameraControl.cpp \
+	CameraControl.h \
+	CameraFocal.cpp \
+	CameraFocal.h \
+	CameraPTZ.cpp \
+	CameraPTZ.h \
+	RTMPSend.cpp \
+	RTMPSend.h \
+	RTMPSession.cpp \
+	RTMPSession.h \
+	RTSPConnection.cpp \
+	RTSPConnection.h \
+	RTSPManager.cpp \
+	RTSPManager.h \
+	MediaControl.cpp \
+	MediaControl.h \
+	MediaStream.cpp \
+	MediaStream.h \
+	H264MediaFile.cpp \
+	H264MediaFile.h \
+	H264NalReader.cpp \
+	H264NalReader.h \
+	ICameraHandler.h \
+	IPublishHandler.h \
+	AudioCap_AAC.cpp \
+	AudioCap_AAC.h \
+	AudioCapBase.cpp \
+	AudioCapBase.h \
+	AudioCap_File.cpp \
+	AudioCap_File.h \
+	AudioCap_G711.cpp \
+	AudioCap_G711.h \
+	AudioCfg.cpp \
+	AudioCfg.h \
+	AudioTestDefine.h \
+	Audio_WAV2AAC.cpp \
+	Audio_WAV2AAC.h \
+	AudioCap.cpp \
+	AudioCap.h \
+	APlayer.cpp \
+	APlayer.h \
+	GSRemoteTalkMgr.cpp \
+	GSRemoteTalkMgr.h \
+	XmppGSTalk.cpp \
+	XmppGSTalk.h \
+	XmppGSPreset.cpp \
+	XmppGSPreset.h \
+	XmppGSPlayback.cpp \
+	XmppGSPlayback.h 
 
 gsarm_LDFLAGS = 
 gsarm_LDADD = \
+	-lavcodec \
+	-lavformat \
+	-lavutil \
+	-lswresample \
 	-lgloox \
 	-lpthread \
-	-lsqlite3
+	-lsqlite3 \
+	-lz
 
 all: all-am
 
@@ -632,13 +716,24 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/APlayer.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AddressManager.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AudioCap.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AudioCapBase.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AudioCap_AAC.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AudioCap_File.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AudioCap_G711.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AudioCfg.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Audio_WAV2AAC.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AutoCallEvent.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AutoControlEvent.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AutoEventthing.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AutoNoticeEvent.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AutoSendSMSEvent.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CANDeviceControl.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CameraControl.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CameraFocal.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CameraPTZ.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Column.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CommLink.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CommLinkManager.Po@am__quote@
@@ -661,9 +756,17 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/GSIOTInfo.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/GSIOTUser.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/GSIOTUserMgr.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/GSRemoteTalkMgr.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/H264MediaFile.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/H264NalReader.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/HeartbeatMon.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/HttpRequest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/IGSMessageHandler.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/IPCamConnection.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/IPCameraBase.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/IPCameraManager.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MediaControl.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MediaStream.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ModbusProc.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/NetBaseClient.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/NetMan.Po@am__quote@
@@ -676,6 +779,10 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/RFRemoteControl.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/RFSignalDefine.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/RS485DevControl.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/RTMPSend.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/RTMPSession.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/RTSPConnection.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/RTSPManager.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/RemoteButtonClass.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/RemoteButtonManager.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/RunCode.Po@am__quote@
@@ -692,10 +799,13 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/XmppGSEvent.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/XmppGSManager.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/XmppGSMessage.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/XmppGSPlayback.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/XmppGSPreset.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/XmppGSRelation.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/XmppGSReport.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/XmppGSResult.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/XmppGSState.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/XmppGSTalk.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/XmppGSUpdate.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/XmppGSVObj.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/XmppRegister.Po@am__quote@

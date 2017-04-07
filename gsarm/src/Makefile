@@ -124,7 +124,19 @@ am_gsarm_OBJECTS = AddressManager.$(OBJEXT) common.$(OBJEXT) \
 	RFSignalDefine.$(OBJEXT) XmppGSRelation.$(OBJEXT) \
 	XmppGSReport.$(OBJEXT) XmppGSVObj.$(OBJEXT) \
 	VObjClass.$(OBJEXT) HttpRequest.$(OBJEXT) \
-	XmppGSUpdate.$(OBJEXT)
+	XmppGSUpdate.$(OBJEXT) IPCamConnection.$(OBJEXT) \
+	IPCameraBase.$(OBJEXT) IPCameraManager.$(OBJEXT) \
+	CameraControl.$(OBJEXT) CameraFocal.$(OBJEXT) \
+	CameraPTZ.$(OBJEXT) RTMPSend.$(OBJEXT) RTMPSession.$(OBJEXT) \
+	RTSPConnection.$(OBJEXT) RTSPManager.$(OBJEXT) \
+	MediaControl.$(OBJEXT) MediaStream.$(OBJEXT) \
+	H264MediaFile.$(OBJEXT) H264NalReader.$(OBJEXT) \
+	AudioCap_AAC.$(OBJEXT) AudioCapBase.$(OBJEXT) \
+	AudioCap_File.$(OBJEXT) AudioCap_G711.$(OBJEXT) \
+	AudioCfg.$(OBJEXT) Audio_WAV2AAC.$(OBJEXT) AudioCap.$(OBJEXT) \
+	APlayer.$(OBJEXT) GSRemoteTalkMgr.$(OBJEXT) \
+	XmppGSTalk.$(OBJEXT) XmppGSPreset.$(OBJEXT) \
+	XmppGSPlayback.$(OBJEXT)
 gsarm_OBJECTS = $(am_gsarm_OBJECTS)
 gsarm_DEPENDENCIES =
 AM_V_lt = $(am__v_lt_$(V))
@@ -213,14 +225,14 @@ am__define_uniq_tagged_files = \
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
-ACLOCAL = ${SHELL} /home/chen/projects/gsiot/missing aclocal-1.14
+ACLOCAL = ${SHELL} /home/chen/projects/gsarm/missing aclocal-1.14
 ALL_LINGUAS = 
 AMTAR = $${TAR-tar}
 AM_DEFAULT_VERBOSITY = 0
 AR = ar
-AUTOCONF = ${SHELL} /home/chen/projects/gsiot/missing autoconf
-AUTOHEADER = ${SHELL} /home/chen/projects/gsiot/missing autoheader
-AUTOMAKE = ${SHELL} /home/chen/projects/gsiot/missing automake-1.14
+AUTOCONF = ${SHELL} /home/chen/projects/gsarm/missing autoconf
+AUTOHEADER = ${SHELL} /home/chen/projects/gsarm/missing autoheader
+AUTOMAKE = ${SHELL} /home/chen/projects/gsarm/missing automake-1.14
 AWK = gawk
 CATALOGS = 
 CATOBJEXT = .gmo
@@ -269,13 +281,19 @@ INTLTOOL__v_MERGE_ = $(INTLTOOL__v_MERGE_$(AM_DEFAULT_VERBOSITY))
 INTLTOOL__v_MERGE_0 = @echo "  ITMRG " $@;
 LD = /usr/bin/ld
 LDFLAGS = 
+LIBAVCODEC_CFLAGS = -I/usr/local/include  
+LIBAVCODEC_LIBS = -pthread -L/usr/local/lib -lavcodec -lXv -lXext -lX11 -lopencore-amrwb -lopencore-amrnb -lmp3lame -lfaac -lz -lswresample -lavutil -lm  
+LIBAVFORMAT_CFLAGS = -I/usr/local/include  
+LIBAVFORMAT_LIBS = -pthread -L/usr/local/lib -lavformat -lavcodec -lXv -lXext -lX11 -lopencore-amrwb -lopencore-amrnb -lmp3lame -lfaac -lz -lswresample -lavutil -lm  
+LIBAVUTIL_CFLAGS = -I/usr/local/include  
+LIBAVUTIL_LIBS = -L/usr/local/lib -lavutil -lm  
 LIBOBJS = 
 LIBS = 
 LIBTOOL = $(SHELL) $(top_builddir)/libtool
 LIPO = 
 LN_S = ln -s
 LTLIBOBJS = 
-MAKEINFO = ${SHELL} /home/chen/projects/gsiot/missing makeinfo
+MAKEINFO = ${SHELL} /home/chen/projects/gsarm/missing makeinfo
 MANIFEST_TOOL = :
 MKDIR_P = /bin/mkdir -p
 MKINSTALLDIRS = ./mkinstalldirs
@@ -313,10 +331,12 @@ STRIP = strip
 USE_NLS = yes
 VERSION = 0.1
 XGETTEXT = /usr/bin/xgettext
-abs_builddir = /home/chen/projects/gsiot/src
-abs_srcdir = /home/chen/projects/gsiot/src
-abs_top_builddir = /home/chen/projects/gsiot
-abs_top_srcdir = /home/chen/projects/gsiot
+ZLIB_CFLAGS = -I/usr/local/include  
+ZLIB_LIBS = -L/usr/local/lib -lz  
+abs_builddir = /home/chen/projects/gsarm/src
+abs_srcdir = /home/chen/projects/gsarm/src
+abs_top_builddir = /home/chen/projects/gsarm
+abs_top_srcdir = /home/chen/projects/gsarm
 ac_ct_AR = ar
 ac_ct_CC = gcc
 ac_ct_CXX = g++
@@ -346,7 +366,7 @@ host_vendor = pc
 htmldir = ${docdir}
 includedir = ${prefix}/include
 infodir = ${datarootdir}/info
-install_sh = ${SHELL} /home/chen/projects/gsiot/install-sh
+install_sh = ${SHELL} /home/chen/projects/gsarm/install-sh
 intltool__v_merge_options_ = $(intltool__v_merge_options_$(AM_DEFAULT_VERBOSITY))
 intltool__v_merge_options_0 = -q
 libdir = ${exec_prefix}/lib
@@ -371,6 +391,11 @@ top_srcdir = ..
 AM_CPPFLAGS = \
 	-DPACKAGE_LOCALE_DIR=\""$(localedir)"\" \
 	-DPACKAGE_SRC_DIR=\""$(srcdir). \
+	$(zlib_CFLAGS). \
+	$(libavutil_CFLAGS). \
+	$(libavformat_CFLAGS). \
+	$(libavcodec_CFLAGS). \
+	$(libhcnetsdk_CFLAGS). \
 	$(SQLITE3_CFLAGS)"\" \
 	-DPACKAGE_DATA_DIR=\""$(pkgdatadir)"\"
 
@@ -492,7 +517,6 @@ gsarm_SOURCES = \
 	SerialDataBuffer.h \
 	SerialMessage.cpp \
 	SerialMessage.h \
-	memmacro.h \
 	HeartbeatMon.cpp \
 	HeartbeatMon.h \
 	CommLink.cpp \
@@ -530,13 +554,73 @@ gsarm_SOURCES = \
 	HttpRequest.cpp \
 	HttpRequest.h \
 	XmppGSUpdate.cpp \
-	XmppGSUpdate.h
+	XmppGSUpdate.h \
+	IPCamConnection.cpp \
+	IPCamConnection.h \
+	IPCameraBase.cpp \
+	IPCameraBase.h \
+	IPCameraManager.cpp \
+	IPCameraManager.h \
+	CameraControl.cpp \
+	CameraControl.h \
+	CameraFocal.cpp \
+	CameraFocal.h \
+	CameraPTZ.cpp \
+	CameraPTZ.h \
+	RTMPSend.cpp \
+	RTMPSend.h \
+	RTMPSession.cpp \
+	RTMPSession.h \
+	RTSPConnection.cpp \
+	RTSPConnection.h \
+	RTSPManager.cpp \
+	RTSPManager.h \
+	MediaControl.cpp \
+	MediaControl.h \
+	MediaStream.cpp \
+	MediaStream.h \
+	H264MediaFile.cpp \
+	H264MediaFile.h \
+	H264NalReader.cpp \
+	H264NalReader.h \
+	ICameraHandler.h \
+	IPublishHandler.h \
+	AudioCap_AAC.cpp \
+	AudioCap_AAC.h \
+	AudioCapBase.cpp \
+	AudioCapBase.h \
+	AudioCap_File.cpp \
+	AudioCap_File.h \
+	AudioCap_G711.cpp \
+	AudioCap_G711.h \
+	AudioCfg.cpp \
+	AudioCfg.h \
+	AudioTestDefine.h \
+	Audio_WAV2AAC.cpp \
+	Audio_WAV2AAC.h \
+	AudioCap.cpp \
+	AudioCap.h \
+	APlayer.cpp \
+	APlayer.h \
+	GSRemoteTalkMgr.cpp \
+	GSRemoteTalkMgr.h \
+	XmppGSTalk.cpp \
+	XmppGSTalk.h \
+	XmppGSPreset.cpp \
+	XmppGSPreset.h \
+	XmppGSPlayback.cpp \
+	XmppGSPlayback.h 
 
 gsarm_LDFLAGS = 
 gsarm_LDADD = \
+	-lavcodec \
+	-lavformat \
+	-lavutil \
+	-lswresample \
 	-lgloox \
 	-lpthread \
-	-lsqlite3
+	-lsqlite3 \
+	-lz
 
 all: all-am
 
@@ -632,13 +716,24 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+include ./$(DEPDIR)/APlayer.Po
 include ./$(DEPDIR)/AddressManager.Po
+include ./$(DEPDIR)/AudioCap.Po
+include ./$(DEPDIR)/AudioCapBase.Po
+include ./$(DEPDIR)/AudioCap_AAC.Po
+include ./$(DEPDIR)/AudioCap_File.Po
+include ./$(DEPDIR)/AudioCap_G711.Po
+include ./$(DEPDIR)/AudioCfg.Po
+include ./$(DEPDIR)/Audio_WAV2AAC.Po
 include ./$(DEPDIR)/AutoCallEvent.Po
 include ./$(DEPDIR)/AutoControlEvent.Po
 include ./$(DEPDIR)/AutoEventthing.Po
 include ./$(DEPDIR)/AutoNoticeEvent.Po
 include ./$(DEPDIR)/AutoSendSMSEvent.Po
 include ./$(DEPDIR)/CANDeviceControl.Po
+include ./$(DEPDIR)/CameraControl.Po
+include ./$(DEPDIR)/CameraFocal.Po
+include ./$(DEPDIR)/CameraPTZ.Po
 include ./$(DEPDIR)/Column.Po
 include ./$(DEPDIR)/CommLink.Po
 include ./$(DEPDIR)/CommLinkManager.Po
@@ -661,9 +756,17 @@ include ./$(DEPDIR)/GSIOTHeartbeat.Po
 include ./$(DEPDIR)/GSIOTInfo.Po
 include ./$(DEPDIR)/GSIOTUser.Po
 include ./$(DEPDIR)/GSIOTUserMgr.Po
+include ./$(DEPDIR)/GSRemoteTalkMgr.Po
+include ./$(DEPDIR)/H264MediaFile.Po
+include ./$(DEPDIR)/H264NalReader.Po
 include ./$(DEPDIR)/HeartbeatMon.Po
 include ./$(DEPDIR)/HttpRequest.Po
 include ./$(DEPDIR)/IGSMessageHandler.Po
+include ./$(DEPDIR)/IPCamConnection.Po
+include ./$(DEPDIR)/IPCameraBase.Po
+include ./$(DEPDIR)/IPCameraManager.Po
+include ./$(DEPDIR)/MediaControl.Po
+include ./$(DEPDIR)/MediaStream.Po
 include ./$(DEPDIR)/ModbusProc.Po
 include ./$(DEPDIR)/NetBaseClient.Po
 include ./$(DEPDIR)/NetMan.Po
@@ -676,6 +779,10 @@ include ./$(DEPDIR)/RFDeviceControl.Po
 include ./$(DEPDIR)/RFRemoteControl.Po
 include ./$(DEPDIR)/RFSignalDefine.Po
 include ./$(DEPDIR)/RS485DevControl.Po
+include ./$(DEPDIR)/RTMPSend.Po
+include ./$(DEPDIR)/RTMPSession.Po
+include ./$(DEPDIR)/RTSPConnection.Po
+include ./$(DEPDIR)/RTSPManager.Po
 include ./$(DEPDIR)/RemoteButtonClass.Po
 include ./$(DEPDIR)/RemoteButtonManager.Po
 include ./$(DEPDIR)/RunCode.Po
@@ -692,10 +799,13 @@ include ./$(DEPDIR)/XmppGSChange.Po
 include ./$(DEPDIR)/XmppGSEvent.Po
 include ./$(DEPDIR)/XmppGSManager.Po
 include ./$(DEPDIR)/XmppGSMessage.Po
+include ./$(DEPDIR)/XmppGSPlayback.Po
+include ./$(DEPDIR)/XmppGSPreset.Po
 include ./$(DEPDIR)/XmppGSRelation.Po
 include ./$(DEPDIR)/XmppGSReport.Po
 include ./$(DEPDIR)/XmppGSResult.Po
 include ./$(DEPDIR)/XmppGSState.Po
+include ./$(DEPDIR)/XmppGSTalk.Po
 include ./$(DEPDIR)/XmppGSUpdate.Po
 include ./$(DEPDIR)/XmppGSVObj.Po
 include ./$(DEPDIR)/XmppRegister.Po

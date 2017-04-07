@@ -1,6 +1,6 @@
 #include "XmppGSUpdate.h"
 
-#include "XmppGSPlayback.h"
+//#include "XmppGSPlayback.h"
 #include "GSIOTClient.h"
 #include "gloox/util.h"
 

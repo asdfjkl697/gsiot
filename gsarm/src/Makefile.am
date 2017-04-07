@@ -5,6 +5,11 @@
 AM_CPPFLAGS = \
 	-DPACKAGE_LOCALE_DIR=\""$(localedir)"\" \
 	-DPACKAGE_SRC_DIR=\""$(srcdir). \
+	$(zlib_CFLAGS). \
+	$(libavutil_CFLAGS). \
+	$(libavformat_CFLAGS). \
+	$(libavcodec_CFLAGS). \
+	$(libhcnetsdk_CFLAGS). \
 	$(SQLITE3_CFLAGS)"\" \
 	-DPACKAGE_DATA_DIR=\""$(pkgdatadir)"\"
 
@@ -129,7 +134,6 @@ gsarm_SOURCES = \
 	SerialDataBuffer.h \
 	SerialMessage.cpp \
 	SerialMessage.h \
-	memmacro.h \
 	HeartbeatMon.cpp \
 	HeartbeatMon.h \
 	CommLink.cpp \
@@ -167,13 +171,73 @@ gsarm_SOURCES = \
 	HttpRequest.cpp \
 	HttpRequest.h \
 	XmppGSUpdate.cpp \
-	XmppGSUpdate.h
+	XmppGSUpdate.h \
+	IPCamConnection.cpp \
+	IPCamConnection.h \
+	IPCameraBase.cpp \
+	IPCameraBase.h \
+	IPCameraManager.cpp \
+	IPCameraManager.h \
+	CameraControl.cpp \
+	CameraControl.h \
+	CameraFocal.cpp \
+	CameraFocal.h \
+	CameraPTZ.cpp \
+	CameraPTZ.h \
+	RTMPSend.cpp \
+	RTMPSend.h \
+	RTMPSession.cpp \
+	RTMPSession.h \
+	RTSPConnection.cpp \
+	RTSPConnection.h \
+	RTSPManager.cpp \
+	RTSPManager.h \
+	MediaControl.cpp \
+	MediaControl.h \
+	MediaStream.cpp \
+	MediaStream.h \
+	H264MediaFile.cpp \
+	H264MediaFile.h \
+	H264NalReader.cpp \
+	H264NalReader.h \
+	ICameraHandler.h \
+	IPublishHandler.h \
+	AudioCap_AAC.cpp \
+	AudioCap_AAC.h \
+	AudioCapBase.cpp \
+	AudioCapBase.h \
+	AudioCap_File.cpp \
+	AudioCap_File.h \
+	AudioCap_G711.cpp \
+	AudioCap_G711.h \
+	AudioCfg.cpp \
+	AudioCfg.h \
+	AudioTestDefine.h \
+	Audio_WAV2AAC.cpp \
+	Audio_WAV2AAC.h \
+	AudioCap.cpp \
+	AudioCap.h \
+	APlayer.cpp \
+	APlayer.h \
+	GSRemoteTalkMgr.cpp \
+	GSRemoteTalkMgr.h \
+	XmppGSTalk.cpp \
+	XmppGSTalk.h \
+	XmppGSPreset.cpp \
+	XmppGSPreset.h \
+	XmppGSPlayback.cpp \
+	XmppGSPlayback.h 
 
 gsarm_LDFLAGS = 
 
 gsarm_LDADD = \
+	-lavcodec \
+	-lavformat \
+	-lavutil \
+	-lswresample \
 	-lgloox \
 	-lpthread \
-	-lsqlite3
+	-lsqlite3 \
+	-lz
 
 

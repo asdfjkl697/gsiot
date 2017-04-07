@@ -419,11 +419,8 @@ DeviceConnection::~DeviceConnection(void)
 	if(this->m_port>-1){
 	    RS232_CloseComport(this->m_port);
 	}
-	//delete(devXml);
 	delete(devManager);
-	//delete(m_serial_msg);//...testFinalDelete 程序将退出，不释放
-	//m_CommLinkMgr.UnInit();//...testFinalDelete 程序将退出，不释放
-
+	
 	CCommLinkRun::Module_UnInit();
 	LOGMSG("~DeviceConnection end\r\n");
 }

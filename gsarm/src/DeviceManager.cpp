@@ -1,6 +1,6 @@
 #include "DeviceManager.h"
 #include "gloox/util.h"
-//#include "IPCameraBase.h"
+#include "IPCameraBase.h" //jyc20170331 resume
 
 DeviceManager::DeviceManager(void)
 	:SQLiteHelper()
@@ -190,8 +190,7 @@ bool DeviceManager::Add_Preset( GSIOTDevice *iotdevice, CPresetObj *pPreset )
 		pPreset->SetName( "preset" );
 	}
 
-	// 允许添加 index 相同的预置位配置，比如别名
-	/*
+	//jyc20170331 resume
 	IPCameraBase *ctl = (IPCameraBase*)iotdevice->getControl();
 
 	defGSReturn ret = ctl->CheckExist( 0, pPreset->GetObjName(), NULL );
@@ -209,7 +208,6 @@ bool DeviceManager::Add_Preset( GSIOTDevice *iotdevice, CPresetObj *pPreset )
 	pPreset->SetId( SaveToDB_Preset( iotdevice->getType(), iotdevice->getId(), pPreset ) );
 
 	ctl->AddPreset( pPreset );
-	*/
 
 	return true;
 }
@@ -314,16 +312,13 @@ bool DeviceManager::Delete_Preset( GSIOTDevice *iotdevice, uint32_t Presetid )
 	{
 		return false;
 	}
-	/*
+	//jyc20170331 resume
 	IPCameraBase *pctl = (IPCameraBase*)iotdevice->getControl();
 	if( !pctl )
 		return false;
 
-	// 为了删除时速度快点，不删除摄像机上的信息，如果有需要删除则再加代码
-
 	DB_DeleteOne_Preset( Presetid, iotdevice->getType(), iotdevice->getId() );
 	pctl->DeletePreset( Presetid );
-	*/
 	return true;
 }
 
@@ -672,7 +667,7 @@ bool DeviceManager::SaveSort_Preset( GSIOTDevice *iotdevice )
 	{
 		return false;
 	}
-	/*
+	//jyc20170331 resume
 	const IPCameraBase *ctl = (IPCameraBase*)iotdevice->getControl();
 	if( !ctl )
 		return false;
@@ -689,7 +684,6 @@ bool DeviceManager::SaveSort_Preset( GSIOTDevice *iotdevice )
 		const CPresetObj *pPreset = *it;
 		DB_Modify_Preset( pPreset, iotdevice->getType(), iotdevice->getId() );
 	}
-	*/
 	return true;
 }
 

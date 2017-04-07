@@ -10,7 +10,7 @@
 #include <bitset>
 
 #include <assert.h>
-#define _ULonglong unsigned long long
+//#define _ULonglong unsigned long long
 
 using namespace gloox;
 
