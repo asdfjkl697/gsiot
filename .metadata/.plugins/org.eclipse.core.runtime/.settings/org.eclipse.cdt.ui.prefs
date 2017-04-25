@@ -1,7 +1,10 @@
 eclipse.preferences.version=1
+editor_folding_default_comments=true
 editor_folding_default_functions=true
 editor_folding_default_headers=false
 editor_folding_default_inactive=true
+editor_folding_default_structures=true
+editor_folding_statements=true
 sourceHoverBackgroundColor=255,255,255
 spelling_locale_initialized=true
 useAnnotationsPrefPage=true

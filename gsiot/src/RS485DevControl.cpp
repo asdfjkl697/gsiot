@@ -296,7 +296,7 @@ bool RS485DevControl::IsValueOverRange( IOTDeviceType DeviceType, float val )
 		break;
 	case IOT_DEVICE_HCHO:
 		{
-			if( macIsValueOverRange( val, defValueRange_HCHO_Min, defValueRange_HCHO_Max ) )
+		if (macIsValueOverRange(val, defValueRange_HCHO_Min, defValueRange_HCHO_Max ) )
 			{
 				return true;
 			}

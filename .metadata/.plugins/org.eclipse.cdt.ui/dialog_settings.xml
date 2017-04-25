@@ -7,6 +7,34 @@
 		<item value="227191" key="searchFlags"/>
 		<item value="false" key="caseSensitive"/>
 		<list key="previousPatterns">
+			<item value="CDataStoreMgr"/>
+			<item value="CheckCreateDB"/>
+			<item value="strlog"/>
+			<item value="DataAnalyse"/>
+			<item value="defCodeIndex_SYS_VChgRng_Default"/>
+			<item value="RUNCODE_Get"/>
+			<item value="g_SYS_VChgRng"/>
+			<item value="defCodeIndex_SYS_VChgRng_HCHO"/>
+			<item value="defCodeIndex_SYS_VChgRng_PM25"/>
+			<item value="IOT_DEVICE_PM25"/>
+			<item value="g_StrToPrecision"/>
+			<item value="g_GetPrecisionForType"/>
+			<item value="onDisconnect"/>
+			<item value="ondisconnect"/>
+			<item value="defRS485_Ver_Wind_1601_201501A"/>
+			<item value="g_tagStat"/>
+			<item value="g_V1kToStrUseValueForType"/>
+			<item value="SYS_VChgRng_HCHO"/>
+			<item value="defRS485_Ver_HCHO_201706A"/>
+			<item value="HCHO"/>
+			<item value="defValueRange_HCHO_Min"/>
+			<item value="IOT_DEVICE_HCHO"/>
+			<item value="jyc20170422"/>
+			<item value="Database"/>
+			<item value="sqlite_open"/>
+			<item value="IotConfig"/>
+			<item value="password"/>
+			<item value="SQLite::Statement"/>
 			<item value="serverPingCount"/>
 			<item value="CHeartbeatGuard"/>
 			<item value="hbGuard"/>
@@ -20,6 +48,10 @@
 			<item value="CheckSystem"/>
 			<item value="datapacket"/>
 		</list>
+	</section>
+	<section name="org.eclipse.cdt.ui.text.hover.CMacroExpansionExploration.internal">
+		<item value="442" key="size.width"/>
+		<item value="162" key="size.height"/>
 	</section>
 	<section name="org.eclipse.cdt.ui.text.hover.CMacroExpansionExploration">
 	</section>

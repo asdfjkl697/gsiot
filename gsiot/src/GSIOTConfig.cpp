@@ -47,13 +47,21 @@ bool GSIOTConfig::PreInit( const std::string &RunParam )
 	if( GSIOT_DBVER != cur_db_ver )
 	{
 		//LOGMSGEX( defLOGNAME, defLOG_ERROR, "cur db_ver=%d, need db_ver=%d!", cur_db_ver, GSIOT_DBVER );
-
 		return false;
 	}
 	//LOGMSGEX( defLOGNAME, defLOG_SYS, "db cur db_ver=%d", cur_db_ver );
+/*	SQLite::Statement cfgquery(*this->cfgdb,
+			"SELECT * FROM config where code=101");
+	if (cfgquery.executeStep()) {
+		string tmp11 = cfgquery.getColumn(1); //jyc20160823 add string tmpx
+		this->m_jid = tmp11;
+		string tmp12 = cfgquery.getColumn(2); //jyc20160823 add string tmpx
+		this->m_password = tmp12;
+	}*/
 
-	SQLite::Statement query(*this->db,"SELECT * FROM config ORDER BY id DESC LIMIT 1");
-	if (query.executeStep()){
+	SQLite::Statement query(*this->db,
+			"SELECT * FROM config ORDER BY id DESC LIMIT 1");
+	if (query.executeStep()) {
 
 		//this->m_serialnumber = query.getColumn(1);
 		//this->m_jid = query.getColumn(2);
@@ -64,7 +72,7 @@ bool GSIOTConfig::PreInit( const std::string &RunParam )
 		this->m_jid = tmp2;
 		string tmp3 = query.getColumn(3);
 		this->m_password = tmp3;
-		this->m_serialport = query.getColumn(4);
+		//this->m_serialport = query.getColumn(4);
 		//this->m_smtpserver = query.getColumn(5);
 		//this->m_smtpuser = query.getColumn(6);
 		//this->m_smtppassword = query.getColumn(7);
@@ -77,14 +85,14 @@ bool GSIOTConfig::PreInit( const std::string &RunParam )
 		this->m_smtppassword = tmp7;
 		string tmp8 = query.getColumn(8);
 		this->m_noticejid = tmp8;
-		
-		if( !query.isColumnNull(9) ) {
+
+		if (!query.isColumnNull(9)) {
 			//this->m_phone = query.getColumn(9); 
 			string tmp9 = query.getColumn(9);
-			this->m_phone = tmp9;	
+			this->m_phone = tmp9;
 		}
-		if( !query.isColumnNull(10) ) { 
-			this->m_DoInterval_ForSMS = (uint32_t)query.getColumn(10).getInt(); 
+		if (!query.isColumnNull(10)) {
+			this->m_DoInterval_ForSMS = (uint32_t) query.getColumn(10).getInt();
 		}
 	}
 

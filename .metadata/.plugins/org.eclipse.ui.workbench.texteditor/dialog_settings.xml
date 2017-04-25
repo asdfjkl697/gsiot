@@ -2,9 +2,9 @@
 <section name="Workbench">
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog_dialogBounds">
 		<item value="318" key="DIALOG_WIDTH"/>
-		<item value="97" key="DIALOG_Y_ORIGIN"/>
+		<item value="212" key="DIALOG_Y_ORIGIN"/>
 		<item value="434" key="DIALOG_HEIGHT"/>
-		<item value="491" key="DIALOG_X_ORIGIN"/>
+		<item value="858" key="DIALOG_X_ORIGIN"/>
 		<item value="1|Ubuntu|11.0|0|GTK|1|" key="DIALOG_FONT_NAME"/>
 	</section>
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
@@ -13,11 +13,16 @@
 		<item value="false" key="casesensitive"/>
 		<item value="false" key="incremental"/>
 		<item value="false" key="wholeword"/>
-		<item value="serverPingCount" key="selection"/>
+		<item value="CheckCreateDB" key="selection"/>
 		<list key="findhistory">
-			<item value="serverPingCount"/>
-			<item value="err"/>
-			<item value="m_data"/>
+			<item value="checkcreatedb"/>
+			<item value="fabs"/>
+			<item value="abs"/>
+			<item value="SYS_VChgRng_HCHO"/>
+			<item value="PM2.5"/>
+			<item value="jyc20170422"/>
+			<item value="20170422"/>
+			<item value="onDisconnect"/>
 		</list>
 		<list key="replacehistory">
 		</list>

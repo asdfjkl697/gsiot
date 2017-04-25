@@ -7,9 +7,11 @@ class SQLiteHelper
 {
 private:
 	std::string path;
+	std::string cfgpath;
 
 protected:
 	static SQLite::Database *db;
+	static SQLite::Database *cfgdb; //jyc20170407 add
 
 public:
 	SQLiteHelper(void);
