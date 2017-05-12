@@ -288,24 +288,30 @@ static void s_FixRunCodeValue( defCodeIndex_ codeindex, int valueindex, int newv
 			oldval = s_RunCode[codeindex].value1;
 			s_RunCode[codeindex].value1 = newval;
 		}
+		break;
 
 	case defRunCodeValIndex_2: 
 		{
 			oldval = s_RunCode[codeindex].value2;
 			s_RunCode[codeindex].value2 = newval;
 		}
+		break;
 
 	case defRunCodeValIndex_3: 
 		{
 			oldval = s_RunCode[codeindex].value3;
 			s_RunCode[codeindex].value3 = newval;
 		}
+		break;
 
 	case defRunCodeValIndex_4: 
 		{
 			oldval = s_RunCode[codeindex].value4;
 			s_RunCode[codeindex].value4 = newval;
 		}
+		break;
+	default:  //jyc20170510 add break and default
+		break;
 	}
 
 	LOGMSG( ">>>>> s_FixRunCodeValue(%s) oldval=%d, newval=%d\r\n", s_RunCode[codeindex].codestr, oldval, newval );
@@ -864,11 +870,8 @@ void CRunCodeMgr::LoadDB_code()
 		int val3 = query.getColumn(col++).getInt();
 		int val4 = query.getColumn(col++).getInt();
 
-		//jyc20160825 can not run have trouble
-		std::string str_val = query.getColumn(col++);
-		//std::string str_val = "jyc20160825";
-		
-		s_RunCode[RUNCODE_Index(code, codestr.c_str())].str_val = str_val;
+		//std::string str_val = query.getColumn(col++);  //jyc20170510 trouble notice have trouble
+		s_RunCode[RUNCODE_Index(code, codestr.c_str())].str_val = "";//str_val; //jyc20170510 modify
 		RUNCODE_Set( RUNCODE_Index(code, codestr.c_str()), val1, val2, val3, val4, true, true, true, true );
 	}
 }

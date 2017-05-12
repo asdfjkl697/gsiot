@@ -67,7 +67,6 @@ O_SRCS += \
 ../src/RFRemoteControl.o \
 ../src/RFSignalDefine.o \
 ../src/RS485DevControl.o \
-../src/RTMPSend.o \
 ../src/RTMPSession.o \
 ../src/RTSPConnection.o \
 ../src/RTSPManager.o \
@@ -143,6 +142,7 @@ CPP_SRCS += \
 ../src/GSIOTUser.cpp \
 ../src/GSIOTUserMgr.cpp \
 ../src/GSRemoteTalkMgr.cpp \
+../src/GsCamera.cpp \
 ../src/H264MediaFile.cpp \
 ../src/H264NalReader.cpp \
 ../src/HeartbeatMon.cpp \
@@ -196,10 +196,8 @@ CPP_SRCS += \
 ../src/XmppGSVObj.cpp \
 ../src/XmppRegister.cpp \
 ../src/common.cpp \
+../src/gsarm.cpp \
 ../src/rs232.cpp 
-
-CC_SRCS += \
-../src/gsarm.cc 
 
 OBJS += \
 ./src/APlayer.o \
@@ -243,6 +241,7 @@ OBJS += \
 ./src/GSIOTUser.o \
 ./src/GSIOTUserMgr.o \
 ./src/GSRemoteTalkMgr.o \
+./src/GsCamera.o \
 ./src/H264MediaFile.o \
 ./src/H264NalReader.o \
 ./src/HeartbeatMon.o \
@@ -299,9 +298,6 @@ OBJS += \
 ./src/gsarm.o \
 ./src/rs232.o 
 
-CC_DEPS += \
-./src/gsarm.d 
-
 CPP_DEPS += \
 ./src/APlayer.d \
 ./src/AddressManager.d \
@@ -344,6 +340,7 @@ CPP_DEPS += \
 ./src/GSIOTUser.d \
 ./src/GSIOTUserMgr.d \
 ./src/GSRemoteTalkMgr.d \
+./src/GsCamera.d \
 ./src/H264MediaFile.d \
 ./src/H264NalReader.d \
 ./src/HeartbeatMon.d \
@@ -397,18 +394,12 @@ CPP_DEPS += \
 ./src/XmppGSVObj.d \
 ./src/XmppRegister.d \
 ./src/common.d \
+./src/gsarm.d \
 ./src/rs232.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes
 src/%.o: ../src/%.cpp
-	@echo 'Building file: $<'
-	@echo 'Invoking: GCC C++ Compiler'
-	g++ -O0 -g3 -Wall -c -fmessage-length=0 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@)" -o "$@" "$<"
-	@echo 'Finished building: $<'
-	@echo ' '
-
-src/%.o: ../src/%.cc
 	@echo 'Building file: $<'
 	@echo 'Invoking: GCC C++ Compiler'
 	g++ -O0 -g3 -Wall -c -fmessage-length=0 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@)" -o "$@" "$<"

@@ -6,7 +6,8 @@
 //#include <Windows.h>
 #include "common.h"
 
-IPCamConnection::IPCamConnection(IDeviceHandler *handler, ICameraAlarmRecv *hAlarmRecv)
+//IPCamConnection::IPCamConnection(IDeviceHandler *handler, ICameraAlarmRecv *hAlarmRecv)
+IPCamConnection::IPCamConnection(IDeviceHandler *handler) //jyc20170511 modify
 {
 	isRunning = false;
 	this->m_handler = handler;
@@ -14,6 +15,7 @@ IPCamConnection::IPCamConnection(IDeviceHandler *handler, ICameraAlarmRecv *hAla
 	//TI368Camera::InitSDK(this);
 	//SSD1935Camera::InitSDK(this);
 	//HikCamera::InitSDK(this, hAlarmRecv);  //jyc20170323 remove
+	GsCamera::InitSDK(this);
 }
 
 IPCamConnection::~IPCamConnection(void)
@@ -23,6 +25,7 @@ IPCamConnection::~IPCamConnection(void)
 	//TI368Camera::Cleanup();
 	//SSD1935Camera::Cleanup();
 	//HikCamera::Cleanup();
+	GsCamera::Cleanup();
 
 	delete(m_camManager);
 }
@@ -126,7 +129,7 @@ void IPCamConnection::Connect()
 {
 	isRunning = true;
 
-	//¶ÁÈ¡ÊÓÆµIPÁÐ±íXML£¬Èç¹û²»´æÔÚÔòÆô¶¯É¨Ãè
+	//ï¿½ï¿½È¡ï¿½ï¿½ÆµIPï¿½Ð±ï¿½XMLï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½É¨ï¿½ï¿½
 	std::list<GSIOTDevice *> cameraList = m_camManager->GetCameraList();
 	std::list<GSIOTDevice *>::const_iterator it = cameraList.begin();
 	for(;it!=cameraList.end();it++){

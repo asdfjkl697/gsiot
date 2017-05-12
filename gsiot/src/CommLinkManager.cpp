@@ -25,7 +25,7 @@ CCommLinkManager::~CCommLinkManager(void)
 {
 }
 
-// ³õÊ¼»¯
+// ï¿½ï¿½Ê¼ï¿½ï¿½
 bool CCommLinkManager::Init()
 {
 	LoadDB_comm_link();
@@ -54,7 +54,7 @@ bool CCommLinkManager::Init()
 	return true;
 }
 
-// ·´³õÊ¼»¯¡¢½øĞĞÊÍ·Å
+// ï¿½ï¿½ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í·ï¿½
 bool CCommLinkManager::UnInit()
 {
 	if( !m_RunList.empty() )
@@ -87,7 +87,7 @@ bool CCommLinkManager::UnInit()
 	return true;
 }
 
-// ¼ì²âĞè×îÖÕÉ¾³ıµÄ¶ÔÏóÁĞ±í
+// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½É¾ï¿½ï¿½Ä¶ï¿½ï¿½ï¿½ï¿½Ğ±ï¿½
 void CCommLinkManager::CheckDeleteList()
 {
 	if( timeGetTime()-m_last_CheckDeleteList < 20*1000 )
@@ -118,10 +118,6 @@ void CCommLinkManager::CheckDeleteList()
 		return;
 	}
 }
-
-
-//=====================================================
-// db
 
 bool CCommLinkManager::LoadDB_comm_link()
 {
@@ -229,7 +225,7 @@ bool CCommLinkManager::db_Update_comm_link( CommLinkCfg *const cfgobj )
 
 	snprintf( sqlbuf, sizeof(sqlbuf), "update comm_link set name='%s', enable=%d, link_type=%d, trans_mod=%d, heartbeat_type=%d, heartbeat_param='%s',"\
 		"param1=%d, param2=%d, param3=%d, param4=%d, param5=%d, param6=%d, param_str1='%s', param_str2='%s' where id=%d", 
-		cfgobj->name.c_str(), cfgobj->enable, cfgobj->link_type, cfgobj->trans_mod, cfgobj->heartbeat_type, cfgobj->heartbeat_param.getstrfmt(cfgobj->heartbeat_type).c_str(),
+		cfgobj->name.c_str(), cfgobj->enable, cfgobj->link_type, cfgobj-> trans_mod, cfgobj->heartbeat_type, cfgobj->heartbeat_param.getstrfmt(cfgobj->heartbeat_type).c_str(),
 		cfgobj->param[0], cfgobj->param[1], cfgobj->param[2], cfgobj->param[3], cfgobj->param[4], cfgobj->param[5], 
 		cfgobj->param_str[0].c_str(), cfgobj->param_str[1].c_str(), cfgobj->id );
 
@@ -323,7 +319,7 @@ bool CCommLinkManager::db_IsBeing_comm_link_relation( IOTDeviceType device_type,
 //=====================================================
 // Cfg
 
-// »ñÈ¡Á´Â·ÅäÖÃĞÅÏ¢
+// ï¿½ï¿½È¡ï¿½ï¿½Â·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢
 CommLinkCfg* CCommLinkManager::Cfg_Get( defLinkID LinkID ) const
 {
 	defmapCommLinkCfg::const_iterator it = this->m_CfgList.find(LinkID);
@@ -335,7 +331,7 @@ CommLinkCfg* CCommLinkManager::Cfg_Get( defLinkID LinkID ) const
 	return NULL;
 }
 
-// Á´Â·ÊÇ·ñÒÑ´æÔÚµÈĞÅÏ¢ÅĞ¶Ï
+// ï¿½ï¿½Â·ï¿½Ç·ï¿½ï¿½Ñ´ï¿½ï¿½Úµï¿½ï¿½ï¿½Ï¢ï¿½Ğ¶ï¿½
 defGSReturn CCommLinkManager::Cfg_CheckExist( const CommLinkCfg &cfgobj, std::string *strerr )
 {
 	for( defmapCommLinkCfg::const_iterator it = m_CfgList.begin(); it!= m_CfgList.end(); ++it )
@@ -345,13 +341,13 @@ defGSReturn CCommLinkManager::Cfg_CheckExist( const CommLinkCfg &cfgobj, std::st
 		
 		if( cfgobj.name == it->second->name )
 		{
-			if( strerr ) *strerr = "Ãû³ÆÒÑ´æÔÚ";
+			if( strerr ) *strerr = "ï¿½ï¿½ï¿½ï¿½Ñ´ï¿½ï¿½ï¿½";
 			return defGSReturn_SameName;
 		}
 
 		if( cfgobj == *(it->second) )
 		{
-			if( strerr ) *strerr = "ÅäÖÃÒÑ´æÔÚ";
+			if( strerr ) *strerr = "ï¿½ï¿½ï¿½ï¿½ï¿½Ñ´ï¿½ï¿½ï¿½";
 			return defGSReturn_IsExist;
 		}
 	}
@@ -359,8 +355,8 @@ defGSReturn CCommLinkManager::Cfg_CheckExist( const CommLinkCfg &cfgobj, std::st
 	return defGSReturn_Success;
 }
 
-// Ìí¼ÓÁ´Â·ÅäÖÃĞÅÏ¢
-// (Ìí¼ÓÍê³ÉºóÔÚÔËĞĞÏß³Ì¹ÜÀíÀïÌí¼ÓÏß³Ì)
+// ï¿½ï¿½ï¿½ï¿½ï¿½Â·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢
+// (ï¿½ï¿½ï¿½ï¿½ï¿½Éºï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ß³Ì¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ß³ï¿½)
 CommLinkCfg* CCommLinkManager::Cfg_Add( CommLinkCfg &cfgobj, defGSReturn &ret, std::string *strerr )
 {
 	ret = Cfg_CheckExist( cfgobj, strerr );
@@ -372,7 +368,7 @@ CommLinkCfg* CCommLinkManager::Cfg_Add( CommLinkCfg &cfgobj, defGSReturn &ret, s
 	cfgobj.id = db_Insert_comm_link( &cfgobj );
 	if( cfgobj.id < 0 )
 	{
-		if( strerr ) *strerr = "±£´æÊ§°Ü";
+		if( strerr ) *strerr = "ï¿½ï¿½ï¿½ï¿½Ê§ï¿½ï¿½";
 		ret = defGSReturn_SaveFailed;
 		return NULL;
 	}
@@ -393,7 +389,7 @@ CommLinkCfg* CCommLinkManager::Cfg_Add( CommLinkCfg &cfgobj, defGSReturn &ret, s
 	return newcfgobj;
 }
 
-// É¾³ıÁ´Â·ÅäÖÃĞÅÏ¢
+// É¾ï¿½ï¿½ï¿½ï¿½Â·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢
 defGSReturn CCommLinkManager::Cfg_Delete( const defLinkID LinkID )
 {
 	db_Delete_comm_link( LinkID );
@@ -427,13 +423,13 @@ defGSReturn CCommLinkManager::Cfg_Delete( const defLinkID LinkID )
 	return defGSReturn_Success;
 }
 
-// ĞŞ¸ÄÁ´Â·ÅäÖÃĞÅÏ¢
+// ï¿½Ş¸ï¿½ï¿½ï¿½Â·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢
 defGSReturn CCommLinkManager::Cfg_Modify( CommLinkCfg &cfgobj, std::string *strerr )
 {
 	CommLinkCfg *cfgcur = Cfg_Get( cfgobj.id );
 	if( !cfgcur )
 	{
-		if( strerr ) *strerr = "ÅäÖÃ²»´æÔÚ";
+		if( strerr ) *strerr = "ï¿½ï¿½ï¿½Ã²ï¿½ï¿½ï¿½ï¿½ï¿½";
 		return defGSReturn_NoExist;
 	}
 
@@ -470,14 +466,14 @@ std::string CCommLinkManager::Cfg_GetShowNameForUI( const IOTDeviceType device_t
 	{
 		if( !cfg->enable )
 		{
-			return std::string("(½ûÓÃ)") + cfg->name;
+			return std::string("(ï¿½ï¿½ï¿½ï¿½)") + cfg->name;
 		}
 
 		return cfg->name;
 	}
 
 	char sqlbuf[256] = {0};
-	snprintf( sqlbuf, sizeof(sqlbuf), "(Á´Â·%d²»´æÔÚ)", LinkID );
+	snprintf( sqlbuf, sizeof(sqlbuf), "(ï¿½ï¿½Â·%dï¿½ï¿½ï¿½ï¿½ï¿½ï¿½)", LinkID );
 
 	return std::string( sqlbuf );
 }
@@ -486,7 +482,7 @@ std::string CCommLinkManager::Cfg_GetShowNameForUI( const IOTDeviceType device_t
 //=====================================================
 // Relation
 
-// »ñÈ¡Éè±¸Ëù¹ØÁªµÄÁ´Â·
+// ï¿½ï¿½È¡ï¿½è±¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Â·
 bool CCommLinkManager::Relation_Get( const GSIOTDeviceKey &key, CommLinkRelation &Relation ) const
 {
 	defmapCommLinkRelation::const_iterator it = this->m_RelationList.find(key);
@@ -499,7 +495,7 @@ bool CCommLinkManager::Relation_Get( const GSIOTDeviceKey &key, CommLinkRelation
 	return false;
 }
 
-// Ìí¼Ó»òĞŞ¸ÄÁ´Â·¹ØÁª
+// ï¿½ï¿½Ó»ï¿½ï¿½Ş¸ï¿½ï¿½ï¿½Â·ï¿½ï¿½ï¿½ï¿½
 defGSReturn CCommLinkManager::Relation_AddModify( CommLinkRelation &Relation )
 {
 	if( db_IsBeing_comm_link_relation( Relation.device_type, Relation.device_id ) )
@@ -516,7 +512,7 @@ defGSReturn CCommLinkManager::Relation_AddModify( CommLinkRelation &Relation )
 	return defGSReturn_Success;
 }
 
-// ¸ù¾İÉè±¸É¾³ıÁ´Â·¹ØÁª
+// ï¿½ï¿½ï¿½ï¿½è±¸É¾ï¿½ï¿½ï¿½ï¿½Â·ï¿½ï¿½ï¿½ï¿½
 defGSReturn CCommLinkManager::Relation_DeleteForDev( const GSIOTDeviceKey &key )
 {
 	db_Delete_comm_link_relation( key );
@@ -531,7 +527,7 @@ defGSReturn CCommLinkManager::Relation_DeleteForDev( const GSIOTDeviceKey &key )
 	return defGSReturn_Success;
 }
 
-// ¸ù¾İÁ´Â·IDÉ¾³ıËùÓĞÏà¹ØµÄÁ´Â·¹ØÁª
+// ï¿½ï¿½ï¿½ï¿½ï¿½Â·IDÉ¾ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Øµï¿½ï¿½ï¿½Â·ï¿½ï¿½ï¿½ï¿½
 defGSReturn CCommLinkManager::Relation_DeleteForLink( const defLinkID LinkID )
 {
 	db_Delete_comm_link_relation_all( LinkID );
@@ -556,8 +552,8 @@ defGSReturn CCommLinkManager::Relation_DeleteForLink( const defLinkID LinkID )
 //=====================================================
 // Run
 
-// »ñÈ¡Ò»¸öÂÖµ½´¦ÀíµÄÔËĞĞ¶ÔÏó
-// allowConnect:µ±Ç°»ñÈ¡µÄÏß³ÌÊÇ·ñÔËĞĞ½øĞĞÁ¬½Ó²Ù×÷
+// ï¿½ï¿½È¡Ò»ï¿½ï¿½ï¿½Öµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ğ¶ï¿½ï¿½ï¿½
+// allowConnect:ï¿½ï¿½Ç°ï¿½ï¿½È¡ï¿½ï¿½ï¿½ß³ï¿½ï¿½Ç·ï¿½ï¿½ï¿½ï¿½Ğ½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó²ï¿½ï¿½ï¿½
 CCommLinkRun* CCommLinkManager::Run_Proc_Get( const bool allowConnect )
 {
 	gloox::util::MutexGuard mutexguard( m_mutex_CommLinkMgr );
@@ -593,19 +589,19 @@ CCommLinkRun* CCommLinkManager::Run_Proc_Get( const bool allowConnect )
 
 			if( !allowConnect )
 			{
-				// Î´Á¬½ÓĞèÒª½øĞĞÁ¬½Ó
+				// Î´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Òªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 				if( !it->second->IsOpen() )
 				{
 					continue;
 				}
 
-				// ĞèÒªÖØÁ¬
+				// ï¿½ï¿½Òªï¿½ï¿½ï¿½ï¿½
 				if( it->second->get_doReconnect() )
 				{
 					continue;
 				}
 
-				// ²»ÆôÓÃĞèÒª¹Ø±ÕÁ¬½Ó
+				// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Òªï¿½Ø±ï¿½ï¿½ï¿½ï¿½ï¿½
 				if( !it->second->get_cfg().enable && it->second->IsOpen() )
 				{
 					continue;
@@ -652,7 +648,7 @@ CCommLinkRun* CCommLinkManager::Run_Proc_Get( const bool allowConnect )
 	return NULL;
 }
 
-// ÊÍ·Å»ñÈ¡µÄ´¦Àí¶ÔÏó
+// ï¿½Í·Å»ï¿½È¡ï¿½Ä´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 void CCommLinkManager::Run_Proc_Release( CCommLinkRun *runobj )
 {
 	gloox::util::MutexGuard mutexguard( m_mutex_CommLinkMgr );
@@ -665,7 +661,7 @@ void CCommLinkManager::Run_Proc_Release( CCommLinkRun *runobj )
 	}
 }
 
-// »ñÈ¡Ò»¸öÖ¸¶¨¶ÔÏó£¬²»´¦Àí£¬Ö»»ñÈ¡ĞÅÏ¢
+// ï¿½ï¿½È¡Ò»ï¿½ï¿½Ö¸ï¿½ï¿½ï¿½ï¿½ï¿½ó£¬²ï¿½ï¿½ï¿½ï¿½?Ö»ï¿½ï¿½È¡ï¿½ï¿½Ï¢
 CCommLinkRun* CCommLinkManager::Run_Info_Get( defLinkID LinkID )
 {
 	gloox::util::MutexGuard mutexguard( m_mutex_CommLinkMgr );
@@ -679,7 +675,7 @@ CCommLinkRun* CCommLinkManager::Run_Info_Get( defLinkID LinkID )
 	return runobj;
 }
 
-// ÊÍ·Å»ñÈ¡µÄĞÅÏ¢¶ÔÏó
+// ï¿½Í·Å»ï¿½È¡ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½ï¿½
 void CCommLinkManager::Run_Info_Release( CCommLinkRun *runobj )
 {
 	gloox::util::MutexGuard mutexguard( m_mutex_CommLinkMgr );
@@ -706,7 +702,7 @@ CCommLinkRun* CCommLinkManager::Run_GetSpec_nolock( defLinkID LinkID )
 	return NULL;
 }
 
-// ÅĞ¶ÏÒ»¸öÁ´Â·ÊÇ·ñÔÚÊ¹ÓÃ£¬°üÀ¨ÊÇ·ñÔÚ´¦Àí»òÕßÔÚĞÅÏ¢²é¿´
+// ï¿½Ğ¶ï¿½Ò»ï¿½ï¿½ï¿½ï¿½Â·ï¿½Ç·ï¿½ï¿½ï¿½Ê¹ï¿½Ã£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ï¿½Ú´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½é¿´
 bool CCommLinkManager::Run_IsUsing( defLinkID LinkID )
 {
 	gloox::util::MutexGuard mutexguard( m_mutex_CommLinkMgr );
@@ -720,13 +716,13 @@ bool CCommLinkManager::Run_IsUsing( defLinkID LinkID )
 	return false;
 }
 
-// ÅĞ¶ÏÒ»¸öÁ´Â·ÊÇ·ñÔÚÊ¹ÓÃ£¬°üÀ¨ÊÇ·ñÔÚ´¦Àí»òÕßÔÚĞÅÏ¢²é¿´
+// ï¿½Ğ¶ï¿½Ò»ï¿½ï¿½ï¿½ï¿½Â·ï¿½Ç·ï¿½ï¿½ï¿½Ê¹ï¿½Ã£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ï¿½Ú´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½é¿´
 bool CCommLinkManager::Run_IsUsingSpec( const CCommLinkRun &runobj )
 {
 	return ( runobj.m_lockProc || runobj.m_lockInfoUse );
 }
 
-// »ñÈ¡Á¬½Ó×´Ì¬
+// ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½×´Ì¬
 defConnectState CCommLinkManager::Run_GetConnectState( defLinkID LinkID )
 {
 	gloox::util::MutexGuard mutexguard( m_mutex_CommLinkMgr );
@@ -740,7 +736,7 @@ defConnectState CCommLinkManager::Run_GetConnectState( defLinkID LinkID )
 	return defConnectState_Null;
 }
 
-// »ñÈ¡×ÛºÏ×´Ì¬ĞÅÏ¢
+// ï¿½ï¿½È¡ï¿½Ûºï¿½×´Ì¬ï¿½ï¿½Ï¢
 void CCommLinkManager::Run_GetAllStateInfo( int &enableCount, bool &allConnectState )
 {
 	enableCount = 0;
@@ -770,7 +766,7 @@ void CCommLinkManager::Run_GetAllStateInfo( int &enableCount, bool &allConnectSt
 	}
 }
 
-// Ìí¼ÓÒ»¸öÔËĞĞ¶ÔÏó
+// ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½Ğ¶ï¿½ï¿½ï¿½
 defGSReturn CCommLinkManager::Run_Add( CommLinkCfg *cfgobj, std::string *strerr )
 {
 	if( !cfgobj )
@@ -784,7 +780,7 @@ defGSReturn CCommLinkManager::Run_Add( CommLinkCfg *cfgobj, std::string *strerr 
 	CCommLinkRun *runobj = Run_GetSpec_nolock( cfgobj->id );
 	if( runobj )
 	{
-		if( strerr ) *strerr = "ÔËĞĞ¶ÔÏóÒÑ´æÔÚ";
+		if( strerr ) *strerr = "ï¿½ï¿½ï¿½Ğ¶ï¿½ï¿½ï¿½ï¿½Ñ´ï¿½ï¿½ï¿½";
 		return defGSReturn_IsExist;
 	}
 
@@ -806,11 +802,11 @@ defGSReturn CCommLinkManager::Run_Add( CommLinkCfg *cfgobj, std::string *strerr 
 		break;
 	}
 
-	if( strerr ) *strerr = "Á´Â·ÀàĞÍ²»Ö§³Ö";
+	if( strerr ) *strerr = "ï¿½ï¿½Â·ï¿½ï¿½ï¿½Í²ï¿½Ö§ï¿½ï¿½";
 	return defGSReturn_UnSupport;
 }
 
-// ÒÆ³ıÒ»¸öÔËĞĞ¶ÔÏó£¬ÔÚdeletelistÀïÕæÕıÉ¾³ı
+// ï¿½Æ³ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½Ğ¶ï¿½ï¿½ï¿½ï¿½ï¿½deletelistï¿½ï¿½ï¿½ï¿½ï¿½ï¿½É¾ï¿½ï¿½
 CCommLinkRun* CCommLinkManager::Run_Remove( const defLinkID LinkID )
 {
 	gloox::util::MutexGuard mutexguard( m_mutex_CommLinkMgr );
@@ -829,7 +825,7 @@ CCommLinkRun* CCommLinkManager::Run_Remove( const defLinkID LinkID )
 	return runobj;
 }
 
-// Á´Â·ÖØÁ¬
+// ï¿½ï¿½Â·ï¿½ï¿½ï¿½ï¿½
 bool CCommLinkManager::Run_Reconnect( defLinkID LinkID )
 {
 	gloox::util::MutexGuard mutexguard( m_mutex_CommLinkMgr );
@@ -844,7 +840,7 @@ bool CCommLinkManager::Run_Reconnect( defLinkID LinkID )
 	return false;
 }
 
-// ËùÓĞÁ´Â·ÖØÁ¬
+// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Â·ï¿½ï¿½ï¿½ï¿½
 bool CCommLinkManager::Run_ReconnectAll()
 {
 	gloox::util::MutexGuard mutexguard( m_mutex_CommLinkMgr );
@@ -860,7 +856,7 @@ bool CCommLinkManager::Run_ReconnectAll()
 	return true;
 }
 
-// ´òÓ¡µÄÔËĞĞ¶ÔÏóĞÅÏ¢
+// ï¿½ï¿½Ó¡ï¿½ï¿½ï¿½ï¿½ï¿½Ğ¶ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢
 void CCommLinkManager::Run_Print()
 {
 	gloox::util::MutexGuard mutexguard( m_mutex_CommLinkMgr );

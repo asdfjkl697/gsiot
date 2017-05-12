@@ -13,8 +13,8 @@ src/DeviceManager.o: ../src/DeviceManager.cpp ../src/DeviceManager.h \
  ../src/HeartbeatMon.h ../src/PresetManager.h ../src/IPCameraBase.h \
  ../src/RTMPSession.h ../src/MediaStream.h ../src/H264MediaFile.h \
  ../src/RTMPSend.h ../src/IPublishHandler.h ../src/AudioCfg.h \
- ../src/CameraControl.h ../src/CameraPTZ.h ../src/CameraFocal.h \
- ../src/AudioCapBase.h
+ ../src/AudioCap_File.h ../src/AudioCap.h ../src/AudioCapBase.h \
+ ../src/CameraControl.h ../src/CameraPTZ.h ../src/CameraFocal.h
 
 ../src/DeviceManager.h:
 
@@ -100,10 +100,14 @@ src/DeviceManager.o: ../src/DeviceManager.cpp ../src/DeviceManager.h \
 
 ../src/AudioCfg.h:
 
+../src/AudioCap_File.h:
+
+../src/AudioCap.h:
+
+../src/AudioCapBase.h:
+
 ../src/CameraControl.h:
 
 ../src/CameraPTZ.h:
 
 ../src/CameraFocal.h:
-
-../src/AudioCapBase.h:

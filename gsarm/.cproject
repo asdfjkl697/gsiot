@@ -42,6 +42,7 @@
 								</option>
 								<option id="gnu.cpp.link.option.libs.1671892619" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
 									<listOptionValue builtIn="false" value="avformat"/>
+									<listOptionValue builtIn="false" value="rtmp"/>
 									<listOptionValue builtIn="false" value="avcodec"/>
 									<listOptionValue builtIn="false" value="avutil"/>
 									<listOptionValue builtIn="false" value="swresample"/>

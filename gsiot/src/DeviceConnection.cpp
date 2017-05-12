@@ -292,8 +292,6 @@ void *CommLink_Thread(LPVOID lpPara) //jyc20160826 test
 							doCreate_hb_device = !hb_device->isDevSelfAndIncludeAddr( hb_deviceType, hb_deviceId, hb_address );
 						}
 
-						
-
 						// ��ȡ�Ѵ����������豸
 						hb_device = pCommLink->get_hb_device();
 

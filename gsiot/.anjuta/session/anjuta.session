@@ -15,7 +15,7 @@ Working directories=../../../gsiot
 
 [Project Manager]
 Shortcut=gsiot//src//gsiot
-Expand=gsiot%%%gsiot%%%gsiot//src
+Expand=gsiot%%%gsiot//src
 
 [Debugger]
 Watch=req->message%%%req->headerSend

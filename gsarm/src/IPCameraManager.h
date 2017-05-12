@@ -4,8 +4,9 @@
 #include "SQLiteHelper.h"
 //#include "TI368Camera.h" //jyc20170331 remove
 //#include "SSD1935Camera.h"
-#include "HikCamera.h"
+//#include "HikCamera.h"
 //#include "DHCamera.h"
+#include "GsCamera.h"
 #include "IPCameraBase.h"
 #include "GSIOTDevice.h"
 

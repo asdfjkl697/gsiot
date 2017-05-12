@@ -8,8 +8,9 @@ src/GSRemoteTalkMgr.o: ../src/GSRemoteTalkMgr.cpp \
  ../src/RFSignalDefine.h ../src/GSObjLocker.h ../src/APlayer.h \
  ../src/IPCameraBase.h ../src/RTMPSession.h ../src/MediaStream.h \
  ../src/H264MediaFile.h ../src/RTMPSend.h ../src/IPublishHandler.h \
- ../src/AudioCfg.h ../src/CameraControl.h ../src/CameraPTZ.h \
- ../src/CameraFocal.h ../src/AudioCapBase.h ../src/PresetManager.h
+ ../src/AudioCfg.h ../src/AudioCap_File.h ../src/AudioCap.h \
+ ../src/AudioCapBase.h ../src/CameraControl.h ../src/CameraPTZ.h \
+ ../src/CameraFocal.h ../src/PresetManager.h
 
 ../src/GSRemoteTalkMgr.h:
 
@@ -69,12 +70,16 @@ src/GSRemoteTalkMgr.o: ../src/GSRemoteTalkMgr.cpp \
 
 ../src/AudioCfg.h:
 
+../src/AudioCap_File.h:
+
+../src/AudioCap.h:
+
+../src/AudioCapBase.h:
+
 ../src/CameraControl.h:
 
 ../src/CameraPTZ.h:
 
 ../src/CameraFocal.h:
-
-../src/AudioCapBase.h:
 
 ../src/PresetManager.h:

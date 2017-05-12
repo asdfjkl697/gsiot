@@ -1,28 +1,26 @@
 #include "RTMPSend.h"
 #include <stdio.h>
 #include <time.h>
-//#include "rtmp_sys.h"  //jyc20170323 rtmpdump nouse 
-#include "librtmp/rtmp_sys.h"  //jyc20170323 modify copy rtmp_sys.h to /usr/local/include/librtmp
+#include "librtmp/rtmp_sys.h" //jyc20170511 modify
 #include "common.h"
 #include "RunCode.h"
-#include "faac.h"
+#include "faac.h" //jyc20170511 modify
 #include "faaccfg.h"
-//#include "libavcodec/flv.h"  //jyc20170323 modify copy flv.h to /usr/local/include/libavcodec
-//#include "MemoryContainer.h"  //jyc20170323 remove
-//#include <objbase.h>  //jyc20170323 remove just for win
+#include "flv.h" //jyc20170511 resume add form libavformat
+//#include "MemoryContainer.h"
+//#include <objbase.h> //win
 
-#define defUseRTMFP
+#include <pthread.h>
+
+//#define defUseRTMFP  //jyc20170511 remove
 
 #if defined(defUseRTMFP)
-
-//#include "NetStream.h"  //jyc20170323 remove
+#include "NetStream.h" //jyc20170511 remove
 #pragma comment(lib,"librtmfp.lib")
 #pragma comment(lib,"libevent.lib")
 #pragma comment(lib,"libeay32.lib")
 
 #endif
-
-//#define defRtmpSendAudio_AAC 1	// rtmp ������Ƶ
 
 #define defUse_TSStartTime // ʱ�����ȡ���ڿ�ʼʱ��
 
@@ -34,7 +32,6 @@
 // ���ж����ʱ
 char *g_flv_code_morepak( char *enc, char *pend, const char *pBuf_src, const uint32_t bufLen_src )
 {
-#if 1
 	const char *pBuf = pBuf_src;
 	uint32_t bufLen = bufLen_src;
 	int prefix = 0;
@@ -53,36 +50,6 @@ char *g_flv_code_morepak( char *enc, char *pend, const char *pBuf_src, const uin
 			cplen = bufLen;
 		}
 
-		//enc = AMF_EncodeInt32( enc, pend, cplen );  //jyc20170323 remove
-		memcpy( enc, pBuf, cplen );
-		enc += cplen;
-
-		pBuf += (cplen + prefix);
-		bufLen -= (cplen + prefix);
-	}
-
-	return enc; // return new size
-
-#else
-
-	const char *pBuf = pBuf_src;
-	uint32_t bufLen = bufLen_src;
-	uint32_t prefix = 0;
-	uint32_t offset = 0;
-	while( bufLen>0 
-		&& pBuf + 3 < pBuf_src+bufLen_src )
-	{
-		uint32_t cplen = bufLen;
-		offset = g_h264_find_next_start_code_ex( (const uint8_t*)pBuf, bufLen, prefix );
-		if( offset > 0 )
-		{
-			cplen = offset;
-		}
-		else
-		{
-			cplen = bufLen;
-		}
-
 		enc = AMF_EncodeInt32( enc, pend, cplen );
 		memcpy( enc, pBuf, cplen );
 		enc += cplen;
@@ -92,8 +59,6 @@ char *g_flv_code_morepak( char *enc, char *pend, const char *pBuf_src, const uin
 	}
 
 	return enc; // return new size
-
-#endif
 }
 
 bool g_rtmp_sendnal( RTMPSend *rtmp_send, RTMPPacket &rtmppkt, RTMPPacket &rtmppkt_sendnal, char *szBodyBuffer, char *enc, char *pend, uint32_t nTimeStamp )
@@ -112,9 +77,9 @@ bool g_rtmp_sendnal( RTMPSend *rtmp_send, RTMPPacket &rtmppkt, RTMPPacket &rtmpp
 		int pps_size = nal_ptr[1].i_payload;
 		uint8_t *pps = nal_ptr[1].p_payload;
 
-		//*enc++= 7 | FLV_FRAME_KEY; //jyc20170323 remove
+		*enc++= 7 | FLV_FRAME_KEY;
 		*enc++= 0; // AVC sequence header
-		//enc = AMF_EncodeInt24(enc,pend,0); // composition time
+		enc = AMF_EncodeInt24(enc,pend,0); // composition time
 
 		*enc++= 0x01;  // version 
 		*enc++= sps[1]; // profile 
@@ -123,11 +88,11 @@ bool g_rtmp_sendnal( RTMPSend *rtmp_send, RTMPPacket &rtmppkt, RTMPPacket &rtmpp
 		*enc++= (uint8_t)0xFF;
 		*enc++= (uint8_t)0xE1;
 
-		//enc = AMF_EncodeInt16(enc,pend, sps_size);
+		enc = AMF_EncodeInt16(enc,pend, sps_size);
 		memcpy(enc, sps, sps_size);
 		enc+= sps_size;
 		*enc++= 1;  //pps number
-		//enc = AMF_EncodeInt16(enc,pend, pps_size);
+		enc = AMF_EncodeInt16(enc,pend, pps_size);
 		memcpy(enc, pps, pps_size);
 		enc+= pps_size;
 		rtmppkt.m_nBodySize=enc - szBodyBuffer;
@@ -136,7 +101,7 @@ bool g_rtmp_sendnal( RTMPSend *rtmp_send, RTMPPacket &rtmppkt, RTMPPacket &rtmpp
 		snprintf( buf, sizeof(buf), "name=%s, RTMP_SendPacket NAL size=%d", rtmp_send->getName().c_str(), rtmppkt.m_nBodySize );
 		g_PrintfByte( (unsigned char*)rtmppkt.m_body, rtmppkt.m_nBodySize>64?64:rtmppkt.m_nBodySize, buf );
 
-		//RTMPPacket_Copy( &rtmppkt_sendnal, &rtmppkt );
+		//RTMPPacket_Copy(&rtmppkt_sendnal,&rtmppkt ); //jyc20170511 remove
 	}
 	else
 	{
@@ -150,7 +115,6 @@ bool g_rtmp_sendnal( RTMPSend *rtmp_send, RTMPPacket &rtmppkt, RTMPPacket &rtmpp
 // audio sequence header������д���Ϣʱ����
 bool g_rtmp_sendAudioInfo( RTMPSend *rtmp_send, RTMPPacket &rtmppkt, RTMPPacket &rtmppkt_sendAudioInfo, char *szBodyBuffer, char *enc, char *pend, uint32_t nTimeStamp, uint8_t &AudioHead )
 {
-	/* //jyc20170323 remove
 	if( defAudioSource_Null == rtmp_send->GetAudioCfg().get_Audio_Source() )
 	{
 		return false;
@@ -175,7 +139,6 @@ bool g_rtmp_sendAudioInfo( RTMPSend *rtmp_send, RTMPPacket &rtmppkt, RTMPPacket 
 	szBodyBuffer[0] = AudioHead;
 	szBodyBuffer[1] = 0x00; // 0: AAC sequence header
 
-#if 1
 	unsigned char aac_cfg1 = 0;
 	unsigned char aac_cfg2 = 0;
 	rtmp_send->GetAudioCfg().get_AAC_AudioSpecificConfig( aac_cfg1, aac_cfg2, aacObjectType );
@@ -184,35 +147,19 @@ bool g_rtmp_sendAudioInfo( RTMPSend *rtmp_send, RTMPPacket &rtmppkt, RTMPPacket 
 
 	rtmppkt.m_nBodySize = 4;
 
-	LOGMSGEX( defLOGNAME, defLOG_INFO, "name=%s, g_rtmp_sendAudioInfo AAC cfg %02X %02X. BodySize=%d\r\n", rtmp_send->getName().c_str(), aac_cfg1, aac_cfg2, rtmppkt.m_nBodySize );
+	//LOGMSGEX( defLOGNAME, defLOG_INFO, "name=%s, g_rtmp_sendAudioInfo AAC cfg %02X %02X. BodySize=%d\r\n", rtmp_send->getName().c_str(), aac_cfg1, aac_cfg2, rtmppkt.m_nBodySize );
 
-#else
-	//aacObjectType
-	//1 0x0a, 0x10
-	//2 0x12, 0x10
-	if(aacObjectType==1){
-		szBodyBuffer[2] = 0x0A;
-		szBodyBuffer[3] = 0X10;
-	}else if(aacObjectType==2){
-		szBodyBuffer[2] = 0x12;
-		szBodyBuffer[3] = 0X10;
-	}
-	//suffix
-	szBodyBuffer[4] = 0x06;    
-	rtmppkt.m_nBodySize = 5;
-#endif
 
-	RTMPPacket_Copy( &rtmppkt_sendAudioInfo, &rtmppkt );
-	*/
+//	RTMPPacket_Copy( &rtmppkt_sendAudioInfo, &rtmppkt ); //jyc20170511 remove
+
 	return true;
-	
 }
 
 unsigned __stdcall RTMPDataExService(LPVOID lpPara)
 {
 	RTMPSend *rtmp_send = (RTMPSend *)lpPara;
 	const uint32_t runningkey = rtmp_send->get_runningkey();
-	/*jyc20170323 remove
+
 	while( rtmp_send->IsRunning() && runningkey == rtmp_send->get_runningkey() )
 	{
 		if( defAudioSource_File == rtmp_send->GetAudioCfg().get_Audio_Source()
@@ -229,28 +176,29 @@ unsigned __stdcall RTMPDataExService(LPVOID lpPara)
 			}
 			else
 			{
-				timeBeginPeriod(1);
-				DWORD start = timeGetTime();
-				Sleep(1);
-				DWORD end = timeGetTime();
-				timeEndPeriod(1);
+//				timeBeginPeriod(1); //jyc20170511 remove
+//				DWORD start = timeGetTime();
+//				usleep(1000);
+//				DWORD end = timeGetTime();
+//				timeEndPeriod(1);
+				usleep(1000);//jyc20170511 add
 			}
 		}
 		else
 		{
 			break;
 		}
-	}*/
+	}
 
 	return 0;
 }
-/* jyc20170323 remove
+
 #if defined(defUseRTMFP)
-unsigned __stdcall RTMFPThread( LPVOID lpPara )
-{   
+//unsigned __stdcall RTMFPThread( LPVOID lpPara )
+void *RTMFPThread( LPVOID lpPara )
+{
 	GS_RTMFP::NetConnection *nc = (GS_RTMFP::NetConnection *)lpPara;
 	nc->Start();
-
 	return 0;
 }
 
@@ -280,10 +228,9 @@ void RTMFPNetStateHandler( void *userData, NetStatusInfo *info, uint8_t *peerid 
 	LOGMSG( "name=%s, level:%s, code:%s, description:%s\r\n", rtmp_send->getName().c_str(), info->level, info->code, info->description );
 }
 #endif
-*/
 
-/*
-unsigned __stdcall RTMPPushThread(LPVOID lpPara)
+//unsigned __stdcall RTMPPushThread(LPVOID lpPara)
+void *RTMPPushThread(LPVOID lpPara)
 {
 	RTMPSend *rtmp_send = (RTMPSend *)lpPara;
 	const uint32_t runningkey = rtmp_send->get_runningkey();
@@ -309,28 +256,25 @@ unsigned __stdcall RTMPPushThread(LPVOID lpPara)
 	rtmp_send->popRTMPHandle( &useUrl, false );
 	const bool New_isRTMFP = g_IsRTMFP_url( useUrl );
 
-#if defined(defUseRTMFP)
+#if defined(defUseRTMFP) //jyc20170511 remove
 	const bool doConnect_RTMFP = IsRUNCODEEnable(defCodeIndex_SYS_Enable_RTMFP) ? New_isRTMFP : false;
 
-	GS_RTMFP::NetConnection nc;
+	GS_RTMFP::NetConnection nc; //jyc20170511 remove
 	GS_RTMFP::NetStream ns( &nc );
 
 	if( doConnect_RTMFP )
 	{
 		rtmp_send->OnPublishUpdateSession( RTMFPSession_strjid );
 
-		HANDLE   hth1;
-		unsigned  uiThread1ID;
-
+		pthread_t id_1;
 		ns.Publish( rtmp_send->getStreamID().c_str() );
-
 		nc.AddStateEventHandler( RTMFPNetStateHandler, rtmp_send );
 		nc.Connect( useUrl.c_str() );
-
 		LOGMSG( "name=%s, RTMFP Connect url=\"%s\"\r\n", rtmp_send->getName().c_str(), useUrl.c_str() );
-
-		hth1 = (HANDLE)_beginthreadex( NULL, 0, RTMFPThread, &nc, 0, &uiThread1ID );
-		CloseHandle( hth1 );
+		int ret=pthread_create(&id_1,NULL,RTMFPThread,&nc );
+		if(ret!=0){
+		        printf("Create PlaybackProc_Thread error!\n");
+		}
 	}
 #endif
 
@@ -341,21 +285,21 @@ unsigned __stdcall RTMPPushThread(LPVOID lpPara)
 		AudioCap_File &AFS = rtmp_send->GetAFS();
 		if( AFS.LoadFiles( rtmp_send->GetAudioCfg() ) )
 		{
-			if( AFS.GetPCM() )
-			{
-				if( defAudioParamDef_Analyse == rtmp_send->GetAudioCfg().get_Audio_ParamDef() )
-				{
-					CAudioCfg::struAudioParam ap;
-					ap.Audio_FmtType = defAudioFmtType_AAC;
-					ap.Audio_Channels = AFS.GetPCM()->channels;
-					ap.Audio_bitSize = AFS.GetPCM()->samplebytes*8;
-					ap.Audio_SampleRate = AFS.GetPCM()->samplerate;
-					ap.Audio_ByteRate = 0;
-					rtmp_send->GetAudioCfg().set_AudioParam_Analyse( ap );
-				}
-			}
+//			if( AFS.GetPCM() ) //jyc20170511 remove
+//			{
+//				if( defAudioParamDef_Analyse == rtmp_send->GetAudioCfg().get_Audio_ParamDef() )
+//				{
+//					CAudioCfg::struAudioParam ap;
+//					ap.Audio_FmtType = defAudioFmtType_AAC;
+//					ap.Audio_Channels = AFS.GetPCM()->channels;
+//					ap.Audio_bitSize = AFS.GetPCM()->samplebytes*8;
+//					ap.Audio_SampleRate = AFS.GetPCM()->samplerate;
+//					ap.Audio_ByteRate = 0;
+//					rtmp_send->GetAudioCfg().set_AudioParam_Analyse( ap );
+//				}
+//			}
 
-			LOGMSGEX( defLOGNAME, defLOG_ERROR, "name=%s, AudioCap_File Start success.\r\n", rtmp_send->getName().c_str() );
+			//LOGMSGEX( defLOGNAME, defLOG_ERROR, "name=%s, AudioCap_File Start success.\r\n", rtmp_send->getName().c_str() );
 		}
 	}
 
@@ -369,11 +313,6 @@ unsigned __stdcall RTMPPushThread(LPVOID lpPara)
 			LOGMSG( "name=%s, set playback netspeed=%d kbps, ret=%d\r\n", rtmp_send->getName().c_str(), netspeed, ret );
 		}
 
-		//int hassize = rtmp_send->HasVideoPacket();
-		//if( hassize > 270 )
-		//{
-		//	rtmp_send->GetIPlayBack()->PlayBackControl( GSPlayBackCode_PLAYPAUSE );
-		//}
 		if( rtmp_send->HasVideoPacket() < 70 || !rtmp_send->IsReady() )
 		{
 			rtmp_send->GetIPlayBack()->PlayBackControl( GSPlayBackCode_PLAYRESTART );
@@ -387,259 +326,204 @@ unsigned __stdcall RTMPPushThread(LPVOID lpPara)
 	{
 		if( !rtmp_send->IsRunning() || runningkey != rtmp_send->get_runningkey() )
 		{
-			goto label_RTMPPushThread_End;
+			goto label_RTMPPushThread_End; //jyc20170511 remove
 		}
 
 		if( ::timeGetTime()-dwStartWait>30000 )
 		{
 			threadret = defGSReturn_NoData;
 			LOGMSG( "name=%s, wait ready and nal timeout %dms!!!\r\n", rtmp_send->getName().c_str(), ::timeGetTime()-dwStartWait );
-			goto label_RTMPPushThread_End;
+			goto label_RTMPPushThread_End; //jyc20170511 remove
 		}
 
-		timeBeginPeriod(1);
-		DWORD start = timeGetTime();
-		uleep(1000);
-		DWORD end = timeGetTime();
-		timeEndPeriod(1);
+//		timeBeginPeriod(1); //jyc20170511 remove
+//		DWORD start = timeGetTime();
+//		Sleep(1);
+//		DWORD end = timeGetTime();
+//		timeEndPeriod(1);
+		usleep(1000); //jyc20170511 modify
 	}
 
 	RTMPPacket_Reset( &rtmppkt );
-#if 1
-	//r = (RTMP*)RTMPSend::CreateRTMPInstance( vecurl, useUrl, rtmp_send->getName().c_str() );
-
-	//r = (RTMP*)rtmp_send->popRTMPHandle();
-	//if( !r )
-	//{
-	//	threadret = defGSReturn_ConnectSvrErr;
-	//	LOGMSGEX( defLOGNAME, defLOG_ERROR, "name=%s, rtmp failed! RTMPHandle=null\r\n", rtmp_send->getName().c_str() );
-	//	goto label_RTMPPushThread_End;
-	//}
-#else
-	r = RTMP_Alloc();
-	RTMP_Init(r);
-	RTMP_SetupURL(r, (char*)url.c_str());
-    RTMP_EnableWrite(r);
-
-	if(!RTMP_Connect(r,NULL)){
-
-		LOGMSGEX( defLOGNAME, defLOG_ERROR, "name=%s, RTMP_Connect failed! url=%s\r\n", rtmp_send->getName().c_str(), url.c_str() );
-		goto label_RTMPPushThread_End;
-	}
-
-	if(!RTMP_ConnectStream(r,0)){
-
-		LOGMSGEX( defLOGNAME, defLOG_ERROR, "name=%s, RTMP_ConnectStream failed!\r\n", rtmp_send->getName().c_str() );
-		goto label_RTMPPushThread_End;
-	}
-#endif
-	//rtmp_send->OnPublishStart();
-
-	char *fullbuf_video_cache_buffer = rtmp_send->get_fullbuf_video_cache_buffer();//char fullbuf_video_cache_buffer[MAX_VIDEO_PACKET_SIZE+RTMP_MAX_HEADER_SIZE];
-	char *video_cache_buffer = fullbuf_video_cache_buffer+RTMP_MAX_HEADER_SIZE; // ��ݻ���ǰ��Ԥ����RTMPͷ����
-	char *pend = video_cache_buffer+MAX_VIDEO_PACKET_SIZE;
-
-	char *szBodyBuffer = video_cache_buffer;
-	char *enc = szBodyBuffer;
-
-	rtmppkt.m_nChannel = 0x15;
-	rtmppkt.m_headerType = RTMP_PACKET_SIZE_LARGE;//RTMP_PACKET_SIZE_MEDIUM;//RTMP_PACKET_SIZE_LARGE;
-	rtmppkt.m_nTimeStamp = 0;
-	rtmppkt.m_nInfoField2 = -1; // r->m_stream_id;
-	if( r ) rtmppkt.m_nInfoField2 = r->m_stream_id;
-	rtmppkt.m_hasAbsTimestamp = 0;
-    rtmppkt.m_packetType = RTMP_PACKET_TYPE_INFO;    
-	rtmppkt.m_body = szBodyBuffer;
-
-	AVal av;
-	//AVal av_val;
-	
-	STR2AVAL(av, "@setDataFrame");
-	enc=AMF_EncodeString(enc,pend, &av);
-	
-    STR2AVAL(av, "onMetaData");
-	enc=AMF_EncodeString(enc,pend, &av);
-
-	*enc ++= AMF_OBJECT;
-	//*enc ++= AMF_ECMA_ARRAY;
-	//enc = AMF_EncodeInt32(enc, pend, 0);
-
-	//-- AMF_OBJECT START
-
-	STR2AVAL(av, "hasMetadata");
-	enc = AMF_EncodeNamedBoolean( enc, pend, &av, 1);
-
-	STR2AVAL(av, "hasVideo");
-	enc = AMF_EncodeNamedBoolean( enc, pend, &av, 1);
-
-	STR2AVAL(av, "hasKeyframes");
-	enc = AMF_EncodeNamedBoolean( enc, pend, &av, 1);
-
-	//STR2AVAL(av, "author");
-	//STR2AVAL(av_val, "");
-	//enc=AMF_EncodeNamedString( enc, pend, &av, &av_val);
-
-	//STR2AVAL(av, "copyright");
-	//STR2AVAL(av_val, "");
-	//enc=AMF_EncodeNamedString( enc, pend, &av, &av_val);
-
-	//STR2AVAL(av, "duration");    
-	//enc = AMF_EncodeNamedNumber(enc, pend,  &av, 0.0);
-
-	STR2AVAL(av, "width");
-	enc = AMF_EncodeNamedNumber( enc, pend, &av, rtmp_send->getVideoWidth());
-
-	STR2AVAL(av, "height");
-	enc = AMF_EncodeNamedNumber( enc, pend, &av, rtmp_send->getVideoHeight());
-
-	STR2AVAL(av, "videocodecid");
-	enc=AMF_EncodeNamedNumber( enc, pend, &av, 7);
-	//STR2AVAL(av_val, "avc1");
-	//enc=AMF_EncodeNamedString( enc, pend, &av, &av_val);
-
-	//STR2AVAL(av, "videodatarate");
-	//enc=AMF_EncodeNamedNumber( enc, pend, &av, 0);        
-
-	//STR2AVAL(av, "framerate");
-	//enc=AMF_EncodeNamedNumber( enc, pend, &av, rtmp_send->getVideoFps());    
-
-	//STR2AVAL(av, "filesize");
-	//enc=AMF_EncodeNamedNumber( enc, pend, &av, 0);	
-
-	if( defAudioSource_Null != rtmp_send->GetAudioCfg().get_Audio_Source()
-		&& !rtmp_send->GetIPlayBack()
-		)
-	{
-		int Audio_Channels = 0;
-		int Audio_bitSize = 0;
-		int Audio_SampleRate = 0;
-		int Audio_ByteRate = 0;
-		rtmp_send->GetAudioCfg().get_param_use( Audio_Channels, Audio_bitSize, Audio_SampleRate, Audio_ByteRate );
-
-		STR2AVAL(av, "hasAudio");
-		enc = AMF_EncodeNamedBoolean( enc, pend, &av, 1);
-
-		STR2AVAL(av, "audiocodecid");
-		enc=AMF_EncodeNamedNumber( enc, pend, &av, rtmp_send->GetAudioCfg().get_Audio_FmtType() );
-
-		STR2AVAL(av, "audiosamplerate");
-		enc=AMF_EncodeNamedNumber( enc, pend, &av, Audio_SampleRate );
-
-		STR2AVAL(av, "audiochannels");
-		enc=AMF_EncodeNamedNumber( enc, pend, &av, Audio_Channels );
-	}
-
-	//-- AMF_OBJECT END
-
-  //  STR2AVAL(av, "");
-    enc = AMF_EncodeInt16(enc, pend, 0); //enc= AMF_EncodeString(enc, pend,&av);
-    *enc++ = AMF_OBJECT_END;
-
-    rtmppkt.m_nBodySize = enc - szBodyBuffer;
-
-	RTMPPacket_Copy( &rtmppkt_metahead, &rtmppkt );
-
-#if 1
-	if( !g_rtmp_sendnal( rtmp_send, rtmppkt, rtmppkt_sendnal, szBodyBuffer, enc, pend, 0 ) )
-	{
-		goto label_RTMPPushThread_End;
-	}
-
+//jyc20170511 remove
+//	char *fullbuf_video_cache_buffer = rtmp_send->get_fullbuf_video_cache_buffer();//char fullbuf_video_cache_buffer[MAX_VIDEO_PACKET_SIZE+RTMP_MAX_HEADER_SIZE];
+//	char *video_cache_buffer = fullbuf_video_cache_buffer+RTMP_MAX_HEADER_SIZE; // ��ݻ���ǰ��Ԥ����RTMPͷ����
+//	char *pend = video_cache_buffer+MAX_VIDEO_PACKET_SIZE;
+//
+//	char *szBodyBuffer = video_cache_buffer;
+//	char *enc = szBodyBuffer;
+//
+//	rtmppkt.m_nChannel = 0x15;
+//	rtmppkt.m_headerType = RTMP_PACKET_SIZE_LARGE;//RTMP_PACKET_SIZE_MEDIUM;//RTMP_PACKET_SIZE_LARGE;
+//	rtmppkt.m_nTimeStamp = 0;
+//	rtmppkt.m_nInfoField2 = -1; // r->m_stream_id;
+//	if( r ) rtmppkt.m_nInfoField2 = r->m_stream_id;
+//	rtmppkt.m_hasAbsTimestamp = 0;
+//    rtmppkt.m_packetType = RTMP_PACKET_TYPE_INFO;
+//	rtmppkt.m_body = szBodyBuffer;
+//
+//	AVal av;
+//	//AVal av_val;
+//
+//	STR2AVAL(av, "@setDataFrame");
+//	enc=AMF_EncodeString(enc,pend, &av);
+//
+//    STR2AVAL(av, "onMetaData");
+//	enc=AMF_EncodeString(enc,pend, &av);
+//
+//	*enc ++= AMF_OBJECT;
+//
+//	STR2AVAL(av, "hasMetadata");
+//	enc = AMF_EncodeNamedBoolean( enc, pend, &av, 1);
+//
+//	STR2AVAL(av, "hasVideo");
+//	enc = AMF_EncodeNamedBoolean( enc, pend, &av, 1);
+//
+//	STR2AVAL(av, "hasKeyframes");
+//	enc = AMF_EncodeNamedBoolean( enc, pend, &av, 1);
+//
+//	STR2AVAL(av, "width");
+//	enc = AMF_EncodeNamedNumber( enc, pend, &av, rtmp_send->getVideoWidth());
+//
+//	STR2AVAL(av, "height");
+//	enc = AMF_EncodeNamedNumber( enc, pend, &av, rtmp_send->getVideoHeight());
+//
+//	STR2AVAL(av, "videocodecid");
+//	enc=AMF_EncodeNamedNumber( enc, pend, &av, 7);
+//
+//	if( defAudioSource_Null != rtmp_send->GetAudioCfg().get_Audio_Source()
+//		&& !rtmp_send->GetIPlayBack()
+//		)
+//	{
+//		int Audio_Channels = 0;
+//		int Audio_bitSize = 0;
+//		int Audio_SampleRate = 0;
+//		int Audio_ByteRate = 0;
+//		rtmp_send->GetAudioCfg().get_param_use( Audio_Channels, Audio_bitSize, Audio_SampleRate, Audio_ByteRate );
+//
+//		STR2AVAL(av, "hasAudio");
+//		enc = AMF_EncodeNamedBoolean( enc, pend, &av, 1);
+//
+//		STR2AVAL(av, "audiocodecid");
+//		enc=AMF_EncodeNamedNumber( enc, pend, &av, rtmp_send->GetAudioCfg().get_Audio_FmtType() );
+//
+//		STR2AVAL(av, "audiosamplerate");
+//		enc=AMF_EncodeNamedNumber( enc, pend, &av, Audio_SampleRate );
+//
+//		STR2AVAL(av, "audiochannels");
+//		enc=AMF_EncodeNamedNumber( enc, pend, &av, Audio_Channels );
+//	}
+//
+//	//-- AMF_OBJECT END
+//
+//  //  STR2AVAL(av, "");
+//    enc = AMF_EncodeInt16(enc, pend, 0); //enc= AMF_EncodeString(enc, pend,&av);
+//    *enc++ = AMF_OBJECT_END;
+//
+//    rtmppkt.m_nBodySize = enc - szBodyBuffer;
+//
+//	RTMPPacket_Copy( &rtmppkt_metahead, &rtmppkt );
+//
+//	if( !g_rtmp_sendnal( rtmp_send, rtmppkt, rtmppkt_sendnal, szBodyBuffer, enc, pend, 0 ) )
+//	{
+//		goto label_RTMPPushThread_End;
+//	}
+//
 #if defined(defUseRTMFP)
 	if( doConnect_RTMFP )
 	{
 		ns.SetMediaHead( GS_RTMFP::VIDEO, (uint8_t*)rtmppkt_sendnal.m_body, rtmppkt_sendnal.m_nBodySize );
 	}
 #endif
-
-#endif
-
-	uint8_t AudioHead = 0;
-	if( g_rtmp_sendAudioInfo( rtmp_send, rtmppkt, rtmppkt_sendAudioInfo, szBodyBuffer, enc, pend, 0, AudioHead ) )
-	{
-		//AudioHead = FLV_CODECID_PCM_MULAW | FLV_MONO | FLV_SAMPLERATE_SPECIAL | FLV_SAMPLESSIZE_16BIT;
-
+//
+//
+//	uint8_t AudioHead = 0;
+//	if( g_rtmp_sendAudioInfo( rtmp_send, rtmppkt, rtmppkt_sendAudioInfo, szBodyBuffer, enc, pend, 0, AudioHead ) )
+//	{
+//		//AudioHead = FLV_CODECID_PCM_MULAW | FLV_MONO | FLV_SAMPLERATE_SPECIAL | FLV_SAMPLESSIZE_16BIT;
+//
 #if defined(defUseRTMFP)
 		if( doConnect_RTMFP )
 		{
 			ns.SetMediaHead( GS_RTMFP::AUDIO, (uint8_t*)rtmppkt_sendAudioInfo.m_body, rtmppkt_sendAudioInfo.m_nBodySize );
 		}
 #endif
-	}
-
-	if( defAudioSource_File == rtmp_send->GetAudioCfg().get_Audio_Source()
-		&& !rtmp_send->GetIPlayBack()
-		)
-	{
-		AudioCap_File &AFS = rtmp_send->GetAFS();
-		AFS.Start( rtmp_send->GetStartTime(), true );
-
-		HANDLE   hth1;
-		unsigned  uiThread1ID;
-		hth1 = (HANDLE)_beginthreadex( NULL, 0, RTMPDataExService, rtmp_send, 0, &uiThread1ID );
-		CloseHandle(hth1);
-	}
-
-	if( !rtmp_send->GetIPlayBack() )
-	{
-		rtmp_send->ReKeyListVideoPacket();
-	}
-
-	rtmppkt.m_headerType = RTMP_PACKET_SIZE_LARGE;
-	bool sendnal = false;
-	DWORD first_tick = 0;
-	DWORD prev_tick = 0;
-	DWORD curtick = ::timeGetTime();
-	DWORD basetick = ::timeGetTime();
-	uint32_t prev_TimeStamp = 0;
-	const DWORD this_start_send_tick = ::timeGetTime();
-	while( rtmp_send->IsRunning() && runningkey == rtmp_send->get_runningkey() )
-	{
-		curtick = ::timeGetTime();
-		if( (curtick-basetick) > 100 )LOGMSGEX( defLOGNAME, defLOG_WORN, "name=%s, RTMPSend s0 tick=%u\r\n", rtmp_send->getName().c_str(), curtick-basetick );
-		basetick = ::timeGetTime();
-
-		if( !r )
-		{
-			r = (RTMP*)rtmp_send->popRTMPHandle();
-
-			// PreSendRTMP
-			if( r )
-			{
-				rtmppkt.m_nInfoField2 = r->m_stream_id;
-				rtmppkt_metahead.m_nInfoField2 = rtmppkt.m_nInfoField2;
-				rtmppkt_sendnal.m_nInfoField2 = rtmppkt.m_nInfoField2;
-				rtmppkt_sendAudioInfo.m_nInfoField2 = rtmppkt.m_nInfoField2;
-
-				if( !RTMP_SendPacket( r, &rtmppkt_metahead, 0 ) )
-				{
-					LOGMSGEX( defLOGNAME, defLOG_ERROR, "name=%s, RTMP_SendPacket failed RTMP_PACKET_TYPE_INFO!\r\n", rtmp_send->getName().c_str() );
-					goto label_RTMPPushThread_End;
-				}
-
-				int outChunkSize = RUNCODE_Get( defCodeIndex_RTMPSend_SetChunkSize );//32*1024;//4096; //32000
-				LOGMSGEX( defLOGNAME, defLOG_INFO, "name=%s, RTMP_SetChunkSize=%d\r\n", rtmp_send->getName().c_str(), outChunkSize );
-				if( !RTMP_SetChunkSize( r, outChunkSize ) )
-				{
-					LOGMSGEX( defLOGNAME, defLOG_ERROR, "name=%s, RTMP_SetChunkSize=%d error!\r\n", rtmp_send->getName().c_str(), outChunkSize );
-					goto label_RTMPPushThread_End;
-				}
-
-				if( !RTMP_SendPacket( r, &rtmppkt_sendnal, 0 ) ){
-					LOGMSGEX( defLOGNAME, defLOG_ERROR, "name=%s, RTMP_SendPacket failed Nal!\r\n", rtmp_send->getName().c_str() );
-					goto label_RTMPPushThread_End;
-				}
-
-				if( rtmppkt_sendAudioInfo.m_body )
-				{
-					if( !RTMP_SendPacket( r, &rtmppkt_sendAudioInfo, 0 ) ){
-						LOGMSGEX( defLOGNAME, defLOG_ERROR, "name=%s, RTMP_SendPacket failed audio info!\r\n", rtmp_send->getName().c_str() );
-						//goto label_RTMPPushThread_End;
-					}
-				}
-			}
-		}
-
+//	}
+//
+//	if( defAudioSource_File == rtmp_send->GetAudioCfg().get_Audio_Source()
+//		&& !rtmp_send->GetIPlayBack()
+//		)
+//	{
+//		AudioCap_File &AFS = rtmp_send->GetAFS();
+//		AFS.Start( rtmp_send->GetStartTime(), true );
+//
+////		HANDLE   hth1;  //jyc20170511 trouble
+////		unsigned  uiThread1ID;
+////		hth1 = (HANDLE)_beginthreadex( NULL, 0, RTMPDataExService, rtmp_send, 0, &uiThread1ID );
+////		CloseHandle(hth1);
+//
+//	}
+//
+//	if( !rtmp_send->GetIPlayBack() )
+//	{
+//		rtmp_send->ReKeyListVideoPacket();
+//	}
+//
+//	rtmppkt.m_headerType = RTMP_PACKET_SIZE_LARGE;
+//	bool sendnal = false;
+//	DWORD first_tick = 0;
+//	DWORD prev_tick = 0;
+//	DWORD curtick = ::timeGetTime();
+//	DWORD basetick = ::timeGetTime();
+//	uint32_t prev_TimeStamp = 0;
+//	const DWORD this_start_send_tick = ::timeGetTime();
+//	while( rtmp_send->IsRunning() && runningkey == rtmp_send->get_runningkey() )
+//	{
+//		//curtick = ::timeGetTime();
+//		//if( (curtick-basetick) > 100 )LOGMSGEX( defLOGNAME, defLOG_WORN, "name=%s, RTMPSend s0 tick=%u\r\n", rtmp_send->getName().c_str(), curtick-basetick );
+//		basetick = ::timeGetTime();
+//
+//		if( !r )
+//		{
+//			r = (RTMP*)rtmp_send->popRTMPHandle();
+//
+//			// PreSendRTMP
+//			if( r )
+//			{
+//				rtmppkt.m_nInfoField2 = r->m_stream_id;
+//				rtmppkt_metahead.m_nInfoField2 = rtmppkt.m_nInfoField2;
+//				rtmppkt_sendnal.m_nInfoField2 = rtmppkt.m_nInfoField2;
+//				rtmppkt_sendAudioInfo.m_nInfoField2 = rtmppkt.m_nInfoField2;
+//
+//				if( !RTMP_SendPacket( r, &rtmppkt_metahead, 0 ) )
+//				{
+//					//LOGMSGEX( defLOGNAME, defLOG_ERROR, "name=%s, RTMP_SendPacket failed RTMP_PACKET_TYPE_INFO!\r\n", rtmp_send->getName().c_str() );
+//					goto label_RTMPPushThread_End;
+//				}
+//
+//				int outChunkSize = RUNCODE_Get( defCodeIndex_RTMPSend_SetChunkSize );//32*1024;//4096; //32000
+//				//LOGMSGEX( defLOGNAME, defLOG_INFO, "name=%s, RTMP_SetChunkSize=%d\r\n", rtmp_send->getName().c_str(), outChunkSize );
+//				if( !RTMP_SetChunkSize( r, outChunkSize ) )
+//				{
+//					//LOGMSGEX( defLOGNAME, defLOG_ERROR, "name=%s, RTMP_SetChunkSize=%d error!\r\n", rtmp_send->getName().c_str(), outChunkSize );
+//					goto label_RTMPPushThread_End;
+//				}
+//
+//				if( !RTMP_SendPacket( r, &rtmppkt_sendnal, 0 ) ){
+//					//LOGMSGEX( defLOGNAME, defLOG_ERROR, "name=%s, RTMP_SendPacket failed Nal!\r\n", rtmp_send->getName().c_str() );
+//					goto label_RTMPPushThread_End;
+//				}
+//
+//				if( rtmppkt_sendAudioInfo.m_body )
+//				{
+//					if( !RTMP_SendPacket( r, &rtmppkt_sendAudioInfo, 0 ) ){
+//						//LOGMSGEX( defLOGNAME, defLOG_ERROR, "name=%s, RTMP_SendPacket failed audio info!\r\n", rtmp_send->getName().c_str() );
+//						//goto label_RTMPPushThread_End;
+//					}
+//				}
+//			}
+//		}
+//
 #if defined(defUseRTMFP)
 		if( doConnect_RTMFP )
 		{
@@ -657,185 +541,162 @@ unsigned __stdcall RTMPPushThread(LPVOID lpPara)
 			}
 		}
 #endif
-
-		if( rtmp_send->GetIPlayBack() )
-		{
-			if( rtmp_send->HasVideoPacket() < 70 )
-			{
-				rtmp_send->GetIPlayBack()->PlayBackControl( GSPlayBackCode_PLAYRESTART );
-			}
-		}
-
-		H264VideoPackge *packet = rtmp_send->getVideoPacket();
-		if( packet )
-		{
-#endif
-			
-			//LOGMSG( "name=%s, RTMPSend getVideoPacket ts=%u, prev_ts=%u, audio=%d, packetSize=%u\r\n", rtmp_send->getName().c_str(), packet->timeStamp, prev_tick, packet->isAudio, packet->size );
-
-			curtick = ::timeGetTime();
-			if( (curtick-basetick) > 100 )LOGMSGEX( defLOGNAME, defLOG_WORN, "name=%s, RTMPSend s1 getVideoPacket tick=%u, ts=%u, packetSize=%u\r\n", rtmp_send->getName().c_str(), curtick-basetick, packet->timeStamp, packet->size );
-			basetick = ::timeGetTime();
-			
-			if( r )
-			{
-				if(!RTMP_IsConnected(r) || RTMP_IsTimedout(r)){
-					LOGMSGEX( defLOGNAME, defLOG_ERROR,"name=%s, connect error\r\n", rtmp_send->getName().c_str());
-					rtmp_send->ReleaseVideoPacket(packet);
-					break;
-				}
-			}
-
-			if(packet->size > MAX_VIDEO_PACKET_SIZE-9){
-				LOGMSGEX( defLOGNAME, defLOG_ERROR, "name=%s, packet too large, packetSize=%u\r\n", rtmp_send->getName().c_str(), packet->size );
-				rtmp_send->ReleaseVideoPacket(packet);
-				continue;
-			}
-
-	        enc = video_cache_buffer;
-
-			if( packet->isAudio )
-			{
-				rtmppkt.m_packetType = RTMP_PACKET_TYPE_AUDIO;
-
-				*enc++= AudioHead;
-
-				if( defAudioFmtType_AAC == rtmp_send->GetAudioCfg().get_Audio_FmtType() )
-				{
-					*enc++= 0x01; // 1: AAC raw
-				}
-
-				memcpy(enc, packet->buf, packet->size);
-				enc+= packet->size;
-			}
-			else
-			{
-				rtmppkt.m_packetType = RTMP_PACKET_TYPE_VIDEO;
-				//*enc++= (packet->buf[0] & ((1 << 5) - 1))== 7 ?  FLV_FRAME_KEY : FLV_FRAME_INTER;
-				*enc++= 7 | (packet->keyframe ?  FLV_FRAME_KEY : FLV_FRAME_INTER);
-				*enc++= 1;
-				enc = AMF_EncodeInt24(enc,pend,0);
-
-#if 1
-				// ������
-				enc = g_flv_code_morepak( enc, pend, packet->buf, packet->size );
-#else
-				enc = AMF_EncodeInt32(enc,pend, packet->size);
-				memcpy(enc, packet->buf, packet->size);
-				enc+= packet->size;
-#endif
-			}
-
-			rtmppkt.m_nTimeStamp = (uint32_t)packet->timeStamp;
-			
-			//delete(packet->buf);
-			//delete(packet);
-
-#if 1
-			curtick = ::timeGetTime();
-			//if( (curtick-basetick) > 10 ) 
-			//  LOGMSGEX( defLOGNAME, defLOG_WORN, "name=%s, 
-			//  RTMPSend s2 AMF_Encode tick=%u, ts=%u, packetSize=%u\r\n",
-			//  rtmp_send->getName().c_str(), curtick-basetick, rtmppkt.m_nTimeStamp, packet->size );
-#endif
-			if( rtmp_send->GetIPlayBack() )
-			{
-				int hassize = rtmp_send->HasVideoPacket();
-				int tick_span = packet->timeStamp-prev_tick;
-#if 1
-				if( prev_tick && tick_span>c_PlayBack_spanfix )
-				{
-					tick_span -= c_PlayBack_spanfix;
-					if( tick_span < 1 )
-					{
-						tick_span = 1;
-					}
-					else if( tick_span > 120 )
-					{
-						if( 0!=rtmp_send->GetPlayBackCtrl_speedlevel()
-							&& (GSPlayBackCode_PLAYFAST==rtmp_send->GetPlayBackCtrl_Code() || GSPlayBackCode_PLAYSLOW==rtmp_send->GetPlayBackCtrl_Code()) )
-						{
-							if( tick_span > 3000 )
-							{
-								tick_span = 3000;
-							}
-						}
-						else
-						{
-							tick_span = 120;
-						}
-					}
-
-					timeBeginPeriod(1);
-					DWORD start = timeGetTime();
-					uleep(tick_span*1000);
-					DWORD end = timeGetTime();
-					timeEndPeriod(1);
-				}
-#else
-				if( prev_tick && tick_span>9 )
-				{
-					tick_span -= 9;
-					if( tick_span < 1 )
-					{
-						tick_span = 1;
-					}
-					else if( tick_span > 100 )
-					{
-						tick_span = 100;
-					}
-					Sleep(tick_span);
-					//printf( "tick_span=%d\r\n", tick_span );
-				}
-#endif
-				prev_tick = packet->timeStamp;
-
-				if( !rtmp_send->IsRunning() )
-				{
-					rtmp_send->ReleaseVideoPacket(packet);
-					break;
-				}
-
-				if( hassize < 70 )
-				{
-					rtmp_send->GetIPlayBack()->PlayBackControl( GSPlayBackCode_PLAYRESTART );
-				}
-			}
-
-			rtmppkt.m_body = video_cache_buffer;
-			rtmppkt.m_nBodySize = enc - video_cache_buffer;
-
-			bool doSendPacket = false;
-			if( packet->isAudio )
-			{
-				if( defAudioSource_Null != rtmp_send->GetAudioCfg().get_Audio_Source() )
-				{
-					if( rtmp_send->GetIPlayBack() )
-					{
-						if( rtmp_send->get_playback_sound() )
-						{
-							doSendPacket = true;
-						}
-					}
-					else
-					{
-						doSendPacket = true;
-					}
-				}
-			}
-			else
-			{
-				doSendPacket = true;
-			}
-
-			if( doSendPacket )
-			{
-				if( rtmppkt.m_nTimeStamp <= prev_TimeStamp )
-				{
-					rtmppkt.m_nTimeStamp = prev_TimeStamp + 2;
-				}
-				prev_TimeStamp = rtmppkt.m_nTimeStamp;
-
+//
+//		if( rtmp_send->GetIPlayBack() )
+//		{
+//			//int hassize = rtmp_send->HasVideoPacket();
+//			//if( hassize > 270 )
+//			//{
+//			//	rtmp_send->GetIPlayBack()->PlayBackControl( GSPlayBackCode_PLAYPAUSE );
+//			//}
+//			if( rtmp_send->HasVideoPacket() < 70 )
+//			{
+//				rtmp_send->GetIPlayBack()->PlayBackControl( GSPlayBackCode_PLAYRESTART );
+//			}
+//		}
+//
+//		H264VideoPackge *packet = rtmp_send->getVideoPacket();
+//		if( packet )
+//		{
+//			//LOGMSG( "name=%s, RTMPSend getVideoPacket ts=%u, prev_ts=%u, audio=%d, packetSize=%u\r\n", rtmp_send->getName().c_str(), packet->timeStamp, prev_tick, packet->isAudio, packet->size );
+//
+//			//curtick = ::timeGetTime();
+//			//if( (curtick-basetick) > 100 )LOGMSGEX( defLOGNAME, defLOG_WORN, "name=%s, RTMPSend s1 getVideoPacket tick=%u, ts=%u, packetSize=%u\r\n", rtmp_send->getName().c_str(), curtick-basetick, packet->timeStamp, packet->size );
+//			basetick = ::timeGetTime();
+//
+//			if( r )
+//			{
+//				if(!RTMP_IsConnected(r) || RTMP_IsTimedout(r)){
+//					//LOGMSGEX( defLOGNAME, defLOG_ERROR,"name=%s, connect error\r\n", rtmp_send->getName().c_str());
+//					rtmp_send->ReleaseVideoPacket(packet);
+//					break;
+//				}
+//			}
+//
+//			if(packet->size > MAX_VIDEO_PACKET_SIZE-9){
+//				//LOGMSGEX( defLOGNAME, defLOG_ERROR, "name=%s, packet too large, packetSize=%u\r\n", rtmp_send->getName().c_str(), packet->size );
+//				rtmp_send->ReleaseVideoPacket(packet);
+//				continue;
+//			}
+//
+//
+//	        enc = video_cache_buffer;
+//
+//			if( packet->isAudio )
+//			{
+//				rtmppkt.m_packetType = RTMP_PACKET_TYPE_AUDIO;
+//
+//				*enc++= AudioHead;
+//
+//				if( defAudioFmtType_AAC == rtmp_send->GetAudioCfg().get_Audio_FmtType() )
+//				{
+//					*enc++= 0x01; // 1: AAC raw
+//				}
+//
+//				memcpy(enc, packet->buf, packet->size);
+//				enc+= packet->size;
+//			}
+//			else
+//			{
+//				rtmppkt.m_packetType = RTMP_PACKET_TYPE_VIDEO;
+//				//*enc++= (packet->buf[0] & ((1 << 5) - 1))== 7 ?  FLV_FRAME_KEY : FLV_FRAME_INTER;
+//				*enc++= 7 | (packet->keyframe ?  FLV_FRAME_KEY : FLV_FRAME_INTER);
+//				*enc++= 1;
+//				enc = AMF_EncodeInt24(enc,pend,0);
+//
+//				enc = g_flv_code_morepak( enc, pend, packet->buf, packet->size );
+//
+//			}
+//
+//			rtmppkt.m_nTimeStamp = (uint32_t)packet->timeStamp;
+//
+//
+////			curtick = ::timeGetTime();
+////			if( (curtick-basetick) > 10 )
+////				LOGMSGEX( defLOGNAME, defLOG_WORN, "name=%s, RTMPSend s2 AMF_Encode tick=%u, ts=%u, packetSize=%u\r\n", rtmp_send->getName().c_str(), curtick-basetick, rtmppkt.m_nTimeStamp, packet->size );
+//
+//			if( rtmp_send->GetIPlayBack() )
+//			{
+//				int hassize = rtmp_send->HasVideoPacket();
+//				int tick_span = packet->timeStamp-prev_tick;
+//				if( prev_tick && tick_span>c_PlayBack_spanfix )
+//				{
+//					tick_span -= c_PlayBack_spanfix;
+//					if( tick_span < 1 )
+//					{
+//						tick_span = 1;
+//					}
+//					else if( tick_span > 120 )
+//					{
+//						if( 0!=rtmp_send->GetPlayBackCtrl_speedlevel()
+//							&& (GSPlayBackCode_PLAYFAST==rtmp_send->GetPlayBackCtrl_Code() || GSPlayBackCode_PLAYSLOW==rtmp_send->GetPlayBackCtrl_Code()) )
+//						{
+//							if( tick_span > 3000 )
+//							{
+//								tick_span = 3000;
+//							}
+//						}
+//						else
+//						{
+//							tick_span = 120;
+//						}
+//					}
+////jyc20170511 remove
+////					timeBeginPeriod(1);
+////					DWORD start = timeGetTime();
+////					uleep(tick_span*1000);
+////					DWORD end = timeGetTime();
+////					timeEndPeriod(1);
+//				}
+//
+//				prev_tick = packet->timeStamp;
+//
+//				if( !rtmp_send->IsRunning() )
+//				{
+//					rtmp_send->ReleaseVideoPacket(packet);
+//					break;
+//				}
+//
+//				if( hassize < 70 )
+//				{
+//					rtmp_send->GetIPlayBack()->PlayBackControl( GSPlayBackCode_PLAYRESTART );
+//				}
+//			}
+//
+//			rtmppkt.m_body = video_cache_buffer;
+//			rtmppkt.m_nBodySize = enc - video_cache_buffer;
+//
+//			bool doSendPacket = false;
+//			if( packet->isAudio )
+//			{
+//				if( defAudioSource_Null != rtmp_send->GetAudioCfg().get_Audio_Source() )
+//				{
+//					if( rtmp_send->GetIPlayBack() )
+//					{
+//						if( rtmp_send->get_playback_sound() )
+//						{
+//							doSendPacket = true;
+//						}
+//					}
+//					else
+//					{
+//						doSendPacket = true;
+//					}
+//				}
+//			}
+//			else
+//			{
+//				doSendPacket = true;
+//			}
+//
+//			if( doSendPacket )
+//			{
+//				if( rtmppkt.m_nTimeStamp <= prev_TimeStamp )
+//				{
+//					rtmppkt.m_nTimeStamp = prev_TimeStamp + 2;
+//				}
+//				prev_TimeStamp = rtmppkt.m_nTimeStamp;
+//
 #if defined(defUseRTMFP)
 				if( doConnect_RTMFP )
 				{
@@ -845,51 +706,52 @@ unsigned __stdcall RTMPPushThread(LPVOID lpPara)
 					}
 					else
 					{
-						ns.PushVideo( packet->keyframe, rtmppkt.m_nTimeStamp, (uint8_t*)rtmppkt.m_body, rtmppkt.m_nBodySize );
+						//ns.PushVideo( packet->keyframe, rtmppkt.m_nTimeStamp, (uint8_t*)rtmppkt.m_body, rtmppkt.m_nBodySize );
 					}
 				}
 #endif
-
-				if( r )
-				{
-					if(RTMP_SendPacket(r,&rtmppkt,0) ==0){
-						curtick = ::timeGetTime();
-						LOGMSGEX( defLOGNAME, defLOG_ERROR, "name=%s, RTMP_SendPacket error, tick=%u, ts=%u, packetSize=%u\r\n", rtmp_send->getName().c_str(), curtick-basetick, rtmppkt.m_nTimeStamp, packet->size );
-						rtmp_send->ReleaseVideoPacket(packet);
-						break;
-					}
-				}
-			}
-
-			curtick = ::timeGetTime();
-			if( (curtick-basetick) > (DWORD)RUNCODE_Get(defCodeIndex_RTMPSend_NetSend_WarnTime) )
-			{
-
-				if( 0!=rtmp_send->GetPlayBackCtrl_speedlevel()
-					&& (GSPlayBackCode_PLAYFAST==rtmp_send->GetPlayBackCtrl_Code() || GSPlayBackCode_PLAYSLOW==rtmp_send->GetPlayBackCtrl_Code()) )
-				{
-					// playback speed!=normal
-				}
-				else
-				{
-					LOGMSGEX( defLOGNAME, defLOG_WORN, "name=%s, RTMPSend s9 tick=%u, ts=%u, BodySize=%u\r\n", rtmp_send->getName().c_str(), curtick-basetick, rtmppkt.m_nTimeStamp, rtmppkt.m_nBodySize );
-				}
-			}
-			basetick = ::timeGetTime();
-
-			rtmp_send->ReleaseVideoPacket(packet);
-
-			rtmppkt.m_headerType = RTMP_PACKET_SIZE_MEDIUM; 
-		}else{
-			timeBeginPeriod(1);
-			DWORD start = timeGetTime();
-			Sleep(1);
-			DWORD end = timeGetTime();
-			timeEndPeriod(1);
-		}
-	}
-
-	threadret = defGSReturn_Success;
+//
+//				if( r )
+//				{
+//					if(RTMP_SendPacket(r,&rtmppkt,0) ==0){
+//						curtick = ::timeGetTime();
+//						//LOGMSGEX( defLOGNAME, defLOG_ERROR, "name=%s, RTMP_SendPacket error, tick=%u, ts=%u, packetSize=%u\r\n", rtmp_send->getName().c_str(), curtick-basetick, rtmppkt.m_nTimeStamp, packet->size );
+//						rtmp_send->ReleaseVideoPacket(packet);
+//						break;
+//					}
+//				}
+//			}
+//
+//			curtick = ::timeGetTime();
+//			if( (curtick-basetick) > (DWORD)RUNCODE_Get(defCodeIndex_RTMPSend_NetSend_WarnTime) )
+//			{
+//
+//				if( 0!=rtmp_send->GetPlayBackCtrl_speedlevel()
+//					&& (GSPlayBackCode_PLAYFAST==rtmp_send->GetPlayBackCtrl_Code() || GSPlayBackCode_PLAYSLOW==rtmp_send->GetPlayBackCtrl_Code()) )
+//				{
+//					// playback speed!=normal
+//				}
+//				else
+//				{
+//					//LOGMSGEX( defLOGNAME, defLOG_WORN, "name=%s, RTMPSend s9 tick=%u, ts=%u, BodySize=%u\r\n", rtmp_send->getName().c_str(), curtick-basetick, rtmppkt.m_nTimeStamp, rtmppkt.m_nBodySize );
+//				}
+//			}
+//			basetick = ::timeGetTime();
+//
+//			rtmp_send->ReleaseVideoPacket(packet);
+//
+//			rtmppkt.m_headerType = RTMP_PACKET_SIZE_MEDIUM;
+//		}else{
+////			timeBeginPeriod(1);
+////			DWORD start = timeGetTime();
+////			Sleep(1);
+////			DWORD end = timeGetTime();
+////			timeEndPeriod(1);
+//		}
+//	}
+//
+//	threadret = defGSReturn_Success;
+//
 
 label_RTMPPushThread_End:
 
@@ -913,7 +775,6 @@ label_RTMPPushThread_End:
 	rtmp_send->OnSendThreadExit( threadret );
 	return 0;
 }
-*/
 
 std::string RTMPSend::s_RTMPSendglobalID = "";
 
@@ -943,19 +804,19 @@ RTMPSend::RTMPSend(IPublishHandler *handler, const std::string& name)
 
 	unsigned char thisid[32] ={0};
 	uint16_t thisid_num = 0;
-	/* jyc20170323 remove
-	GUID guid;
-	if( S_OK == ::CoCreateGuid( &guid ) )
-	{
-		thisid_num = sizeof( guid );
-		memcpy( &thisid, &guid, thisid_num );
-	}
-	else
-	{
-		const uint32_t nt = (uint32_t)this;
-		thisid_num = sizeof( nt );
-		memcpy( thisid, &nt, thisid_num );
-	}*/
+
+//	GUID guid; //jyc20170511 remove
+//	if( S_OK == ::CoCreateGuid( &guid ) )
+//	{
+//		thisid_num = sizeof( guid );
+//		memcpy( &thisid, &guid, thisid_num );
+//	}
+//	else
+//	{
+//		const uint32_t nt = (uint32_t)this;
+//		thisid_num = sizeof( nt );
+//		memcpy( thisid, &nt, thisid_num );
+//	}
 
 	m_StreamID =
 		IsRUNCODEEnable( defCodeIndex_RTMFP_UseSpecStreamID )
@@ -980,7 +841,8 @@ RTMPSend::~RTMPSend(void)
 
 	if( m_fullbuf_video_cache_buffer )
 	{
-		//jyc20170323 remove
+		//delete []m_fullbuf_video_cache_buffer;
+		//jyc20170511 remove
 		//g_GetMemoryContainer()->ReleaseMemory( m_fullbuf_video_cache_buffer, MAX_VIDEO_PACKET_SIZE+RTMP_MAX_HEADER_SIZE );
 		m_fullbuf_video_cache_buffer = NULL;
 	}
@@ -1001,16 +863,16 @@ RTMPSend::~RTMPSend(void)
 
 }
 
-char* RTMPSend::get_fullbuf_video_cache_buffer()
-{
-	if( !m_fullbuf_video_cache_buffer )
-	{
-		//jyc20170323 remove
-		//m_fullbuf_video_cache_buffer = g_GetMemoryContainer()->GetMemory( MAX_VIDEO_PACKET_SIZE+RTMP_MAX_HEADER_SIZE );
-	}
-
-	return m_fullbuf_video_cache_buffer;
-}
+//char* RTMPSend::get_fullbuf_video_cache_buffer()
+//{
+//	if( !m_fullbuf_video_cache_buffer )
+//	{
+//		//m_fullbuf_video_cache_buffer = new char[MAX_VIDEO_PACKET_SIZE+RTMP_MAX_HEADER_SIZE];
+//		m_fullbuf_video_cache_buffer = g_GetMemoryContainer()->GetMemory( MAX_VIDEO_PACKET_SIZE+RTMP_MAX_HEADER_SIZE );
+//	}
+//
+//	return m_fullbuf_video_cache_buffer;
+//}
 
 
 void RTMPSend::deleteRTMPHandle( defRTMPConnectHandle handle )
@@ -1021,8 +883,8 @@ void RTMPSend::deleteRTMPHandle( defRTMPConnectHandle handle )
 	RTMP *r = (RTMP*)handle;
 	if( r )
 	{
-		//RTMP_Close(r); //jyc20170323 remove
-		//RTMP_Free(r);
+		RTMP_Close(r);
+		RTMP_Free(r);
 	}
 }
 
@@ -1054,11 +916,10 @@ defRTMPConnectHandle RTMPSend::CreateRTMPInstance( const std::vector<std::string
 	}
 
 	RTMP *r = NULL;
-	//jyc20170323 remove
-	//r = RTMP_Alloc();
-	//RTMP_Init(r);
+	r = RTMP_Alloc();
+	RTMP_Init(r);
+
 	bool issuccess = false;
-	/* jyc20170323 remove
 	for( int i=0; i<vecurltemp.size() && i<SYS_RTMPUrlNumMax; ++i )
 	{
 		RTMP_SetupURL(r, (char*)vecurltemp[i].c_str() );
@@ -1079,7 +940,7 @@ defRTMPConnectHandle RTMPSend::CreateRTMPInstance( const std::vector<std::string
 		issuccess = true;
 		useUrl = vecurltemp[i].c_str();
 		break;
-	}*/
+	}
 
 	if( !issuccess )
 	{
@@ -1094,12 +955,13 @@ label_CreateRTMPConnectInstance_End:
 
 	if( r )
 	{
-		//RTMP_Close(r); //jyc20170406 remove
-		//RTMP_Free(r);
+		RTMP_Close(r);
+		RTMP_Free(r);
 	}
 
 	return NULL;
 }
+
 
 void RTMPSend::pushRTMPHandle( defRTMPConnectHandle handle, const std::string &useUrl )
 {
@@ -1175,6 +1037,12 @@ void RTMPSend::Close()
 int RTMPSend::Connect(const std::string& url)
 {
 	this->setUrl( url );
+	//wait_frist_key_frame = true;
+
+	//LOGMSGEX( defLOGNAME, defLOG_INFO, "RTMPSend::Connect: name=%s, url=\"%s\"\r\n", m_name.c_str(), url.c_str() );
+
+	//test
+
 	return 1;
 }
 int RTMPSend::SetVideoMetaData(int width,int height,int fps)
@@ -1186,22 +1054,36 @@ int RTMPSend::SetVideoMetaData(int width,int height,int fps)
 }
 int RTMPSend::Run()
 {
-	/* jyc20170323 remove
-	HANDLE   hth1;
-    unsigned  uiThread1ID;
-	if(!this->isRunning){
-	   this->Close();//videoPackage.empty();
-	   //startTime = timeGetTime();
-	   this->isRunning = true;
-	   this->m_runningkey++;
-	   this->m_lastGetVideoPacketTime = timeGetTime();
-	   m_isThreadExit = false;
-	   hth1 = (HANDLE)_beginthreadex(NULL, 0, RTMPPushThread, this, 0, &uiThread1ID);
-	   CloseHandle(hth1);
-	   this->m_handler->OnPublishStart();
-	}
+//	HANDLE   hth1;
+//    unsigned  uiThread1ID;
+//	if(!this->isRunning){
+//	   this->Close();//videoPackage.empty();
+//	   //startTime = timeGetTime();
+//	   this->isRunning = true;
+//	   this->m_runningkey++;
+//	   this->m_lastGetVideoPacketTime = timeGetTime();
+//	   m_isThreadExit = false;
+//	   hth1 = (HANDLE)_beginthreadex(NULL, 0, RTMPPushThread, this, 0, &uiThread1ID);
+//	   CloseHandle(hth1);
+//	   this->m_handler->OnPublishStart();
+//	}
+
+	pthread_t id_1;
+    int ret;
+    if(!this->isRunning){
+    	   this->Close();
+    	   this->isRunning = true;
+    	   this->m_runningkey++;
+    	   this->m_lastGetVideoPacketTime = timeGetTime();
+    	   m_isThreadExit = false;
+    	   ret=pthread_create(&id_1, NULL, RTMPPushThread, this );
+    	   if(ret!=0) {
+    	          printf("Create PlayMgrProcThread error!\n");
+    	   }
+    	   this->m_handler->OnPublishStart();
+    }
+
 	return this->isRunning;
-	*/
 }
 
 void RTMPSend::SetVideoNal(x264_nal_t *nal,int i_nal)
@@ -1221,7 +1103,6 @@ x264_nal_t* RTMPSend::getNal()
 	for( int i=0; i<nalSize; ++i )
 	{
 		snprintf( chbuf, sizeof(chbuf), "RTMPSend(%s)::getNal(%d/%d)", this->m_name.c_str(), i+1, nalSize );
-
 		g_PrintfByte( videoNal[i].p_payload, videoNal[i].i_payload>64?64:videoNal[i].i_payload, chbuf );
 	}
 
@@ -1281,7 +1162,6 @@ void RTMPSend::PushVideo( const bool keyframe, char *buffer, int size, uint32_t 
 			return;
 		}
 	}
-#if 1
 	if( !isAudio )
 	{
 		// h264 no head err
@@ -1299,7 +1179,7 @@ void RTMPSend::PushVideo( const bool keyframe, char *buffer, int size, uint32_t 
 		buffer += prefixNum;
 		size -= prefixNum;
 	}
-#endif
+
 
 	if( size > MAX_VIDEO_PACKET_SIZE )
 	{
@@ -1318,6 +1198,7 @@ void RTMPSend::PushVideo( const bool keyframe, char *buffer, int size, uint32_t 
 	//packet->size = g_h264_remove_all_start_code( (uint8_t*)packet->buf, packet->size );
 
 	m_queue_mutex.lock();
+
 
 	packet->index = ++m_packet_index;
 	this->videoPackage.push_back(packet);
@@ -1379,7 +1260,6 @@ void RTMPSend::PushVideo( const bool keyframe, char *buffer, int size, uint32_t 
 
 void RTMPSend::PushVideo( const bool keyframe, char *buffer, int size, const bool isAudio )
 {
-
 	uint32_t timestamp = timeGetTime();
 
 	PushVideo(keyframe, buffer, size, timestamp, isAudio );
@@ -1472,7 +1352,7 @@ H264VideoPackge* RTMPSend::getVideoPacket()
 					else
 					{
 						ResetPlayBackCtrlFlag();
-						
+
 						if( !packet->keyframe )
 						{
 							RePreFirstKeyListVideoPacket_nolock();
@@ -1491,7 +1371,7 @@ H264VideoPackge* RTMPSend::getVideoPacket()
 
 		if( !this->GetIPlayBack() )
 		{
-			//packet->timeStamp = timeGetTime()-startTime; // use lock time
+
 		}
 		else
 		{
@@ -1509,6 +1389,7 @@ H264VideoPackge* RTMPSend::getVideoPacket()
 		{
 			packet->timeStamp = m_lasttsVideoPackageList;
 		}
+
 
 		if( this->GetIPlayBack() )
 		{
@@ -1529,6 +1410,8 @@ H264VideoPackge* RTMPSend::getVideoPacket()
 
 					if( doThrowFrame )
 					{
+						//m_lastThrowIndex = packet->index;
+						//LOGMSG( "throwpacket %d", packet->index );
 						ReleaseVideoPacket_nolock( packet );
 						packet = NULL;
 						m_queue_mutex.unlock();
@@ -1724,21 +1607,14 @@ H264VideoPackge* RTMPSend::newVideoPacket( int needsize, bool keyframe )
 	m_queue_mutex.unlock();
 
 	if( !packet )
-	{
-#if 1 // defuseMemoryContainer  //jyc20170323 remove
+	{//jyc20170511 remove
 		//int c_bufLimit = needsize>CRM_MEMORY_MIN_LEN ? needsize:CRM_MEMORY_MIN_LEN;
 		
 		//char *c_pbuf = g_GetMemoryContainer()->GetMemory( c_bufLimit + sizeof(H264VideoPackge) ); // ���ṹ�ͻ��������ͬһ�����ڴ�����
 
-		//packet = (H264VideoPackge*)c_pbuf;
-		//packet->bufLimit = c_bufLimit;
-		//packet->buf = c_pbuf + sizeof(H264VideoPackge);
-#else
-		packet = new H264VideoPackge();
-		packet->bufLimit = needsize>MINNEW_VIDEO_PACKET_SIZE ? needsize:MINNEW_VIDEO_PACKET_SIZE;
-		if( keyframe ) packet->bufLimit += KEYNEWOVER_VIDEO_PACKET_SIZE;
-		packet->buf = new char[packet->bufLimit];
-#endif
+//		packet = (H264VideoPackge*)c_pbuf;
+//		packet->bufLimit = c_bufLimit;
+//		packet->buf = c_pbuf + sizeof(H264VideoPackge);
 	}
 
 	return packet;
@@ -1939,13 +1815,13 @@ void RTMPSend::ReleaseVideoPacket_nolock( H264VideoPackge *p )
 
 // ����ɾ���ʵ������
 void RTMPSend::FinalDeleteVideoPacket( H264VideoPackge *p )
-{
-#if 1 // defuseMemoryContainer  //jyc20170323 remove
-	//g_GetMemoryContainer()->ReleaseMemory( (char*)p, p->bufLimit+sizeof(H264VideoPackge) ); // �ṹ�ͻ��������ͬһ�����ڴ�����
-#else
-	delete [](p->buf);
-	delete p;
-#endif
+{//jyc20170511 remove
+//#if 1 // defuseMemoryContainer
+//	g_GetMemoryContainer()->ReleaseMemory( (char*)p, p->bufLimit+sizeof(H264VideoPackge) ); // �ṹ�ͻ��������ͬһ�����ڴ�����
+//#else
+//	delete [](p->buf);
+//	delete p;
+//#endif
 }
 
 bool RTMPSend::IsReady()

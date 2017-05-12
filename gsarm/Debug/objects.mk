@@ -4,5 +4,5 @@
 
 USER_OBJS :=
 
-LIBS := -lavformat -lavcodec -lavutil -lswresample -lsqlite3 -lpthread -lgloox -lz
+LIBS := -lavformat -lrtmp -lavcodec -lavutil -lswresample -lsqlite3 -lpthread -lgloox -lz
 

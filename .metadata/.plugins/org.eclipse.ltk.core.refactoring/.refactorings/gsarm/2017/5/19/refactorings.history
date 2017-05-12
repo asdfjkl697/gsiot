@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename resource &apos;gsarm/src/gsarm.cc&apos; to &apos;gsarm.cpp&apos;" description="Rename resource &apos;gsarm.cc&apos;" flags="7" id="org.eclipse.ltk.core.refactoring.rename.resource" input="src/gsarm.cc" name="gsarm.cpp" stamp="1494398061101" updateReferences="true"/>
+</session>

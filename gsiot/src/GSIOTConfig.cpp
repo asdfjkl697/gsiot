@@ -36,28 +36,53 @@ bool GSIOTConfig::doDBUpdate()
 	return g_doDBUpdate( db );
 }
 
+#include "SQLiteHelper.h"
+#include "common.h"
+
+void GSIOTConfig::LoadDB_cfg() {
+	std::string cfgpath;
+	static SQLite::Database *cfgdb;
+	cfgpath.append((std::string) ROOTDIR + "gscfg.db");
+	try {
+		if (!cfgdb) {
+			cfgdb = new SQLite::Database(cfgpath.c_str(),
+					SQLITE_OPEN_READWRITE);
+		}
+	} catch (...) {
+		cfgdb = NULL;
+		printf("Open DB failed!\n");
+	}
+
+	SQLite::Statement query(*cfgdb, "select * from config");
+	while (query.executeStep()) {
+		uint32_t code = (uint32_t)query.getColumn(1).getInt();
+		string tmp1 = query.getColumn(2);
+		switch(code){
+		case 101:
+			this->m_jid = tmp1;
+			break;
+		case 102:
+			this->m_password = tmp1;
+			break;
+		default:
+			break;
+		}
+	}
+}
+
 bool GSIOTConfig::PreInit( const std::string &RunParam )
 {
-	if( !db )
-	{
+	LoadDB_cfg(); //jyc20170425 add
+
+	if (!db) {
 		return false;
 	}
 
 	const int cur_db_ver = g_GetDBVer(db);
-	if( GSIOT_DBVER != cur_db_ver )
-	{
-		//LOGMSGEX( defLOGNAME, defLOG_ERROR, "cur db_ver=%d, need db_ver=%d!", cur_db_ver, GSIOT_DBVER );
+	if ( GSIOT_DBVER != cur_db_ver) {
 		return false;
 	}
 	//LOGMSGEX( defLOGNAME, defLOG_SYS, "db cur db_ver=%d", cur_db_ver );
-/*	SQLite::Statement cfgquery(*this->cfgdb,
-			"SELECT * FROM config where code=101");
-	if (cfgquery.executeStep()) {
-		string tmp11 = cfgquery.getColumn(1); //jyc20160823 add string tmpx
-		this->m_jid = tmp11;
-		string tmp12 = cfgquery.getColumn(2); //jyc20160823 add string tmpx
-		this->m_password = tmp12;
-	}*/
 
 	SQLite::Statement query(*this->db,
 			"SELECT * FROM config ORDER BY id DESC LIMIT 1");
@@ -68,10 +93,10 @@ bool GSIOTConfig::PreInit( const std::string &RunParam )
 		//this->m_password = query.getColumn(3);
 		string tmp1 = query.getColumn(1); //jyc20160823 add string tmpx
 		this->m_serialnumber = tmp1;
-		string tmp2 = query.getColumn(2);
-		this->m_jid = tmp2;
-		string tmp3 = query.getColumn(3);
-		this->m_password = tmp3;
+		//string tmp2 = query.getColumn(2);
+		//this->m_jid = tmp2;
+		//string tmp3 = query.getColumn(3);
+		//this->m_password = tmp3;
 		//this->m_serialport = query.getColumn(4);
 		//this->m_smtpserver = query.getColumn(5);
 		//this->m_smtpuser = query.getColumn(6);
@@ -98,11 +123,10 @@ bool GSIOTConfig::PreInit( const std::string &RunParam )
 
 	m_UserMgr.Init(db);
 	defmapGSIOTUser &mapUser = m_UserMgr.GetList_User();
-	for( defmapGSIOTUser::const_iterator it=mapUser.begin(); it!=mapUser.end(); ++it )
-	{
+	for (defmapGSIOTUser::const_iterator it = mapUser.begin();
+			it != mapUser.end(); ++it) {
 		GSIOTUser *pUser = it->second;
-
-		this->RefreshAuthOverview( pUser );
+		this->RefreshAuthOverview(pUser);
 	}
 
 	LoadRelation();

@@ -1,0 +1,1715 @@
+#include "GSIOTClient.h"
+
+
+/*静态函数*/
+void HikCamera::InitSDK( ICameraHandler *handler, ICameraAlarmRecv *hAlarmRecv )
+{
+	g_ICameraAlarmRecv = hAlarmRecv;
+
+	defNS_HIK::NET_DVR_Init();
+    //defNS_HIK::NET_DVR_SetDVRMessageCallBack_V30(MessageCallback,(unsigned long)handler);
+	defNS_HIK::NET_DVR_SetDVRMessageCallBack_V30(MessageCallback,NULL);
+	defNS_HIK::NET_DVR_SetConnectTime(3000, 3);
+	defNS_HIK::NET_DVR_SetReconnect( 10000, TRUE );
+
+	//---------------------------------------
+	//设置异常消息回调函数
+	defNS_HIK::NET_DVR_SetExceptionCallBack_V30(0, NULL,g_ExceptionCallBack, NULL);
+}
+
+void HikCamera::Cleanup()
+{
+	defNS_HIK::NET_DVR_Cleanup();
+}
+
+bool HikCamera::GetChannelNum( char *sDVRIP, uint16_t wDVRPort, char *sUserName, char *sPassword, uint8_t &byChanNum, uint8_t &byStartChan, std::string &strErr )
+{
+	char chbuf[256] = {0};
+
+	byChanNum = 0;
+	byStartChan = 0;
+	strErr = "";
+
+	defNS_HIK::NET_DVR_DEVICEINFO_V30 DeviceInfo;
+	memset( &DeviceInfo, 0, sizeof(DeviceInfo) );
+
+	long lLogin = defNS_HIK::NET_DVR_Login_V30( sDVRIP, wDVRPort, sUserName, sPassword, &DeviceInfo );
+	if(lLogin<0)
+	{
+		int nErr = defNS_HIK::NET_DVR_GetLastError();
+		LOGMSGEX( defLOGNAME, defLOG_ERROR, "Cam Cfg:Connect(%s:%d) Failed! err=%d\r\n", sDVRIP, wDVRPort, nErr );
+
+		if(nErr == NET_DVR_PASSWORD_ERROR)
+		{
+			strErr = "用户名密码错误!";
+			return false;
+		}
+
+		sprintf_s( chbuf, sizeof(chbuf), "%s:%d 连接失败！", sDVRIP, wDVRPort );
+		strErr = chbuf;
+		return false;
+	}
+
+	defNS_HIK::NET_DVR_Logout(lLogin);
+
+	byChanNum = DeviceInfo.byChanNum;
+	byStartChan = DeviceInfo.byStartChan;
+
+	return true;
+}
+
+bool HikCamera::GetCameraDevInfo(
+	char *sDVRIP, uint16_t wDVRPort, char *sUserName, char *sPassword, const std::string &devname,
+	std::string &strCamSerialNo, defvecChInfo &vecChInfo, std::string &strErr, const uint32_t streamfmt )
+{
+	char chbuf[256] = {0};
+
+	strErr = "";
+
+	// login and get devinfo
+	defNS_HIK::NET_DVR_DEVICEINFO_V30 DeviceInfo;
+	memset( &DeviceInfo, 0, sizeof(DeviceInfo) );
+	long lLogin = defNS_HIK::NET_DVR_Login_V30( sDVRIP, wDVRPort, sUserName, sPassword, &DeviceInfo );
+	if(lLogin<0)
+	{
+		int nErr = defNS_HIK::NET_DVR_GetLastError();
+		LOGMSGEX( defLOGNAME, defLOG_ERROR, "Cam Cfg:Connect(%s:%d) Failed! err=%d\r\n", sDVRIP, wDVRPort, nErr );
+
+		if(nErr == NET_DVR_PASSWORD_ERROR)
+		{
+			strErr = "用户名密码错误!";
+			return false;
+		}
+
+		sprintf_s( chbuf, sizeof(chbuf), "%s:%d 连接失败！", sDVRIP, wDVRPort );
+		strErr = chbuf;
+		return false;
+	}
+
+	strncpy_s( chbuf, (char*)DeviceInfo.sSerialNumber, sizeof(DeviceInfo.sSerialNumber) );
+	chbuf[sizeof(DeviceInfo.sSerialNumber)] = 0;
+	strCamSerialNo = chbuf;
+
+	// 模拟通道起始号和数量
+	const int iStartChan = DeviceInfo.byStartChan;
+	const int iAnalogChanNum = DeviceInfo.byChanNum;
+
+	// get ipcinfo
+	DWORD dwReturned = 0;
+	int iGroupNO = 0;
+	defNS_HIK::NET_DVR_IPPARACFG_V40 IPAccessCfgV40;
+	memset( &IPAccessCfgV40, 0, sizeof(IPAccessCfgV40) );
+	BOOL bIPRet = defNS_HIK::NET_DVR_GetDVRConfig( lLogin, NET_DVR_GET_IPPARACFG_V40, iGroupNO, &IPAccessCfgV40, sizeof(IPAccessCfgV40), &dwReturned);
+
+	// 数字通道起始号和数量
+	const int dwStartDChan = bIPRet ? IPAccessCfgV40.dwStartDChan: 0;
+	const int iIPChanNum = bIPRet ? IPAccessCfgV40.dwDChanNum: 0;
+
+	const bool isMoreCh = (iAnalogChanNum+iIPChanNum)>1;
+
+	int iAnalogChanCount = 0;
+	int iIPChanCount = 0;
+	char ChID[256] = {0};
+	char strCh[256] = {0};
+	char chDesc[256] = {0};
+	for( int i = 0; i < MAX_CHANNUM_V30; i++ )
+	{
+		DWORD dwChanShow = 0;
+		bool isAdd = false;
+
+		//analog channel
+		if (iAnalogChanCount < iAnalogChanNum)
+		{
+			isAdd = true;
+			dwChanShow = iAnalogChanCount + iStartChan;
+
+			if( isMoreCh )
+			{
+				sprintf_s( ChID, sizeof(ChID), "-%d", dwChanShow );
+			}
+			else
+			{
+				strcpy( ChID, "" );
+			}
+
+			sprintf_s( chDesc, sizeof(chDesc), "通道%s，通道号=%d", ChID, dwChanShow );
+
+			iAnalogChanCount++;
+			sprintf_s( strCh, sizeof(strCh), "A%d", iAnalogChanCount );
+		}
+		//IP channel
+		else if (iIPChanCount < iIPChanNum)
+		{
+			isAdd = true;
+			dwChanShow = iIPChanCount + dwStartDChan;
+
+			if( isMoreCh )
+			{
+				sprintf_s( ChID, sizeof(ChID), "-D%d", iIPChanCount+1 );
+			}
+			else
+			{
+				strcpy( ChID, "" );
+			}
+
+			sprintf_s( chDesc, sizeof(chDesc), "数字通道%s，通道号=%d", ChID, dwChanShow );
+
+			iIPChanCount++;
+			sprintf_s( strCh, sizeof(strCh), "D%d", iIPChanCount );
+		}
+
+		if( isAdd )
+		{
+			struChInfo SelChMain;
+			SelChMain.channel = dwChanShow;
+			SelChMain.name = devname + ChID;
+			SelChMain.strCh = strCh;
+			SelChMain.streamfmt = 0;
+			SelChMain.desc = std::string(chDesc) + "，主码流";
+			vecChInfo.push_back( SelChMain );
+
+			if( 0!=streamfmt )
+			{
+				struChInfo SelChSub;
+				SelChSub.channel = dwChanShow;
+				SelChSub.name = devname + ChID + "sub";
+				SelChSub.strCh = strCh;
+				SelChSub.streamfmt = 1;
+				SelChSub.desc = std::string(chDesc) + "，子码流";
+				vecChInfo.push_back( SelChSub );
+			}
+		}
+	}
+
+	defNS_HIK::NET_DVR_Logout(lLogin);
+
+	return true;
+}
+
+defGSReturn HikCamera::SetCamTime_Spec( const struGSTime &newtime, const std::string &name, const std::string &sIP, uint16_t wPort, const std::string &sUserName, const std::string &sPassword )
+{
+	defGSReturn gsret = defGSReturn_Err;
+
+	long LoginID = -1;
+
+	defNS_HIK::NET_DVR_DEVICEINFO_V30 DeviceInfo;
+	memset( &DeviceInfo, 0, sizeof(DeviceInfo) );
+	LoginID = defNS_HIK::NET_DVR_Login_V30( (char*)sIP.c_str(), wPort, (char*)sUserName.c_str(), (char*)sPassword.c_str(), &DeviceInfo );
+	if( LoginID<0 )
+	{
+		int nErr = defNS_HIK::NET_DVR_GetLastError();
+		LOGMSGEX( defLOGNAME, defLOG_ERROR, "SetCamTime_Spec:Connect(%s,%s:%d) Failed! err=%d\r\n", name.c_str()?name.c_str():"", sIP.c_str(), wPort, nErr );
+
+		return hikErr2GSErr( nErr );
+	}
+
+	return SetCamTime_ForLoginID( newtime, name, LoginID, sIP, wPort );
+}
+
+defGSReturn HikCamera::SetCamTime_ForLoginID( const struGSTime &newtime, const std::string &name, const long LoginID, const std::string &sIP, const uint16_t wPort )
+{
+	defGSReturn gsret = defGSReturn_Err;
+
+	if( LoginID>=0 )
+	{
+		defNS_HIK::NET_DVR_TIME CurTime;
+		memset( &CurTime, 0, sizeof(CurTime) );
+		char szLan[1024] = {0};
+		CurTime.dwYear = newtime.Year;
+		CurTime.dwMonth = newtime.Month;
+		CurTime.dwDay = newtime.Day;
+		CurTime.dwHour = newtime.Hour;
+		CurTime.dwMinute = newtime.Minute;
+		CurTime.dwSecond = newtime.Second;
+
+		if( defNS_HIK::NET_DVR_SetDVRConfig( LoginID, NET_DVR_SET_TIMECFG, 0, &CurTime, sizeof(CurTime) ) )
+		{
+			LOGMSGEX( defLOGNAME, defLOG_ERROR, "SetCamTime(%s,%s:%d) Success.", name.c_str()?name.c_str():"", sIP.c_str(), wPort );
+
+			return defGSReturn_Success;
+		}
+	}
+
+	LOGMSGEX( defLOGNAME, defLOG_ERROR, "SetCamTime(%s,%s:%d) Failed!\r\n", name.c_str()?name.c_str():"", sIP.c_str(), wPort );
+	return defGSReturn_ConnectObjErr;
+}
+
+HikCamera::HikCamera(const std::string& deviceID, const std::string& name,
+		const std::string& ipaddress,uint32_t port,const std::string& username,
+		const std::string& password, const std::string& ver, GSPtzFlag PTZFlag, GSFocalFlag FocalFlag,
+		uint32_t channel, uint32_t streamfmt )
+		:IPCameraBase(deviceID, name,ipaddress, port, username,
+		password, ver, PTZFlag, FocalFlag, channel, streamfmt )
+{
+	this->m_camera_hwnd = -1;
+	this->m_playhandle = -1;
+	this->m_AlarmChan = -1;
+	this->m_isFirstAudio = true;
+	this->m_AudioEncType = -1;
+	this->m_pDecHandle = (void*)-1;
+
+	this->m_lVoiceComHandle = -1;
+
+	//setBufferTime(0);
+
+	memset( &m_sptr, 0, sizeof(m_sptr) );
+	memset( &m_frame, 0, sizeof(m_frame) );
+
+	m_timeMakeKeyFrame = timeGetTime()-60000;
+}
+
+HikCamera::~HikCamera(void)
+{
+	//LOGMSG("~HikCamera\r\n");
+	m_demux.Close();
+}
+
+void HikCamera::PreinitBufCheck()
+{
+	m_demux.PreinitBufCheck();
+	this->GetStreamObj()->GetRTMPSendObj()->get_fullbuf_video_cache_buffer();
+}
+
+bool HikCamera::TestConnect( std::string &strErr )
+{
+	LOGMSG( "Cam:TestConnect(%s,%s:%d)\r\n", m_name.c_str()?m_name.c_str():"", (char *)this->m_ipaddress.c_str(), this->m_port );
+
+	char chbuf[256] = {0};
+
+	strErr = "";
+
+	defNS_HIK::NET_DVR_DEVICEINFO_V30 DeviceInfo;
+	memset( &DeviceInfo, 0, sizeof(DeviceInfo) );
+	long lLogin = defNS_HIK::NET_DVR_Login_V30( (char *)this->m_ipaddress.c_str(), this->m_port,
+		(char *)this->m_username.c_str(), (char *)this->m_password.c_str(), &DeviceInfo );
+	if(lLogin<0)
+	{
+		int nErr = defNS_HIK::NET_DVR_GetLastError();
+		LOGMSGEX( defLOGNAME, defLOG_ERROR, "Cam:TestConnect(%s,%s:%d) Failed! err=%d\r\n", m_name.c_str()?m_name.c_str():"", (char *)this->m_ipaddress.c_str(), this->m_port, nErr );
+
+		if(nErr == NET_DVR_PASSWORD_ERROR)
+		{
+			strErr = "用户名密码错误!";
+			return false;
+		}
+
+		sprintf_s( chbuf, sizeof(chbuf), "%s:%d 连接失败！", (char *)this->m_ipaddress.c_str(), this->m_port );
+		strErr = chbuf;
+		return false;
+	}
+
+	return true;
+}
+
+defGSReturn HikCamera::SetCamTime( const struGSTime &newtime )
+{
+	this->Login( false );
+
+	return SetCamTime_ForLoginID( newtime, m_name, m_camera_hwnd, this->ConnUse_ip(), this->ConnUse_port() );
+}
+
+defGSReturn HikCamera::Login( bool playback )
+{
+	if( m_camera_hwnd < 0 )
+	{
+		defNS_HIK::NET_DVR_DEVICEINFO_V30 DeviceInfo;
+		memset( &DeviceInfo, 0, sizeof(DeviceInfo) );
+
+		long lLogin = defNS_HIK::NET_DVR_Login_V30((char *)this->ConnUse_ip(playback).c_str(),this->ConnUse_port(playback),
+			(char *)this->ConnUse_username(playback).c_str(), (char *)this->ConnUse_password(playback).c_str(),&DeviceInfo);
+
+		if(lLogin<0)
+		{
+			int nErr = defNS_HIK::NET_DVR_GetLastError();
+
+			LOGMSGEX( defLOGNAME, defLOG_ERROR, "Cam:Login(%s,%s:%d) Failed! err=%d\r\n", m_name.c_str()?m_name.c_str():"", (char *)this->ConnUse_ip(playback).c_str(), this->ConnUse_port(playback), nErr );
+
+			return hikErr2GSErr( nErr );
+		}
+
+		this->m_camera_hwnd = lLogin;
+		//LOGMSG( "Cam:Connect(%s,%s:%d) Success. handle=%d\r\n", m_name.c_str()?m_name.c_str():"", (char *)this->ConnUse_ip(playback).c_str(), this->ConnUse_port(playback), this->m_camera_hwnd );
+	}
+
+	ConnectAlarmGuard();
+
+	return defGSReturn_Success;
+}
+
+// 连接建立告警通道
+void HikCamera::ConnectAlarmGuard()
+{
+	if( m_AlarmChan < 0 )
+	{
+		if( m_AGRunState
+			&& m_AdvAttr.get_AdvAttr( defCamAdvAttr_SupportAlarm )
+			)
+		{
+			m_AlarmChan = defNS_HIK::NET_DVR_SetupAlarmChan_V30( m_camera_hwnd );
+
+			LOGMSG( "Cam:ConnectAlarmGuard(%s,%s:%d) h=%d\r\n", m_name.c_str()?m_name.c_str():"", (char *)this->ConnUse_ip().c_str(), this->ConnUse_port(), m_AlarmChan );
+		}
+	}
+}
+
+// 连接建立告警通道
+void HikCamera::DisconnectAlarmGuard()
+{
+	if( m_AlarmChan>=0 )
+	{
+		LOGMSG( "Cam:DisconnectAlarmGuard(%s,%s:%d) h=%d\r\n", m_name.c_str()?m_name.c_str():"", (char *)this->ConnUse_ip().c_str(), this->ConnUse_port(), m_AlarmChan );
+
+		defNS_HIK::NET_DVR_CloseAlarmChan_V30( m_AlarmChan );
+	}
+
+	m_AlarmChan = -1;
+}
+
+void HikCamera::Logout()
+{
+	DisconnectAlarmGuard();
+
+	if( m_playhandle>=0 )
+	{
+		if( m_isPlayBack )
+		{
+			defNS_HIK::NET_DVR_StopPlayBack( this->m_playhandle );
+		}
+		else
+		{
+			defNS_HIK::NET_DVR_SetRealDataCallBack(this->m_playhandle, NULL, 0);
+			defNS_HIK::NET_DVR_StopRealPlay(this->m_playhandle);
+		}
+	}
+
+	if( m_camera_hwnd>=0 )
+	{
+		//defNS_HIK::NET_DVR_CloseAlarmChan(this->m_camera_hwnd);
+		defNS_HIK::NET_DVR_Logout(this->m_camera_hwnd);
+	}
+
+	this->m_camera_hwnd = -1;
+	this->m_playhandle = -1;
+	this->m_AlarmChan = -1;
+}
+
+defGSReturn HikCamera::Connect( bool reconnectAudio, void* RealPlayWnd, bool playback, const struGSTime *pdtBegin, const struGSTime *pdtEnd )
+{
+	ConnectBefore();
+
+	this->m_isFirstAudio = true;
+
+#if 0 //--temptest
+	playback=true;
+	struGSTime dtBegin;
+	struGSTime dtEnd;
+	dtBegin.Year   = 2013;
+	dtBegin.Month  = 11;
+	dtBegin.Day    = 8;
+	dtBegin.Hour   = 10;
+	dtBegin.Minute = 0;
+	dtBegin.Second =0;
+	dtEnd.Year   = 2013;
+	dtEnd.Month  = 11;
+	dtEnd.Day    = 10;
+	dtEnd.Hour   = 10;
+	dtEnd.Minute = 0;
+	dtEnd.Second =0;
+	pdtBegin = &dtBegin;
+	pdtEnd = &dtEnd;
+#endif
+
+	LOGMSG( "Cam:Connect(%s,%s:%d)\r\n", m_name.c_str()?m_name.c_str():"", (char *)this->ConnUse_ip(playback).c_str(), this->ConnUse_port(playback) );
+
+	if( this->IsConnect() )
+	{
+		this->OnDisconnct();
+	}
+
+	this->m_state.Reset();
+	this->m_state.startTime = timeGetTime();
+
+	defGSReturn ret = this->Login( playback );
+	if( macGSFailed(ret) )
+	{
+		ConnectAfter();
+		return ret;
+	}
+
+	LOGMSG( "Cam:Connect(%s,%s:%d) Success. LoginID=%d\r\n", m_name.c_str()?m_name.c_str():"", (char *)this->ConnUse_ip(playback).c_str(), this->ConnUse_port(playback), this->m_camera_hwnd );
+
+	//defNS_HIK::NET_DVR_SetupAlarmChan(lLogin);
+#if 1
+	m_isPlayBack = playback;
+
+	if( m_isPlayBack )
+	{
+		return PlayBack( RealPlayWnd, pdtBegin, pdtEnd );
+	}
+#endif
+
+	InitAudioEncType();
+
+	ret = this->SetChannelStream(m_channel, reconnectAudio, RealPlayWnd);
+
+	ConnectAfter();
+	return ret;
+}
+
+bool HikCamera::isSupportAudioEncType( int AudioEncType )
+{
+	switch(AudioEncType)
+	{
+	case AUDIOTALKTYPE_G711_MU:
+	case AUDIOTALKTYPE_G711_A:
+		return true;
+
+	case AUDIOTALKTYPE_G722:
+		return true;
+
+	case AUDIOTALKTYPE_G726:
+		return true;
+
+	default:
+		break;
+	}
+
+	return false;
+}
+
+bool HikCamera::InitAudioEncType()
+{
+	this->m_AudioEncType = -1;
+
+	// 是否获取音频编码
+	//if( defAudioSource_CamReEnc == this->GetAudioCfg().get_Audio_Source()
+	//	||
+	//	( defAudioSource_Camera == this->GetAudioCfg().get_Audio_Source() && defAudioParamDef_Analyse==this->GetAudioCfg().get_Audio_ParamDef() )
+	//	)
+	{
+		LOGMSG( "Cam(%s)(%s) InitAudioEncType...", m_name.c_str()?m_name.c_str():"", CAudioCfg::getstr_AudioSource(this->GetAudioCfg().get_Audio_Source(),false).c_str() );
+
+		defNS_HIK::NET_DVR_COMPRESSION_AUDIO struCodeType;
+		memset( &struCodeType, 0, sizeof(defNS_HIK::NET_DVR_COMPRESSION_AUDIO) );
+		if( defNS_HIK::NET_DVR_GetCurrentAudioCompress( this->m_camera_hwnd, &struCodeType ) )
+		{
+			m_AudioEncType = struCodeType.byAudioEncType;
+			LOGMSG( "Cam(%s) AudioEncType=%d", m_name.c_str()?m_name.c_str():"", m_AudioEncType );
+		}
+		else
+		{
+			LOGMSG( "Cam(%s) get AudioEncType failed!", m_name.c_str()?m_name.c_str():"" );
+		}
+	}
+	//else
+	//{
+	//	return false;
+	//}
+
+	// 摄像头音频
+	if( defAudioSource_Camera == this->GetAudioCfg().get_Audio_Source() && defAudioParamDef_Analyse==this->GetAudioCfg().get_Audio_ParamDef() )
+	{
+		CAudioCfg::struAudioParam ap;
+		ap.Audio_FmtType = defAudioFmtType_Unknown;
+		ap.Audio_Channels = 1;
+		ap.Audio_bitSize = 16;
+		ap.Audio_ByteRate = 2048;
+
+		switch(m_AudioEncType)
+		{
+		case AUDIOTALKTYPE_G711_MU:
+			ap.Audio_FmtType = defAudioFmtType_PCM_MULAW;
+			ap.Audio_SampleRate = 8000;
+			break;
+
+		case AUDIOTALKTYPE_G711_A:
+			ap.Audio_FmtType = defAudioFmtType_PCM_ALAW;
+			ap.Audio_SampleRate = 8000;
+			break;
+
+		default:
+			break;
+		}
+
+
+		LOGMSG( "Cam(%s) analyze set AudioFmtType=%d", m_name.c_str()?m_name.c_str():"", ap.Audio_FmtType );
+		this->GetAudioCfg().set_Audio_FmtType( ap.Audio_FmtType );
+		this->GetAudioCfg().set_AudioParam_Analyse( ap );
+		this->UpdateAudioCfg();
+		return true;
+	}
+
+	// 摄像头音频转码
+	if( defAudioSource_CamReEnc != this->GetAudioCfg().get_Audio_Source() )
+		return false;
+
+	if( this->GetStreamObj()->GetRTMPSendObj()->GetIPlayBack() )
+		return false;
+
+	if( !IsRUNCODEEnable(defCodeIndex_SYS_CamReEnc) )
+		return false;
+
+	if( !isSupportAudioEncType( m_AudioEncType ) )
+	{
+		LOGMSG( "Cam(%s) AudioEncType=%d no support!\r\n", m_name.c_str()?m_name.c_str():"", m_AudioEncType );
+		return false;
+	}
+
+	CAudioCfg::struAudioParam ap;
+	ap.Audio_FmtType = defAudioFmtType_AAC;
+	ap.Audio_Channels = 1;
+	ap.Audio_bitSize = 16;
+	ap.Audio_ByteRate = 2048;
+
+	switch(m_AudioEncType)
+	{
+	case AUDIOTALKTYPE_G711_MU:
+	case AUDIOTALKTYPE_G711_A:
+		ap.Audio_SampleRate = 8000;
+		break;
+
+	case AUDIOTALKTYPE_G722:
+		{
+			ap.Audio_SampleRate = 16000;
+			m_pDecHandle = defNS_HIK::NET_DVR_InitG722Decoder();
+			LOGMSG( "Cam(%s) NET_DVR_InitG722Decoder(%X)\r\n", m_name.c_str()?m_name.c_str():"", m_pDecHandle );
+			if( -1 == (int)m_pDecHandle )
+			{
+				return false;
+			}
+		}
+		break;
+
+	case AUDIOTALKTYPE_G726:
+		{
+			ap.Audio_SampleRate = 8000;
+			void *pDecHandleM = NULL;
+			m_pDecHandle = defNS_HIK::NET_DVR_InitG726Decoder(&pDecHandleM);
+			LOGMSG( "Cam(%s) NET_DVR_InitG726Decoder(%X) Module=%X\r\n", m_name.c_str()?m_name.c_str():"", m_pDecHandle, pDecHandleM );
+			if( -1 == (int)m_pDecHandle )
+			{
+				return false;
+			}
+
+			if( (int)pDecHandleM != (int)m_pDecHandle )
+			{
+				LOGMSG( "Cam(%s) NET_DVR_InitG726Decoder(%X) Module=%X is diff failed\r\n", m_name.c_str()?m_name.c_str():"", m_pDecHandle, pDecHandleM );
+				return false;
+			}
+		}
+		break;
+
+	default:
+		{
+			// not support
+			return false;
+		}
+		break;
+	}
+
+	//if( defAudioParamDef_Analyse == this->GetAudioCfg().get_Audio_ParamDef() )
+	{
+		this->GetAudioCfg().set_AudioParam_Analyse( ap );
+		this->UpdateAudioCfg();
+	}
+
+	if( !m_accen.OpenAudio( this->GetAudioCfg() ) )
+	{
+		LOGMSG( "Cam(%s) accen OpenAudio failed\r\n", m_name.c_str()?m_name.c_str():"" );
+		return false;
+	}
+
+	LOGMSG( "Cam(%s) InitAudioEncType success.\r\n", m_name.c_str()?m_name.c_str():"" );
+	return true;
+}
+
+defGSReturn HikCamera::SetChannelStream(int channel, bool reconnectAudio, void* RealPlayWnd)
+{
+#if 0
+	defNS_HIK::NET_DVR_CLIENTINFO ClientInfo = {0};
+
+	ClientInfo.hPlayWnd = NULL;
+	ClientInfo.lChannel = channel;
+	ClientInfo.lLinkMode = m_streamfmt<<31;
+	ClientInfo.sMultiCastIP = "";
+
+	this->m_playhandle = defNS_HIK::NET_DVR_RealPlay_V30( this->m_camera_hwnd, &ClientInfo, DataCallBack, this, TRUE );
+	//this->m_playhandle = defNS_HIK::NET_DVR_RealPlay_V30( this->m_camera_hwnd, &ClientInfo, NULL, NULL, TRUE );
+#else
+	defNS_HIK::NET_DVR_PREVIEWINFO ClientInfo = {0};
+	memset( &ClientInfo, 0, sizeof(ClientInfo) );
+	ClientInfo.lChannel = channel;//通道号
+	ClientInfo.dwStreamType = m_streamfmt;
+	ClientInfo.dwLinkMode = 0;// 0：TCP方式,1：UDP方式,2：多播方式,3 - RTP方式，-RTP/RTSP,5-RSTP/HTTP
+	ClientInfo.hPlayWnd =  (HWND)RealPlayWnd;//播放窗口的句柄,为NULL表示不播放图象
+	ClientInfo.bBlocked = 0;  //0-非阻塞取流, 1-阻塞取流, 如果阻塞SDK内部connect失败将会有5s的超时才能够返回,不适合于轮询取流操作.
+	ClientInfo.bPassbackRecord = 0; //0-不启用录像回传,1启用录像回传
+	ClientInfo.byPreviewMode = 0;//预览模式，0-正常预览，1-延迟预览
+
+	this->m_playhandle = defNS_HIK::NET_DVR_RealPlay_V40( this->m_camera_hwnd, &ClientInfo, RealPlayWnd?NULL:DataCallBack, RealPlayWnd?0:this );
+#endif
+
+	if(this->m_playhandle <0 )
+	{
+		long nErr = defNS_HIK::NET_DVR_GetLastError();
+
+		LOGMSGEX( defLOGNAME, defLOG_ERROR, "Cam:Play Failed! LoginID=%d, ch=%d, streamfmt=%d, err=%d\r\n", this->m_camera_hwnd, channel, m_streamfmt, nErr );
+
+		return hikErr2GSErr( nErr );
+	}else{
+		//defNS_HIK::NET_DVR_SetStandardDataCallBack( this->m_camera_hwnd, DataCallBack, (DWORD)this );
+		//defNS_HIK::NET_DVR_SetRealDataCallBack(this->m_playhandle, DataCallBack, (long)this);
+
+		//MakeKeyFrame();
+	}
+
+	if( reconnectAudio )
+		StartLocalCapAudio();
+
+	LOGMSG( "Cam:Play Success. LoginID=%d, ch=%d, lLinkMode=%d\r\n", this->m_camera_hwnd, channel, m_streamfmt );
+
+	return defGSReturn_Success;
+}
+
+defGSReturn HikCamera::PlayBack( void* RealPlayWnd, const struGSTime *pdtBegin, const struGSTime *pdtEnd )
+{
+	if( !pdtBegin || !pdtEnd )
+		return defGSReturn_ErrParam;
+
+	const HWND hwnd = (HWND)RealPlayWnd;
+	const bool isPlayBackReverse = false;
+
+	this->GetStreamObj()->GetRTMPSendObj()->SetIPlayBack( this );
+
+	//---------------------------------------
+	//按时间回放
+	defNS_HIK::NET_DVR_TIME BeginTime={0};
+	memset( &BeginTime, 0, sizeof(BeginTime) );
+	BeginTime.dwYear   = pdtBegin->Year;
+	BeginTime.dwMonth  = pdtBegin->Month;
+	BeginTime.dwDay    = pdtBegin->Day;
+	BeginTime.dwHour   = pdtBegin->Hour;
+	BeginTime.dwMinute = pdtBegin->Minute;
+	BeginTime.dwSecond = pdtBegin->Second;
+
+	defNS_HIK::NET_DVR_TIME EndTime={0};
+	memset( &EndTime, 0, sizeof(EndTime) );
+	EndTime.dwYear    = pdtEnd->Year;
+	EndTime.dwMonth   = pdtEnd->Month;
+	EndTime.dwDay     = pdtEnd->Day;
+	EndTime.dwHour    = pdtEnd->Hour;
+	EndTime.dwMinute  = pdtEnd->Minute;
+	EndTime.dwSecond  = pdtEnd->Second;
+
+	if( isPlayBackReverse )
+	{
+		defNS_HIK::NET_DVR_PLAYCOND struPlayCon = {0};
+		memset( &struPlayCon, 0, sizeof(struPlayCon) );
+		struPlayCon.byDrawFrame = 0;
+		struPlayCon.dwChannel = this->ConnUse_channel(true);
+		struPlayCon.struStartTime = BeginTime;
+		struPlayCon.struStopTime = EndTime;
+
+		this->m_playhandle = defNS_HIK::NET_DVR_PlayBackReverseByTime_V40( this->m_camera_hwnd, hwnd, &struPlayCon );
+	}
+	else
+	{
+		defNS_HIK::NET_DVR_VOD_PARA struVodPara={0};
+		memset( &struVodPara, 0, sizeof(struVodPara) );
+		struVodPara.dwSize=sizeof(struVodPara);
+		struVodPara.struIDInfo.dwSize = sizeof(struVodPara.struIDInfo);
+		struVodPara.struIDInfo.dwChannel= this->ConnUse_channel(true);
+		struVodPara.hWnd = hwnd;
+		//struVodPara.hWnd=NULL;
+		//struVodPara.hWnd=::GetActiveWindow();
+		struVodPara.struBeginTime = BeginTime;
+		struVodPara.struEndTime = EndTime;
+
+		this->m_playhandle = defNS_HIK::NET_DVR_PlayBackByTime_V40(this->m_camera_hwnd, &struVodPara);
+	}
+
+	if(m_playhandle < 0)
+	{
+		const DWORD nErr = defNS_HIK::NET_DVR_GetLastError();
+
+		LOGMSG( "hik cam(%s) PlayBack nErr=%d", this->m_name.c_str(), nErr );
+
+		return hikErr2GSErr( nErr );
+	}
+
+	if( !hwnd )
+	{
+		defNS_HIK::NET_DVR_SetPlayDataCallBack_V40( m_playhandle, PlayDataCallBack_V40, this );
+	}
+
+	//---------------------------------------
+	//开始
+	if(!defNS_HIK::NET_DVR_PlayBackControl_V40(m_playhandle, NET_DVR_PLAYSTART,NULL, 0, NULL,NULL))
+	{
+		return hikErr2GSErr( defNS_HIK::NET_DVR_GetLastError() );
+	}
+
+	//uint32_t pos = -1;
+	//BOOL BL = defNS_HIK::NET_DVR_PlayBackControl( m_playhandle, NET_DVR_PLAYGETPOS, 0, (DWORD*)&pos );
+	//if( pos<0 || pos >= 100 )
+	//{
+	//	return -1;
+	//}
+
+	return defGSReturn_Success;
+}
+
+defGSReturn HikCamera::QuickSearchPlayback( const struGSTime *pdtBegin, const struGSTime *pdtEnd )
+{
+	if( !pdtBegin || !pdtEnd )
+		return defGSReturn_Err;
+
+	const bool playback = true;
+	const uint32_t curtime = timeGetTime();
+
+	defNS_HIK::NET_DVR_DEVICEINFO_V30 DeviceInfo;
+	memset( &DeviceInfo, 0, sizeof(DeviceInfo) );
+
+	const long lLogin = defNS_HIK::NET_DVR_Login_V30(
+		(char*)this->ConnUse_ip(playback).c_str(),
+		this->ConnUse_port(playback),
+		(char*)this->ConnUse_username(playback).c_str(),
+		(char*)this->ConnUse_password(playback).c_str(),
+		&DeviceInfo
+		);
+
+	if( lLogin < 0 )
+	{
+		const int nErr = defNS_HIK::NET_DVR_GetLastError();
+
+		LOGMSG( "Cam:QuickSearchPlayback(%s,%s:%d) Login Failed! err=%d\r\n", m_name.c_str()?m_name.c_str():"", (char*)this->ConnUse_ip(playback).c_str(), this->ConnUse_port(playback), nErr );
+
+		return defGSReturn_ConnectObjErr;
+	}
+
+	defNS_HIK::NET_DVR_FILECOND_V40 struFileCond;
+	memset( &struFileCond, 0, sizeof(struFileCond) );
+
+	struFileCond.lChannel = this->ConnUse_channel(playback);
+	struFileCond.dwFileType = 0xff; // 全部
+	struFileCond.dwIsLocked = 0xff; // 全部
+
+	struFileCond.dwUseCardNo = 0;
+	//struFileCond.sCardNumber[CARDNUM_LEN];
+
+	struFileCond.struStartTime.dwYear   = pdtBegin->Year;
+	struFileCond.struStartTime.dwMonth  = pdtBegin->Month;
+	struFileCond.struStartTime.dwDay    = pdtBegin->Day;
+	struFileCond.struStartTime.dwHour   = pdtBegin->Hour;
+	struFileCond.struStartTime.dwMinute = pdtBegin->Minute;
+	struFileCond.struStartTime.dwSecond = pdtBegin->Second;
+
+	struFileCond.struStopTime.dwYear    = pdtEnd->Year;
+	struFileCond.struStopTime.dwMonth   = pdtEnd->Month;
+	struFileCond.struStopTime.dwDay     = pdtEnd->Day;
+	struFileCond.struStopTime.dwHour    = pdtEnd->Hour;
+	struFileCond.struStopTime.dwMinute  = pdtEnd->Minute;
+	struFileCond.struStopTime.dwSecond  = pdtEnd->Second;
+
+	struFileCond.byDrawFrame = 0; //0:不抽帧，1：抽帧
+	struFileCond.byFindType = 0; //0:查询普通卷，1：查询存档卷
+	struFileCond.byQuickSearch = 1; //0:普通查询，1：快速（日历）查询 *****
+	//struFileCond.dwVolumeNum;  //存档卷号
+	//struFileCond.byWorkingDeviceGUID[GUID_LEN];    //工作机GUID，通过获取N+1得到
+
+	defGSReturn ret = defGSReturn_Err;
+
+	const LONG lFileHandle = defNS_HIK::NET_DVR_FindFile_V40( lLogin, &struFileCond );
+	if( lFileHandle < 0 )
+	{
+		ret = defGSReturn_CreateObjErr;
+
+		const int nErr = defNS_HIK::NET_DVR_GetLastError();
+
+		LOGMSG( "Cam:QuickSearchPlayback(%s,%s:%d) FindFile Failed! err=%d\r\n", m_name.c_str()?m_name.c_str():"", (char*)this->ConnUse_ip(playback).c_str(), this->ConnUse_port(playback), nErr );
+
+		goto label_QuickSearchPlayback_End;
+	}
+
+	defNS_HIK::NET_DVR_FINDDATA_V40 struFileInfo;
+	memset( &struFileInfo, 0, sizeof(struFileInfo) );
+
+	ret = defGSReturn_TimeOut;
+	while( timeGetTime()-curtime < 10000 )
+	{
+		const LONG lFindRet = defNS_HIK::NET_DVR_FindNextFile_V40( lFileHandle, &struFileInfo );
+		if( NET_DVR_FILE_SUCCESS == lFindRet )
+		{
+			ret = defGSReturn_Success;
+			break;
+		}
+		else
+		{
+			if( NET_DVR_ISFINDING == lFindRet )
+			{
+				Sleep(5);
+				continue;
+			}
+
+			if( (NET_DVR_NOMOREFILE == lFindRet) || (NET_DVR_FILE_NOFIND == lFindRet) )
+			{
+				ret = defGSReturn_NotFoundContent;
+				break;
+			}
+			else
+			{
+				ret = defGSReturn_Null;
+				break;
+			}
+		}
+	}
+
+label_QuickSearchPlayback_End:
+
+	if( lFileHandle >= 0 )
+	{
+		defNS_HIK::NET_DVR_FindClose_V30( lFileHandle );
+	}
+
+	if( lLogin >= 0 )
+	{
+		defNS_HIK::NET_DVR_Logout( lLogin );
+	}
+
+	LOGMSG( "Cam:QuickSearchPlayback(%s,%s:%d) usetime=%ums, ret=%d:%s\r\n", m_name.c_str()?m_name.c_str():"", (char*)this->ConnUse_ip(playback).c_str(), this->ConnUse_port(playback), timeGetTime()-curtime, ret, g_Trans_GSReturn(ret).c_str() );
+
+	return ret;
+}
+
+int HikCamera::PlayBackControl( GSPlayBackCode_ ControlCode, void *pInBuffer, uint32_t InLen, void *pOutBuffer, uint32_t *pOutLen )
+{
+	//LOGMSG( "HikCamera::PlayBackControl(%d)", ControlCode );
+
+	gloox::util::MutexGuard mutexguard( m_mutex );
+
+	switch( ControlCode )
+	{
+	case GSPlayBackCode_PlaySetTime:
+		{
+			struGSTime *pdtBegin = (struGSTime*)pInBuffer;
+			defNS_HIK::NET_DVR_TIME struTime;
+			memset( &struTime, 0, sizeof(struTime) );
+			struTime.dwYear = pdtBegin->Year;
+			struTime.dwMonth = pdtBegin->Month;
+			struTime.dwDay = pdtBegin->Day;
+			struTime.dwHour = pdtBegin->Hour;
+			struTime.dwMinute = pdtBegin->Minute;
+			struTime.dwSecond = pdtBegin->Second;
+
+			if( defNS_HIK::NET_DVR_PlayBackControl_V40(m_playhandle, NET_DVR_PLAYSETTIME, &struTime, sizeof(struTime), NULL, 0) )
+			{
+				return 1;
+			}
+			else
+			{
+				return -1;
+			}
+		}
+		break;
+
+	case GSPlayBackCode_PLAYPAUSE:
+		{
+			if( defNS_HIK::NET_DVR_PlayBackControl_V40(m_playhandle, NET_DVR_PLAYPAUSE) )
+			{
+				return 1;
+			}
+			else
+			{
+				return -1;
+			}
+		}
+		break;
+
+	case GSPlayBackCode_PLAYRESTART:
+		{
+			if( defNS_HIK::NET_DVR_PlayBackControl_V40(m_playhandle, NET_DVR_PLAYRESTART) )
+			{
+				return 1;
+			}
+			else
+			{
+				return -1;
+			}
+		}
+		break;
+
+	case GSPlayBackCode_PLAYNORMAL:
+		{
+			if( defNS_HIK::NET_DVR_PlayBackControl_V40(m_playhandle, NET_DVR_PLAYNORMAL) )
+			{
+				return 1;
+			}
+			else
+			{
+				return -1;
+			}
+		}
+		break;
+
+	case GSPlayBackCode_PLAYFAST:
+		{
+			if( defNS_HIK::NET_DVR_PlayBackControl_V40(m_playhandle, NET_DVR_PLAYFAST) )
+			{
+				return 1;
+			}
+			else
+			{
+				return -1;
+			}
+		}
+		break;
+
+	case GSPlayBackCode_PLAYSETPOS:
+		{
+			if( defNS_HIK::NET_DVR_PlayBackControl(m_playhandle, NET_DVR_PLAYSETPOS, (int)pInBuffer, NULL) )
+			{
+				return 1;
+			}
+			else
+			{
+				return -1;
+			}
+		}
+		break;
+
+	case GSPlayBackCode_PLAYGETPOS:
+		{
+			if( defNS_HIK::NET_DVR_PlayBackControl(m_playhandle, NET_DVR_PLAYGETPOS, 0, (DWORD*)pOutBuffer ) )
+			{
+				return 1;
+			}
+			else
+			{
+				return -1;
+			}
+		}
+		break;
+
+	case GSPlayBackCode_SETSPEED:
+		{
+			// 速度单位：kbps
+			int speed = (int)pInBuffer;
+			if( defNS_HIK::NET_DVR_PlayBackControl_V40( m_playhandle, NET_DVR_SETSPEED, &speed, sizeof(int) ) )
+			{
+				return 1;
+			}
+			else
+			{
+				return -1;
+			}
+		}
+		break;
+
+	default:
+		{
+			LOGMSGEX( defLOGNAME, defLOG_ERROR, "HikCamera::PlayBackControl unsupport ControlCode=%d\r\n", ControlCode );
+		}
+		break;
+	}
+
+	return -1;
+}
+
+void HikCamera::OnDisconnct()
+{
+	StopLocalCapAudio();
+
+	//defNS_HIK::NET_DVR_DelRealDataCallBack(m_iPlayhandle, RealDataCallBack, (long)this);
+
+	this->OnTalkSend( defTalkSendCmd_Close, NULL, 0 );
+
+	if( (int)m_pDecHandle >= 0 )
+	{
+		switch(m_AudioEncType)
+		{
+		case AUDIOTALKTYPE_G722:
+			{
+				defNS_HIK::NET_DVR_ReleaseG722Decoder( m_pDecHandle );
+			}
+			break;
+
+		case AUDIOTALKTYPE_G726:
+			{
+				defNS_HIK::NET_DVR_ReleaseG726Decoder( m_pDecHandle );
+			}
+			break;
+		}
+	}
+	m_AudioEncType = -1;
+	m_pDecHandle = (void*)-1;
+	m_accen_bufMerge.ResetDataBuf();
+	m_accen.CloseAudio();
+
+	this->Logout();
+
+	this->ResetBuf();
+}
+
+bool HikCamera::IsConnect()
+{
+	if( m_camera_hwnd>=0 && m_playhandle>=0 )
+	{
+		return true;
+	}
+
+	return false;
+}
+
+void HikCamera::ResetBuf()
+{
+	m_demux.ReadReset();
+	m_demux.Close();
+	memset( &m_sptr, 0, sizeof(m_sptr) );
+	memset( &m_frame, 0, sizeof(m_frame) );
+
+	m_bufMerge.ResetDataBuf();
+}
+
+void HikCamera::SearchInit(ICameraHandler *handler)
+{
+}
+
+void HikCamera::SearchStart()
+{
+}
+
+void HikCamera::SearchStop()
+{
+}
+
+bool HikCamera::DealwithAlarm(char* pBuf , unsigned long dwLen)
+{
+	return true;
+}
+
+// speed : 1-7
+bool HikCamera::SendPTZ( GSPTZ_CtrlCmd command, int param1, int param2, int speed, const char *callinfo )
+{
+	long lPTZCommand = TILT_UP;
+	bool bStop = false;
+
+	this->Login( false );
+
+	bool direction = (GSPtzFlag_negative_direction==this->getPTZFlag())?false:true; // 正常方向
+
+	long lSpeed = 4; //default
+	if( speed>0 )
+	{
+		lSpeed = speed;
+	}
+
+	switch( command )
+	{
+	case GSPTZ_STOPAll:
+		lPTZCommand = TILT_UP;
+		bStop = true;
+		break;
+
+	case GSPTZ_UP:
+		lPTZCommand = direction ? TILT_UP : TILT_DOWN;
+		break;
+
+	case GSPTZ_DOWN:
+		lPTZCommand = direction ? TILT_DOWN : TILT_UP;
+		break;
+
+	case GSPTZ_LEFT:
+		lPTZCommand = direction ? PAN_LEFT : PAN_RIGHT;
+		break;
+
+	case GSPTZ_RIGHT:
+		lPTZCommand = direction ? PAN_RIGHT : PAN_LEFT;
+		break;
+
+	case GSPTZ_RIGHT_UP:	// 云台右上
+		lPTZCommand = direction ? UP_RIGHT: DOWN_LEFT;
+		break;
+
+	case GSPTZ_RIGHT_DOWN:	// 云台右下
+		lPTZCommand = direction ? DOWN_RIGHT : UP_LEFT;
+		break;
+
+	case GSPTZ_LEFT_UP:		// 云台左上
+		lPTZCommand = direction ? UP_LEFT : DOWN_RIGHT;
+		break;
+
+	case GSPTZ_LEFT_DOWN:	// 云台左下
+		lPTZCommand = direction ? DOWN_LEFT : UP_RIGHT;
+		break;
+
+	case GSPTZ_AUTO:
+		lPTZCommand = PAN_AUTO;
+		break;
+
+	case GSPTZ_ZOOM_IN:		// 焦距变大(倍率变大)
+		lPTZCommand = ZOOM_IN;
+		break;
+
+	case GSPTZ_ZOOM_OUT:	// 焦距变小(倍率变小)
+		lPTZCommand = ZOOM_OUT;
+		break;
+
+	case GSPTZ_FOCUS_NEAR:	// 焦点前调
+		lPTZCommand = FOCUS_NEAR;
+		break;
+
+	case GSPTZ_FOCUS_FAR:	// 焦点后调
+		lPTZCommand = FOCUS_FAR;
+		break;
+
+	case GSPTZ_IRIS_OPEN:	// 光圈扩大
+		lPTZCommand = IRIS_OPEN;
+		break;
+
+	case GSPTZ_IRIS_CLOSE:	// 光圈缩小
+		lPTZCommand = IRIS_CLOSE;
+		break;
+
+	case GSPTZ_MOTION_TRACK_Enable:
+		{
+			return Set_motion_track( true );
+		}
+		break;
+
+	case GSPTZ_MOTION_TRACK_Disable:
+		{
+			return Set_motion_track( false );
+		}
+		break;
+
+	case GSPTZ_MANUALTRACE:
+		{
+			if( !m_AdvAttr.get_AdvAttr( defCamAdvAttr_manual_trace ) )
+			{
+				LOGMSG( "hik cam(%s) defCamAdvAttr_manual_trace=false", this->m_name.c_str() );
+				return false;
+			}
+
+			defNS_HIK::NET_DVR_PTZ_MANUALTRACE struTrack = {0};
+			memset( &struTrack, 0, sizeof(struTrack) );
+			struTrack.dwSize = sizeof(defNS_HIK::NET_DVR_PTZ_MANUALTRACE);
+
+			struTrack.struPoint.fX = param1 / 10000;
+			struTrack.struPoint.fX /= 10000;
+
+			struTrack.struPoint.fY = param1 % 10000;
+			struTrack.struPoint.fY /= 10000;
+
+			//LOGMSG( "ptz x=%f, y=%f", struTrack.struPoint.fX, struTrack.struPoint.fY );
+
+			struTrack.byTrackType = 0;
+			struTrack.dwChannel = m_channel;
+			DWORD iRet = 0;
+			if (!defNS_HIK::NET_DVR_RemoteControl( this->m_camera_hwnd, NET_DVR_CONTROL_PTZ_MANUALTRACE, &struTrack, sizeof(struTrack)))
+			{
+				LOGMSG( "hik cam(%s) NET_DVR_RemoteControl NET_DVR_CONTROL_PTZ_MANUALTRACE Failed!err=%d", this->m_name.c_str(), defNS_HIK::NET_DVR_GetLastError() );
+				return false;
+			}
+
+			LOGMSG( "hik cam(%s) set MANUALTRACE x=%d, y=%d\r\n", this->m_name.c_str(), struTrack.struPoint.fX, struTrack.struPoint.fY );
+			return true;
+		}
+		break;
+
+	case GSPTZ_MANUALPTZSel:
+		{
+			if( !m_AdvAttr.get_AdvAttr( defCamAdvAttr_manual_ptzsel ) )
+			{
+				LOGMSG( "hik cam(%s) defCamAdvAttr_manual_ptzsel=false", this->m_name.c_str() );
+				return false;
+			}
+
+			defNS_HIK::NET_DVR_POINT_FRAME ptFrame;
+			memset( &ptFrame, 0, sizeof(ptFrame) );
+
+			//divides the width and height to 255 proportion
+			ptFrame.xTop = param1 / 10000;
+			ptFrame.xTop *= 255;
+			ptFrame.xTop /= 10000;
+
+			ptFrame.yTop = param1 % 10000;
+			ptFrame.yTop *= 255;
+			ptFrame.yTop /= 10000;
+
+			ptFrame.xBottom = ptFrame.xTop + 1;
+			ptFrame.yBottom = ptFrame.yTop + 1;
+			ptFrame.bCounter = 0;
+
+			//if (!defNS_HIK::NET_DVR_PTZSelZoomIn( this->m_playhandle, &ptFrame ) )
+			if (!defNS_HIK::NET_DVR_PTZSelZoomIn_EX( this->m_camera_hwnd, this->m_channel, &ptFrame ) )
+			{
+				LOGMSG( "hik cam(%s) MANUALPTZSel NET_DVR_PTZSelZoomIn_EX Failed! err=%d", this->m_name.c_str(), defNS_HIK::NET_DVR_GetLastError() );
+				return false;
+			}
+
+			LOGMSG( "hik cam(%s) set MANUALPTZSel x=%d, y=%d\r\n", this->m_name.c_str(), ptFrame.xTop, ptFrame.yTop );
+			return true;
+		}
+		break;
+
+	case GSPTZ_MANUALZoomRng:
+		{
+			if( !m_AdvAttr.get_AdvAttr( defCamAdvAttr_manual_zoomrng ) )
+			{
+				LOGMSG( "hik cam(%s) defCamAdvAttr_manual_zoomrng=false", this->m_name.c_str() );
+				return false;
+			}
+
+			defNS_HIK::NET_DVR_POINT_FRAME ptFrame;
+			memset( &ptFrame, 0, sizeof(ptFrame) );
+
+			//divides the width and height to 255 proportion
+			ptFrame.xTop = param1 / 10000;
+			ptFrame.xTop *= 255;
+			ptFrame.xTop /= 10000;
+
+			ptFrame.yTop = param1 % 10000;
+			ptFrame.yTop *= 255;
+			ptFrame.yTop /= 10000;
+
+			ptFrame.xBottom = param2 / 10000;
+			ptFrame.xBottom *= 255;
+			ptFrame.xBottom /= 10000;
+
+			ptFrame.yBottom = param2 % 10000;
+			ptFrame.yBottom *= 255;
+			ptFrame.yBottom /= 10000;
+
+			ptFrame.bCounter = 0;
+
+			const int abslittle = 2;
+			const int xabs = abs(ptFrame.xBottom-ptFrame.xTop);
+			const int yabs = abs(ptFrame.yBottom-ptFrame.yTop);
+			if( xabs<=abslittle || yabs<=abslittle )
+			{
+				ptFrame.xBottom = ptFrame.xTop + 1;
+				ptFrame.yBottom = ptFrame.yTop + 1;
+				//LOGMSG( "hik cam(%s) MANUALZoomRng abs<=%d little Failed! abs(%d,%d)", this->m_name.c_str(), abslittle, xabs, yabs );
+				//return false;
+			}
+
+			//if (!defNS_HIK::NET_DVR_PTZSelZoomIn( this->m_playhandle, &ptFrame ) )
+			if (!defNS_HIK::NET_DVR_PTZSelZoomIn_EX( this->m_camera_hwnd, this->m_channel, &ptFrame ) )
+			{
+				LOGMSG( "hik cam(%s) MANUALZoomRng NET_DVR_PTZSelZoomIn_EX Failed! err=%d", this->m_name.c_str(), defNS_HIK::NET_DVR_GetLastError() );
+				return false;
+			}
+
+			LOGMSG( "hik cam(%s) set MANUALZoomRng abs(%d,%d) rc(%d,%d,%d,%d)\r\n", this->m_name.c_str(), xabs, yabs, ptFrame.xTop, ptFrame.yTop, ptFrame.xBottom, ptFrame.yBottom );
+			return true;
+		}
+		break;
+
+	case GSPTZ_PTZ_ParkAction_Enable:	// 守望功能 打开
+		return Set_PTZ_ParkAction(true);
+		break;
+
+	case GSPTZ_PTZ_ParkAction_Disable:	// 守望功能 关闭
+		return Set_PTZ_ParkAction(false);
+		break;
+
+	case GSPTZ_Add_Preset:		// 设置预置点
+	case GSPTZ_SetNew_Preset:
+		return PresetControl( SET_PRESET, param1, callinfo?(std::string(callinfo)+" Add_Preset"):"Add_Preset" );
+
+	case GSPTZ_Del_Preset:		// 清除预置点
+		return PresetControl( CLE_PRESET, param1, callinfo?(std::string(callinfo)+" Del_Preset"):"Del_Preset" );
+
+	case GSPTZ_Goto_Preset:		// 转到预置点
+		return PresetControl( GOTO_PRESET, param1, callinfo?(std::string(callinfo)+" Goto_Preset"):"Goto_Preset" );
+
+	case GSPTZ_Rename_Preset:
+		return true;
+
+	case GSPTZ_CameraReboot:	// 重启
+		{
+			if( !defNS_HIK::NET_DVR_RebootDVR( this->m_camera_hwnd ) )
+			{
+				LOGMSG( "hik cam(%s) GSPTZ_CameraReboot Failed!", this->m_name.c_str() );
+				return false;
+			}
+
+			LOGMSG( "hik cam(%s) GSPTZ_CameraReboot success.", this->m_name.c_str() );
+			return true;
+		}
+		break;
+
+	default:
+		return false;
+	}
+
+	// 自动完成控制标志
+
+	uint32_t sleeptime = 0;
+	if( command > GSPTZ_STOPAll && command <= GSPTZ_ZOOM_OUT && 0!=param1 )
+	{
+		const uint32_t Cam_PtzAutoMax = RUNCODE_Get(defCodeIndex_Cam_PtzAutoMax);
+		const uint32_t Cam_PtzAutoNorm_udlr = RUNCODE_Get(defCodeIndex_Cam_PtzAutoNorm,defRunCodeValIndex_1);
+		const uint32_t Cam_PtzAutoNorm_zoom = RUNCODE_Get(defCodeIndex_Cam_PtzAutoNorm,defRunCodeValIndex_2);
+		const uint32_t Cam_PtzAutoFast_udlr = RUNCODE_Get(defCodeIndex_Cam_PtzAutoFast,defRunCodeValIndex_1);
+		const uint32_t Cam_PtzAutoFast_zoom = RUNCODE_Get(defCodeIndex_Cam_PtzAutoFast,defRunCodeValIndex_2);
+
+		const int autoflag = param1;
+		switch( autoflag )
+		{
+		case -2:
+			{
+				speed = 7;
+				if( GSPTZ_ZOOM_IN == command || GSPTZ_ZOOM_OUT==command )
+					sleeptime = Cam_PtzAutoFast_zoom;
+				else
+					sleeptime = Cam_PtzAutoFast_udlr;
+			}
+			break;
+
+		case -1:
+			{
+				if( GSPTZ_ZOOM_IN == command || GSPTZ_ZOOM_OUT==command )
+					sleeptime = Cam_PtzAutoNorm_zoom;
+				else
+					sleeptime = Cam_PtzAutoNorm_udlr;
+			}
+			break;
+
+		case 0:
+			break;
+
+		default:
+			{
+				if( param1>0 && param1<Cam_PtzAutoMax )
+					sleeptime = param1;
+				else
+					sleeptime = 0;
+			}
+			break;
+		}
+	}
+
+	const BOOL ret = defNS_HIK::NET_DVR_PTZControlWithSpeed_Other( this->m_camera_hwnd, this->m_channel, lPTZCommand, bStop?1:0, speed );
+
+	LOGMSG( "hik cam(%s) gscmd=%d speed=%d %s. sleeptime=%d", this->m_name.c_str(), command, speed, ret?"success":"failed", sleeptime );
+
+	if( !ret )
+	{
+		return false;
+	}
+
+	if( sleeptime )
+	{
+		if( sleeptime<0 || sleeptime>5000 )
+		{
+			sleeptime = 255;
+		}
+
+		Sleep( sleeptime );
+
+		if( GSPTZ_STOPAll != command )
+		{
+			this->SendPTZ( GSPTZ_STOPAll, 0, 0 );
+		}
+	}
+
+	return true;
+}
+
+int HikCamera::GetPTZState(GSPTZ_CtrlCmd command, bool refresh_device)
+{
+	if( refresh_device )
+	{
+		switch( command )
+		{
+		case GSPTZ_MOTION_TRACK_Enable:
+			{
+				if( !m_AdvAttr.get_AdvAttr( defCamAdvAttr_motion_track ) )
+				{
+					break;
+				}
+
+				DWORD dwReturn=0;
+				defNS_HIK::NET_DVR_MOTION_TRACK_CFG strMotionTtackCfg = {0};
+				memset(&strMotionTtackCfg, 0, sizeof(strMotionTtackCfg));
+				//strMotionTtackCfg.dwSize = sizeof(strMotionTtackCfg);
+
+				this->Login( false );
+
+				if( defNS_HIK::NET_DVR_GetDVRConfig( this->m_camera_hwnd, NET_DVR_GET_MOTION_TRACK_CFG, m_channel, &strMotionTtackCfg, sizeof(strMotionTtackCfg), &dwReturn ) )
+				{
+					m_EnableTrack = strMotionTtackCfg.byEnableTrack;
+					LOGMSG( "hik cam(%s) UserID(%d) NET_DVR_GetDVRConfig Success MOTION_TRACK_CFG=%d", this->m_name.c_str(), this->m_camera_hwnd, m_EnableTrack );
+				}
+				else
+				{
+					LOGMSG( "hik cam(%s) UserID(%d) NET_DVR_GetDVRConfig MOTION_TRACK_CFG Failed! ret=%d", this->m_name.c_str(), this->m_camera_hwnd, dwReturn );
+				}
+			}
+			break;
+
+		case GSPTZ_PTZ_ParkAction_Enable:
+			{
+				if( !m_AdvAttr.get_AdvAttr( defCamAdvAttr_PTZ_ParkAction ) )
+				{
+					break;
+				}
+
+				this->Login( false );
+
+#if defined(defUseParkAction_TimeTask)
+				DWORD dwReturn=0;
+				defNS_HIK::NET_DVR_TIME_TASK struTimeTask;
+				memset(&struTimeTask, 0, sizeof(struTimeTask));
+				struTimeTask.dwSize = sizeof(struTimeTask);
+
+				if( defNS_HIK::NET_DVR_GetDVRConfig( this->m_camera_hwnd, NET_DVR_GET_SCH_TASK, m_channel, &struTimeTask, sizeof(struTimeTask), &dwReturn ) )
+				{
+					m_PTZ_ParkAction = struTimeTask.byTaskEnable;
+					LOGMSG( "hik cam(%s) UserID(%d) NET_DVR_GetDVRConfig Success ParkAction-TimeTask=%d", this->m_name.c_str(), this->m_camera_hwnd, m_PTZ_ParkAction );
+				}
+				else
+				{
+					LOGMSG( "hik cam(%s) UserID(%d) NET_DVR_GetDVRConfig ParkAction-TimeTask Failed! ret=%d", this->m_name.c_str(), this->m_camera_hwnd, dwReturn );
+				}
+#else
+				DWORD dwReturn=0;
+				defNS_HIK::NET_DVR_PTZ_PARKACTION_CFG strPTZ_PARKACTION_CFG = {0};
+				memset(&strPTZ_PARKACTION_CFG, 0, sizeof(strPTZ_PARKACTION_CFG));
+				strPTZ_PARKACTION_CFG.dwSize = sizeof(strPTZ_PARKACTION_CFG);
+
+				if( defNS_HIK::NET_DVR_GetDVRConfig( this->m_camera_hwnd, NET_DVR_GET_PTZ_PARKACTION_CFG, m_channel, &strPTZ_PARKACTION_CFG, sizeof(strPTZ_PARKACTION_CFG), &dwReturn ) )
+				{
+					m_PTZ_ParkAction = strPTZ_PARKACTION_CFG.byEnable;
+					LOGMSG( "hik cam(%s) UserID(%d) NET_DVR_GetDVRConfig Success PTZ_PARKACTION_CFG=%d", this->m_name.c_str(), this->m_camera_hwnd, m_PTZ_ParkAction );
+				}
+				else
+				{
+					LOGMSG( "hik cam(%s) UserID(%d) NET_DVR_GetDVRConfig PTZ_PARKACTION_CFG Failed! ret=%d", this->m_name.c_str(), this->m_camera_hwnd, dwReturn );
+				}
+#endif
+			}
+			break;
+		}
+	}
+
+	switch( command )
+	{
+	case GSPTZ_MOTION_TRACK_Enable:
+		{
+			return m_EnableTrack;
+		}
+		break;
+
+	case GSPTZ_PTZ_ParkAction_Enable:
+		{
+			return m_PTZ_ParkAction;
+		}
+		break;
+	}
+
+	return 0;
+}
+
+bool HikCamera::Set_motion_track( const bool enable, const bool srccall )
+{
+	if( !m_AdvAttr.get_AdvAttr( defCamAdvAttr_motion_track ) )
+	{
+		LOGMSG( "hik cam(%s) defCamAdvAttr_motion_track=false", this->m_name.c_str() );
+		return false;
+	}
+
+	defNS_HIK::NET_DVR_MOTION_TRACK_CFG strMotionTtackCfg = {0};
+	memset(&strMotionTtackCfg, 0, sizeof(strMotionTtackCfg));
+	strMotionTtackCfg.dwSize = sizeof(strMotionTtackCfg);
+	strMotionTtackCfg.byEnableTrack = enable ? 1:0;
+
+	if( !defNS_HIK::NET_DVR_SetDVRConfig( this->m_camera_hwnd, NET_DVR_SET_MOTION_TRACK_CFG, m_channel, &strMotionTtackCfg, sizeof(strMotionTtackCfg)) )
+	{
+		LOGMSG( "hik cam(%s) NET_DVR_SetDVRConfig MOTION_TRACK_CFG Failed!err=%d", this->m_name.c_str(), defNS_HIK::NET_DVR_GetLastError() );
+		return false;
+	}
+
+	m_EnableTrack = strMotionTtackCfg.byEnableTrack;
+	LOGMSG( "hik cam(%s) set MOTION_TRACK=%d", this->m_name.c_str(), m_EnableTrack );
+
+#if 1
+	// 其它功能打开时暂时关闭避免冲突，其它功能关闭时根据keep是否保持守望
+	const bool keep = m_AdvAttr.get_AdvAttr( defCamAdvAttr_PTZ_ParkActionKeep ); // 保持守望
+	if( srccall && (enable||keep) && IsRUNCODEEnable(defCodeIndex_SYS_MotionTrack2ParkAction) )
+	{
+		Set_PTZ_ParkAction( !enable, false );
+	}
+#else
+	if( enable && IsRUNCODEEnable(defCodeIndex_SYS_MotionTrack2ParkAction) )
+	{
+		Set_PTZ_ParkAction( false );
+	}
+#endif
+
+	return true;
+}
+
+bool HikCamera::Set_PTZ_ParkAction( const bool enable, const bool srccall )
+{
+	if( !m_AdvAttr.get_AdvAttr( defCamAdvAttr_PTZ_ParkAction ) )
+	{
+		LOGMSG( "hik cam(%s) defCamAdvAttr_PTZ_ParkAction=false", this->m_name.c_str() );
+		return false;
+	}
+
+#if defined(defUseParkAction_TimeTask)
+	// 定时任务守望模式
+	DWORD dwReturn=0;
+	defNS_HIK::NET_DVR_TIME_TASK struTimeTask = {0};
+	memset(&struTimeTask, 0, sizeof(struTimeTask));
+	struTimeTask.dwSize = sizeof(struTimeTask);
+
+	if( !defNS_HIK::NET_DVR_GetDVRConfig( this->m_camera_hwnd, NET_DVR_GET_SCH_TASK, m_channel, &struTimeTask, sizeof(struTimeTask), &dwReturn ) )
+	{
+		LOGMSG( "hik cam(%s) UserID(%d) NET_DVR_GetDVRConfig ParkAction-TimeTask Failed! ret=%d", this->m_name.c_str(), this->m_camera_hwnd, dwReturn );
+	}
+
+	struTimeTask.dwSize = sizeof(struTimeTask);
+	struTimeTask.byTaskEnable = enable ? 1:0;
+
+	if( !defNS_HIK::NET_DVR_SetDVRConfig( this->m_camera_hwnd, NET_DVR_SET_SCH_TASK, m_channel, &struTimeTask, sizeof(struTimeTask)) )
+	{
+		LOGMSG( "hik cam(%s) UserID(%d) NET_DVR_SetDVRConfig ParkAction-TimeTask Failed!err=%d", this->m_name.c_str(), this->m_camera_hwnd, defNS_HIK::NET_DVR_GetLastError() );
+		return false;
+	}
+
+	m_PTZ_ParkAction = struTimeTask.byTaskEnable;
+
+#else
+	// hik守望模式
+	DWORD dwReturn=0;
+	defNS_HIK::NET_DVR_PTZ_PARKACTION_CFG strPTZ_PARKACTION_CFG = {0};
+	memset(&strPTZ_PARKACTION_CFG, 0, sizeof(strPTZ_PARKACTION_CFG));
+	strPTZ_PARKACTION_CFG.dwSize = sizeof(strPTZ_PARKACTION_CFG);
+
+	if( !defNS_HIK::NET_DVR_GetDVRConfig( this->m_camera_hwnd, NET_DVR_GET_PTZ_PARKACTION_CFG, m_channel, &strPTZ_PARKACTION_CFG, sizeof(strPTZ_PARKACTION_CFG), &dwReturn ) )
+	{
+		LOGMSG( "hik cam(%s) UserID(%d) NET_DVR_GetDVRConfig PTZ_PARKACTION_CFG Failed! ret=%d", this->m_name.c_str(), this->m_camera_hwnd, dwReturn );
+	}
+
+	strPTZ_PARKACTION_CFG.dwSize = sizeof(strPTZ_PARKACTION_CFG);
+	strPTZ_PARKACTION_CFG.byEnable = enable ? 1:0;
+
+	if( !defNS_HIK::NET_DVR_SetDVRConfig( this->m_camera_hwnd, NET_DVR_SET_PTZ_PARKACTION_CFG, m_channel, &strPTZ_PARKACTION_CFG, sizeof(strPTZ_PARKACTION_CFG)) )
+	{
+		LOGMSG( "hik cam(%s) UserID(%d) NET_DVR_SetDVRConfig PTZ_PARKACTION_CFG Failed!err=%d", this->m_name.c_str(), this->m_camera_hwnd, defNS_HIK::NET_DVR_GetLastError() );
+		return false;
+	}
+
+	m_PTZ_ParkAction = strPTZ_PARKACTION_CFG.byEnable;
+
+#endif
+
+	LOGMSG( "hik cam(%s) set PTZ_PARKACTION=%d", this->m_name.c_str(), m_PTZ_ParkAction );
+
+#if 1
+	if( srccall && enable && IsRUNCODEEnable(defCodeIndex_SYS_MotionTrack2ParkAction) )
+	{
+		Set_motion_track( !enable, false );
+	}
+#else
+	if( enable && IsRUNCODEEnable(defCodeIndex_SYS_MotionTrack2ParkAction) )
+	{
+		Set_motion_track( false );
+	}
+#endif
+
+	return true;
+}
+
+bool HikCamera::PresetControl( DWORD dwPTZPresetCmd, DWORD dwPresetIndex, const std::string &callinfo )
+{
+	if( !m_AdvAttr.get_AdvAttr( defCamAdvAttr_PTZ_Preset ) )
+	{
+		LOGMSG( "hik cam(%s) defCamAdvAttr_PTZ_Preset=false", this->m_name.c_str() );
+		return false;
+	}
+
+	// 调用时不限制，其他限制
+	if( GOTO_PRESET!=dwPTZPresetCmd && (dwPresetIndex<defGSPresetIndex_Min || dwPresetIndex>defGSPresetIndex_Max) )
+	{
+		LOGMSG( "hik cam(%s) PresetControl %s err! index=%d over range", this->m_name.c_str(), callinfo.c_str(), dwPresetIndex );
+		return false;
+	}
+
+	if( !defNS_HIK::NET_DVR_PTZPreset_Other( this->m_camera_hwnd, m_channel, dwPTZPresetCmd, dwPresetIndex ) )
+	{
+		LOGMSG( "hik cam(%s) NET_DVR_PTZPreset_Other %s index=%d Failed! err=%d", this->m_name.c_str(), callinfo.c_str(), dwPresetIndex, defNS_HIK::NET_DVR_GetLastError() );
+		return false;
+	}
+
+	LOGMSG( "hik cam(%s) PresetControl %s index=%d\r\n", this->m_name.c_str(), callinfo.c_str(), dwPresetIndex );
+	return true;
+}
+
+void HikCamera::OnPublishStart()
+{
+	//MakeKeyFrame();
+}
+
+void HikCamera::MakeKeyFrame( bool forcenow )
+{
+	if( !IsConnect() )
+	{
+		return;
+	}
+}
+
+void HikCamera::OnData(LONG lRealHandle, DWORD dwDataType, BYTE *pBuffer, DWORD dwBufSize )
+{
+
+}
+
+void HikCamera::doAudioSource_CameraReEnc( unsigned char *buffer, int size, const uint32_t sendFrameTS )
+{
+
+}
+
+bool HikCamera::isTalkSupport() const
+{
+	return false;
+}
+
+bool HikCamera::OnTalkSend( defTalkSendCmd_ TalkSendCmd, unsigned char *pdata, uint32_t data_size )
+{
+	return true;
+}
+
+void HikCamera::check_NetUseable( bool *isChanged )
+{
+
+}
+
+defGSReturn HikCamera::GetCamShowInfo( int &showtime, int &showname, std::string &name )
+{
+	return defGSReturn_Err;
+}
+
+defGSReturn HikCamera::SetCamShowInfo( const int showtime, const int showname, const char *pname )
+{
+	return defGSReturn_Err;
+}
+
+defGSReturn HikCamera::GetCamCompressCfg( std::string *cfginfo, struCamParamBuf *getCamParamBuf )
+{
+	return defGSReturn_Success;
+}
+
+// setuseCamParamBuf有值时，使用此覆盖整个结构进行设置
+defGSReturn HikCamera::SetCamCompressCfg( const defCamCompress CamCompress, const struCamParamBuf *setuseCamParamBuf )
+{
+	return defGSReturn_Success;
+}
+
+bool HikCamera::CapturePic( char *buf, DWORD bufsize, DWORD &outsize, DWORD PicSize )
+{
+	return false;
+}
+

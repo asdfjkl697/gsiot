@@ -7,6 +7,7 @@
 #include "IPCameraBase.h"
 #include "ICameraHandler.h"
 #include "IPCameraManager.h"
+#include "GsCamera.h" //jyc20170511 add
 
 using namespace gloox;
 
@@ -18,7 +19,7 @@ private:
 	IPCameraManager *m_camManager;
 
 public:
-	IPCamConnection(IDeviceHandler *handler, ICameraAlarmRecv *hAlarmRecv);
+	IPCamConnection(IDeviceHandler *handler/*jyc20170511 remove, ICameraAlarmRecv *hAlarmRecv*/);
 	~IPCamConnection(void);
 
 	IPCameraManager* GetCameraManager()

@@ -9,8 +9,9 @@ src/IPCamConnection.o: ../src/IPCamConnection.cpp \
  ../src/CameraPTZ.h ../src/CameraFocal.h ../src/IPCameraBase.h \
  ../src/RTMPSession.h ../src/MediaStream.h ../src/H264MediaFile.h \
  ../src/RTMPSend.h ../src/IPublishHandler.h ../src/AudioCfg.h \
- ../src/AudioCapBase.h ../src/PresetManager.h ../src/ICameraHandler.h \
- ../src/IPCameraManager.h ../src/HikCamera.h ../src/Audio_WAV2AAC.h
+ ../src/AudioCap_File.h ../src/AudioCap.h ../src/AudioCapBase.h \
+ ../src/PresetManager.h ../src/ICameraHandler.h ../src/IPCameraManager.h \
+ ../src/GsCamera.h ../src/Audio_WAV2AAC.h
 
 ../src/IPCamConnection.h:
 
@@ -74,6 +75,10 @@ src/IPCamConnection.o: ../src/IPCamConnection.cpp \
 
 ../src/AudioCfg.h:
 
+../src/AudioCap_File.h:
+
+../src/AudioCap.h:
+
 ../src/AudioCapBase.h:
 
 ../src/PresetManager.h:
@@ -82,6 +87,6 @@ src/IPCamConnection.o: ../src/IPCamConnection.cpp \
 
 ../src/IPCameraManager.h:
 
-../src/HikCamera.h:
+../src/GsCamera.h:
 
 ../src/Audio_WAV2AAC.h:

@@ -516,7 +516,7 @@ defGSReturn IPCameraBase::SendToRTMPServer( const JID& jid, const std::string& u
 		}
 	}
 
-	// �ȴ���Ƶ����Ϣ���
+	//等待视频基本信息完成
 	//DWORD dwStartWait = ::timeGetTime();
 	//while( !this->GetStreamObj()->HasNAL()
 	//	&& ::timeGetTime()-dwStartWait<10000 )
@@ -603,16 +603,7 @@ defGSReturn IPCameraBase::SendToRTMPServer( const JID& jid, const std::string& u
 	if( this->getStatus() != "playing" )
 	{
 		this->setStatus("playing");
-		//this->setUrl(useUrl);
 	}
-
-	//this->setUrl( stream->GetRTMPSendObj()->getUrl() );
-
-	//this->UpdateSession(jid);
-
-	//LOGMSG( "cam(%s) MakeKeyFrame", this->m_name.c_str() );
-	//this->MakeKeyFrame(false);
-
 	return defGSReturn_Success;
 }
 

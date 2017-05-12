@@ -7,8 +7,9 @@ src/APlayer.o: ../src/APlayer.cpp ../src/APlayer.h ../src/common.h \
  ../src/RemoteButtonClass.h ../src/RFSignalDefine.h ../src/GSObjLocker.h \
  ../src/IPCameraBase.h ../src/RTMPSession.h ../src/MediaStream.h \
  ../src/H264MediaFile.h ../src/RTMPSend.h ../src/IPublishHandler.h \
- ../src/AudioCfg.h ../src/CameraControl.h ../src/CameraPTZ.h \
- ../src/CameraFocal.h ../src/AudioCapBase.h ../src/PresetManager.h
+ ../src/AudioCfg.h ../src/AudioCap_File.h ../src/AudioCap.h \
+ ../src/AudioCapBase.h ../src/CameraControl.h ../src/CameraPTZ.h \
+ ../src/CameraFocal.h ../src/PresetManager.h
 
 ../src/APlayer.h:
 
@@ -64,12 +65,16 @@ src/APlayer.o: ../src/APlayer.cpp ../src/APlayer.h ../src/common.h \
 
 ../src/AudioCfg.h:
 
+../src/AudioCap_File.h:
+
+../src/AudioCap.h:
+
+../src/AudioCapBase.h:
+
 ../src/CameraControl.h:
 
 ../src/CameraPTZ.h:
 
 ../src/CameraFocal.h:
-
-../src/AudioCapBase.h:
 
 ../src/PresetManager.h:

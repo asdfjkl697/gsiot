@@ -1,0 +1,3162 @@
+#include "GsCamera.h"
+//#include <Windows.h>
+#include "common.h"
+//#include "mp4av_h264.h"
+#include "RunCode.h"
+
+#define HIK_G711_AUDDECSIZE		160
+
+static ICameraAlarmRecv *g_ICameraAlarmRecv = NULL;
+
+//#define defNS_HIK ns_hik
+//namespace ns_hik
+//{
+//#include "HCNetSDK.h"
+//#pragma comment(lib,"HCNetSDK.lib")
+//}
+
+#define defDefault_hik_rate 25
+
+#define defHIK_WaitFullFrameFinsh	// �ȴ�����֡����ֻ��67��68ʱ������
+
+defGSReturn hikErr2GSErr( const DWORD nErr )
+{
+	switch( nErr )
+	{
+//	case NET_DVR_NOERROR:
+//		return defGSReturn_Success;
+//
+//	case NET_DVR_PASSWORD_ERROR:
+//		return defGSReturn_ErrPassword;
+//
+//	case NET_DVR_DEV_NET_OVERFLOW:
+//		return defGSReturn_ResLimit;
+		return defGSReturn_Success; //jyc20170511 modify
+	}
+
+	return defGSReturn_Err; // ����ȷƥ��Ĵ����룬���������Ҫ�ٸ�������ж�
+}
+
+uint32_t hikTransVideoBitrate( const DWORD dwVideoBitrate )
+{
+	/*
+	��Ƶ����:0-������1-16K(����)��2-32K��3-48k��4-64K��5-80K��6-96K��7-128K��8-160k��9-192K��10-224K��
+    11-256K��12-320K��13-384K��14-448K��15-512K��16-640K��17-768K��18-896K��19-1024K��20-1280K��21-1536K��22-1792K��23-2048K��
+    24-3072K��25-4096K��26-8192K��27-16384K�����λ(31λ)�ó�1��ʾ���Զ���������0��30λ��ʾ����ֵ����Сֵ16k,0xfffffffe���Զ�����Դһ��
+	*/
+
+	switch( dwVideoBitrate )
+	{
+	case 1: return 16000;
+	case 2: return 32000;
+	case 3: return 48000;
+	case 4: return 64000;
+	case 5: return 80000;
+	case 6: return 96000;
+	case 7: return 128000;
+	case 8: return 160000;
+	case 9: return 192000;
+	case 10: return 224000;
+	case 11: return 256000;
+	case 12: return 320000;
+	case 13: return 384000;
+	case 14: return 448000;
+	case 15: return 512000;
+	case 16: return 640000;
+	case 17: return 760000;
+	case 18: return 896000;
+	case 19: return 1024000;
+	case 20: return 1280000;
+	case 21: return 1536000;
+	case 22: return 1792000;
+	case 23: return 2048000;
+	case 24: return 3072000;
+	case 25: return 4096000;
+	case 26: return 8192000;
+	case 27: return 16384000;
+	default:
+	{
+		if( dwVideoBitrate & 0x80000000 )
+		{
+			return ( dwVideoBitrate & 0x7FFFFFFF );
+		}
+	}
+	break;
+	}
+
+	return 0;
+}
+
+static bool getAlarmStr_MessageCallback(
+		std::string &alarmstr,
+		const LONG lCommand,
+		/*const defNS_HIK::NET_DVR_ALARMER *pAlarmer,*/
+		const char *pAlarmInfo,
+		const DWORD dwBufLen )
+{
+	int at = -1;
+
+//	if( COMM_ALARM_V30==lCommand )			// ������Ϣ
+//	{
+//		defNS_HIK::NET_DVR_ALARMINFO_V30 *pA = (defNS_HIK::NET_DVR_ALARMINFO_V30*)pAlarmInfo;
+//		at = pA->dwAlarmType;
+//
+//		switch(pA->dwAlarmType)
+//		{
+//		case 3:
+//			alarmstr = "�ƶ����"; return true;
+//
+//		case 6:
+//			alarmstr = "�ڵ�"; return true;
+//
+//		case 9:
+//			alarmstr = "��Ƶ�ź��쳣"; return true;
+//
+//		case 10:
+//			alarmstr = "¼��orץͼ�쳣"; return true;
+//
+//		case 15:
+//			alarmstr = "�������"; return true;
+//
+//		case 0:
+//		case 1:
+//		case 2:
+//		case 4:
+//		case 5:
+//		case 7:
+//		case 8:
+//		case 11:
+//		case 12:
+//		case 13:
+//			break;
+//		}
+//	}
+//	else if( COMM_ALARM_RULE==lCommand )	// ��Ϊ������Ϣ
+//	{
+//		defNS_HIK::NET_VCA_RULE_ALARM *pA = (defNS_HIK::NET_VCA_RULE_ALARM*)pAlarmInfo;
+//		at = pA->struRuleInfo.wEventTypeEx;
+//
+//		alarmstr = (char*)pA->struRuleInfo.byRuleName;
+//		if( !alarmstr.empty() )
+//		{
+//			return true;
+//		}
+//
+//		switch(pA->struRuleInfo.wEventTypeEx)
+//		{
+//		case defNS_HIK::ENUM_VCA_EVENT_TRAVERSE_PLANE:
+//			alarmstr = "��Խ������"; return true;
+//
+//		case defNS_HIK::ENUM_VCA_EVENT_ENTER_AREA:
+//			alarmstr = "Ŀ���������"; return true;
+//
+//		case defNS_HIK::ENUM_VCA_EVENT_EXIT_AREA:
+//			alarmstr = "Ŀ���뿪����"; return true;
+//
+//		case defNS_HIK::ENUM_VCA_EVENT_INTRUSION:
+//			alarmstr = "�������"; return true;//�ܽ�����//�����������
+//
+//		case defNS_HIK::ENUM_VCA_EVENT_LOITER:
+//			alarmstr = "�ǻ�"; return true;
+//
+//		case defNS_HIK::ENUM_VCA_EVENT_LEFT_TAKE:
+//			alarmstr = "��Ʒ������ȡ"; return true;
+//
+//		case defNS_HIK::ENUM_VCA_EVENT_PARKING:
+//			alarmstr = "ͣ��"; return true;
+//
+//		case defNS_HIK::ENUM_VCA_EVENT_RUN:
+//			alarmstr = "�����ƶ�"; return true;
+//
+//		case defNS_HIK::ENUM_VCA_EVENT_HIGH_DENSITY:
+//			alarmstr = "��������Ա�ۼ�"; return true;
+//
+//		case defNS_HIK::ENUM_VCA_EVENT_VIOLENT_MOTION:
+//			alarmstr = "�����˶����"; return true;
+//
+//		case defNS_HIK::ENUM_VCA_EVENT_REACH_HIGHT:
+//			alarmstr = "�ʸ߼��"; return true;
+//
+//		case defNS_HIK::ENUM_VCA_EVENT_LEFT:
+//			alarmstr = "��Ʒ����"; return true;
+//
+//		case defNS_HIK::ENUM_VCA_EVENT_TAKE:
+//			alarmstr = "��Ʒ��ȡ"; return true;
+//
+//		case defNS_HIK::ENUM_VCA_EVENT_FALL_DOWN:
+//			alarmstr = "���ؼ��"; return true;
+//
+//		case defNS_HIK::ENUM_VCA_EVENT_AUDIO_ABNORMAL:
+//			alarmstr = "��ǿͻ����"; return true;
+//
+//		case defNS_HIK::ENUM_VCA_EVENT_ADV_TRAVERSE_PLANE:
+//			alarmstr = "���߾�����"; return true;
+//		}
+//	}
+//	else if( COMM_ALARM_FACE==lCommand )	// �������ʶ�𱨾���Ϣ
+//	{
+//		defNS_HIK::NET_DVR_FACEDETECT_ALARM *pA = (defNS_HIK::NET_DVR_FACEDETECT_ALARM*)pAlarmInfo;
+//		at = 0;
+//
+//		alarmstr = (char*)pA->byRuleName;
+//		if( !alarmstr.empty() )
+//		{
+//			return true;
+//		}
+//
+//		alarmstr = "����ʶ��";
+//		return true;
+//	}
+//	else if( COMM_UPLOAD_FACESNAP_RESULT==lCommand )	// ����ʶ����
+//	{
+//		defNS_HIK::NET_VCA_FACESNAP_RESULT *pA = (defNS_HIK::NET_VCA_FACESNAP_RESULT*)pAlarmInfo;
+//		at = 0;
+//
+//		alarmstr = "�������";
+//		return true;
+//	}
+//	else if( COMM_IPC_AUXALARM_RESULT==lCommand )
+//	{
+//		defNS_HIK::NET_IPC_AUXALARM_RESULT *pA = (defNS_HIK::NET_IPC_AUXALARM_RESULT*)pAlarmInfo;
+//		at = pA->byAlarmType;
+//
+//		if( defNS_HIK::IPC_AUXALARM_PIR==pA->byAlarmType )
+//		{
+//			alarmstr = (char*)pA->struAuxAlarm.struPIRAlarm.byAlarmName;
+//			if( !alarmstr.empty() )
+//			{
+//				return true;
+//			}
+//
+//			alarmstr = "PIR����"; // ���������⡢����������ֱ���
+//			return true;
+//		}
+//	}
+//
+//	if( alarmstr.empty() )
+//	{
+//		char chbuf[256] = {0};
+//		sprintf_s( chbuf, sizeof(chbuf), "����x%X:%d", lCommand, at );
+//		alarmstr = chbuf;
+//	}
+
+	return false;
+}
+
+//void CALLBACK MessageCallback(
+//		LONG lCommand, defNS_HIK::NET_DVR_ALARMER *pAlarmer,
+//		char *pAlarmInfo, DWORD dwBufLen,
+//		void* pUser)
+//{
+//	int channel = defInvalidCamCh;
+//	int at = -1;
+//
+//	if( COMM_ALARM_V30==lCommand )			// ������Ϣ
+//	{
+//		defNS_HIK::NET_DVR_ALARMINFO_V30 *pA = (defNS_HIK::NET_DVR_ALARMINFO_V30*)pAlarmInfo;
+//		at = pA->dwAlarmType;
+//	}
+//	else if( COMM_ALARM_RULE==lCommand )	// ��Ϊ������Ϣ
+//	{
+//		defNS_HIK::NET_VCA_RULE_ALARM *pA = (defNS_HIK::NET_VCA_RULE_ALARM*)pAlarmInfo;
+//		at = pA->struRuleInfo.wEventTypeEx;
+//		channel = pA->struDevInfo.byChannel;
+//	}
+//	else if( COMM_ALARM_FACE==lCommand )	// �������ʶ�𱨾���Ϣ
+//	{
+//		defNS_HIK::NET_DVR_FACEDETECT_ALARM *pA = (defNS_HIK::NET_DVR_FACEDETECT_ALARM*)pAlarmInfo;
+//		at = 0;
+//		channel = pA->struDevInfo.byChannel;
+//	}
+//	else if( COMM_UPLOAD_FACESNAP_RESULT==lCommand )	// ����ʶ����
+//	{
+//		defNS_HIK::NET_VCA_FACESNAP_RESULT *pA = (defNS_HIK::NET_VCA_FACESNAP_RESULT*)pAlarmInfo;
+//		at = 0;
+//		channel = pA->struDevInfo.byChannel;
+//	}
+//	else if( COMM_IPC_AUXALARM_RESULT==lCommand )
+//	{
+//		defNS_HIK::NET_IPC_AUXALARM_RESULT *pA = (defNS_HIK::NET_IPC_AUXALARM_RESULT*)pAlarmInfo;
+//		at = pA->byAlarmType;
+//		channel = pA->dwChannel;
+//
+//		if( defNS_HIK::IPC_AUXALARM_PIR==pA->byAlarmType )
+//		{
+//		}
+//	}
+//
+//	//LOGMSG( "HikAlarm recv(%X): %s:%d at=%d", lCommand, pAlarmer->sDeviceIP,  pAlarmer->wLinkPort, at );
+//
+//	if( g_ICameraAlarmRecv )
+//	{
+//		std::string alarmstr;
+//		const bool isAlarm = getAlarmStr_MessageCallback( alarmstr, lCommand, pAlarmer, pAlarmInfo, dwBufLen );
+//
+//		g_ICameraAlarmRecv->OnCameraAlarmRecv( isAlarm, CameraType_hik, pAlarmer?pAlarmer->sDeviceIP:"", pAlarmer?pAlarmer->wLinkPort:0, channel, alarmstr.c_str() );
+//	}
+//}
+
+//void CALLBACK g_ExceptionCallBack(DWORD dwType, LONG lUserID, LONG lHandle, void *pUser)
+//{
+//	switch(dwType)
+//	{
+//	case EXCEPTION_RECONNECT:    //Ԥ��ʱ����
+//		//LOGMSGEX( defLOGNAME, defLOG_WORN, "----------HIK reconnect--------\r\n");
+//		break;
+//	default:
+//		break;
+//	}
+//}
+//
+////void CALLBACK DataCallBack(LONG lRealHandle, DWORD dwDataType, BYTE *pBuffer,DWORD dwBufSize,DWORD lUser)
+//void CALLBACK DataCallBack(LONG lRealHandle, DWORD dwDataType, BYTE *pBuffer, DWORD dwBufSize, void* lUser)
+//{
+//	if( 0 == lUser )
+//	{
+//		return;
+//	}
+//
+//	GsCamera *Camera = (GsCamera*)lUser;
+//	Camera->OnData( lRealHandle, dwDataType, pBuffer, dwBufSize );
+//}
+//
+//void CALLBACK PlayDataCallBack_V40( LONG lPlayHandle, DWORD dwDataType, BYTE *pBuffer,DWORD dwBufSize,void *pUser )
+//{
+//	if( 0 == pUser )
+//	{
+//		return;
+//	}
+//
+//	GsCamera *Camera = (GsCamera*)pUser;
+//	Camera->OnData( lPlayHandle, dwDataType, pBuffer, dwBufSize );
+//}
+
+/*��̬����*/
+void GsCamera::InitSDK( ICameraHandler *handler, ICameraAlarmRecv *hAlarmRecv )
+{
+//	g_ICameraAlarmRecv = hAlarmRecv;
+//
+//	defNS_HIK::NET_DVR_Init();
+//    //defNS_HIK::NET_DVR_SetDVRMessageCallBack_V30(MessageCallback,(unsigned long)handler);
+//	defNS_HIK::NET_DVR_SetDVRMessageCallBack_V30(MessageCallback,NULL);
+//	defNS_HIK::NET_DVR_SetConnectTime(3000, 3);
+//	defNS_HIK::NET_DVR_SetReconnect( 10000, TRUE );
+//
+//	//---------------------------------------
+//	//�����쳣��Ϣ�ص�����
+//	defNS_HIK::NET_DVR_SetExceptionCallBack_V30(0, NULL,g_ExceptionCallBack, NULL);
+}
+
+void GsCamera::Cleanup()
+{
+//	defNS_HIK::NET_DVR_Cleanup();
+}
+
+bool GsCamera::GetChannelNum( char *sDVRIP, uint16_t wDVRPort, char *sUserName, char *sPassword, uint8_t &byChanNum, uint8_t &byStartChan, std::string &strErr )
+{
+	char chbuf[256] = {0};
+
+	byChanNum = 0;
+	byStartChan = 0;
+	strErr = "";
+
+//	defNS_HIK::NET_DVR_DEVICEINFO_V30 DeviceInfo;
+//	memset( &DeviceInfo, 0, sizeof(DeviceInfo) );
+//
+//	long lLogin = defNS_HIK::NET_DVR_Login_V30( sDVRIP, wDVRPort, sUserName, sPassword, &DeviceInfo );
+//	if(lLogin<0)
+//	{
+//		int nErr = defNS_HIK::NET_DVR_GetLastError();
+//		LOGMSGEX( defLOGNAME, defLOG_ERROR, "Cam Cfg:Connect(%s:%d) Failed! err=%d\r\n", sDVRIP, wDVRPort, nErr );
+//
+//		if(nErr == NET_DVR_PASSWORD_ERROR)
+//		{
+//			strErr = "�û����������!";
+//			return false;
+//		}
+//
+//		sprintf_s( chbuf, sizeof(chbuf), "%s:%d ����ʧ�ܣ�", sDVRIP, wDVRPort );
+//		strErr = chbuf;
+//		return false;
+//	}
+//
+//	defNS_HIK::NET_DVR_Logout(lLogin);
+//
+//	byChanNum = DeviceInfo.byChanNum;
+//	byStartChan = DeviceInfo.byStartChan;
+
+	return true;
+}
+
+bool GsCamera::GetCameraDevInfo(
+	char *sDVRIP, uint16_t wDVRPort, char *sUserName, char *sPassword, const std::string &devname, 
+	std::string &strCamSerialNo, defvecChInfo &vecChInfo, std::string &strErr, const uint32_t streamfmt )
+{
+	char chbuf[256] = {0};
+
+	strErr = "";
+
+//	// login and get devinfo
+//	defNS_HIK::NET_DVR_DEVICEINFO_V30 DeviceInfo;
+//	memset( &DeviceInfo, 0, sizeof(DeviceInfo) );
+//	long lLogin = defNS_HIK::NET_DVR_Login_V30( sDVRIP, wDVRPort, sUserName, sPassword, &DeviceInfo );
+//	if(lLogin<0)
+//	{
+//		int nErr = defNS_HIK::NET_DVR_GetLastError();
+//		LOGMSGEX( defLOGNAME, defLOG_ERROR, "Cam Cfg:Connect(%s:%d) Failed! err=%d\r\n", sDVRIP, wDVRPort, nErr );
+//
+//		if(nErr == NET_DVR_PASSWORD_ERROR)
+//		{
+//			strErr = "�û����������!";
+//			return false;
+//		}
+//
+//		sprintf_s( chbuf, sizeof(chbuf), "%s:%d ����ʧ�ܣ�", sDVRIP, wDVRPort );
+//		strErr = chbuf;
+//		return false;
+//	}
+//
+//	strncpy_s( chbuf, (char*)DeviceInfo.sSerialNumber, sizeof(DeviceInfo.sSerialNumber) );
+//	chbuf[sizeof(DeviceInfo.sSerialNumber)] = 0;
+//	strCamSerialNo = chbuf;
+//
+//	// ģ��ͨ����ʼ�ź�����
+//	const int iStartChan = DeviceInfo.byStartChan;
+//	const int iAnalogChanNum = DeviceInfo.byChanNum;
+//
+//	// get ipcinfo
+//	DWORD dwReturned = 0;
+//	int iGroupNO = 0;
+//	defNS_HIK::NET_DVR_IPPARACFG_V40 IPAccessCfgV40;
+//	memset( &IPAccessCfgV40, 0, sizeof(IPAccessCfgV40) );
+//	BOOL bIPRet = defNS_HIK::NET_DVR_GetDVRConfig( lLogin, NET_DVR_GET_IPPARACFG_V40, iGroupNO, &IPAccessCfgV40, sizeof(IPAccessCfgV40), &dwReturned);
+//
+//	// ����ͨ����ʼ�ź�����
+//	const int dwStartDChan = bIPRet ? IPAccessCfgV40.dwStartDChan: 0;
+//	const int iIPChanNum = bIPRet ? IPAccessCfgV40.dwDChanNum: 0;
+//
+//	const bool isMoreCh = (iAnalogChanNum+iIPChanNum)>1;
+//
+//	int iAnalogChanCount = 0;
+//	int iIPChanCount = 0;
+//	char ChID[256] = {0};
+//	char strCh[256] = {0};
+//	char chDesc[256] = {0};
+//	for( int i = 0; i < MAX_CHANNUM_V30; i++ )
+//	{
+//		DWORD dwChanShow = 0;
+//		bool isAdd = false;
+//
+//		//analog channel
+//		if (iAnalogChanCount < iAnalogChanNum)
+//		{
+//			isAdd = true;
+//			dwChanShow = iAnalogChanCount + iStartChan;
+//
+//			if( isMoreCh )
+//			{
+//				sprintf_s( ChID, sizeof(ChID), "-%d", dwChanShow );
+//			}
+//			else
+//			{
+//				strcpy( ChID, "" );
+//			}
+//
+//			sprintf_s( chDesc, sizeof(chDesc), "ͨ��%s��ͨ����=%d", ChID, dwChanShow );
+//
+//			iAnalogChanCount++;
+//			sprintf_s( strCh, sizeof(strCh), "A%d", iAnalogChanCount );
+//		}
+//		//IP channel
+//		else if (iIPChanCount < iIPChanNum)
+//		{
+//			isAdd = true;
+//			dwChanShow = iIPChanCount + dwStartDChan;
+//
+//			if( isMoreCh )
+//			{
+//				sprintf_s( ChID, sizeof(ChID), "-D%d", iIPChanCount+1 );
+//			}
+//			else
+//			{
+//				strcpy( ChID, "" );
+//			}
+//
+//			sprintf_s( chDesc, sizeof(chDesc), "����ͨ��%s��ͨ����=%d", ChID, dwChanShow );
+//
+//			iIPChanCount++;
+//			sprintf_s( strCh, sizeof(strCh), "D%d", iIPChanCount );
+//		}
+//
+//		if( isAdd )
+//		{
+//			struChInfo SelChMain;
+//			SelChMain.channel = dwChanShow;
+//			SelChMain.name = devname + ChID;
+//			SelChMain.strCh = strCh;
+//			SelChMain.streamfmt = 0;
+//			SelChMain.desc = std::string(chDesc) + "��������";
+//			vecChInfo.push_back( SelChMain );
+//
+//			if( 0!=streamfmt )
+//			{
+//				struChInfo SelChSub;
+//				SelChSub.channel = dwChanShow;
+//				SelChSub.name = devname + ChID + "sub";
+//				SelChSub.strCh = strCh;
+//				SelChSub.streamfmt = 1;
+//				SelChSub.desc = std::string(chDesc) + "��������";
+//				vecChInfo.push_back( SelChSub );
+//			}
+//		}
+//	}
+//
+//	defNS_HIK::NET_DVR_Logout(lLogin);
+
+	return true;
+}
+
+defGSReturn GsCamera::SetCamTime_Spec( const struGSTime &newtime, const std::string &name, const std::string &sIP, uint16_t wPort, const std::string &sUserName, const std::string &sPassword )
+{
+	defGSReturn gsret = defGSReturn_Err;
+	
+	long LoginID = -1;
+
+//	defNS_HIK::NET_DVR_DEVICEINFO_V30 DeviceInfo;
+//	memset( &DeviceInfo, 0, sizeof(DeviceInfo) );
+//	LoginID = defNS_HIK::NET_DVR_Login_V30( (char*)sIP.c_str(), wPort, (char*)sUserName.c_str(), (char*)sPassword.c_str(), &DeviceInfo );
+//	if( LoginID<0 )
+//	{
+//		int nErr = defNS_HIK::NET_DVR_GetLastError();
+//		LOGMSGEX( defLOGNAME, defLOG_ERROR, "SetCamTime_Spec:Connect(%s,%s:%d) Failed! err=%d\r\n", name.c_str()?name.c_str():"", sIP.c_str(), wPort, nErr );
+//
+//		return hikErr2GSErr( nErr );
+//	}
+
+	return SetCamTime_ForLoginID( newtime, name, LoginID, sIP, wPort );
+}
+
+defGSReturn GsCamera::SetCamTime_ForLoginID( const struGSTime &newtime, const std::string &name, const long LoginID, const std::string &sIP, const uint16_t wPort )
+{
+	defGSReturn gsret = defGSReturn_Err;
+
+//	if( LoginID>=0 )
+//	{
+//		defNS_HIK::NET_DVR_TIME CurTime;
+//		memset( &CurTime, 0, sizeof(CurTime) );
+//		char szLan[1024] = {0};
+//		CurTime.dwYear = newtime.Year;
+//		CurTime.dwMonth = newtime.Month;
+//		CurTime.dwDay = newtime.Day;
+//		CurTime.dwHour = newtime.Hour;
+//		CurTime.dwMinute = newtime.Minute;
+//		CurTime.dwSecond = newtime.Second;
+//
+//		if( defNS_HIK::NET_DVR_SetDVRConfig( LoginID, NET_DVR_SET_TIMECFG, 0, &CurTime, sizeof(CurTime) ) )
+//		{
+//			LOGMSGEX( defLOGNAME, defLOG_ERROR, "SetCamTime(%s,%s:%d) Success.", name.c_str()?name.c_str():"", sIP.c_str(), wPort );
+//
+//			return defGSReturn_Success;
+//		}
+//	}
+//
+//	LOGMSGEX( defLOGNAME, defLOG_ERROR, "SetCamTime(%s,%s:%d) Failed!\r\n", name.c_str()?name.c_str():"", sIP.c_str(), wPort );
+	return defGSReturn_ConnectObjErr;
+}
+
+GsCamera::GsCamera(const std::string& deviceID, const std::string& name,
+		const std::string& ipaddress,uint32_t port,const std::string& username,
+		const std::string& password, const std::string& ver, GSPtzFlag PTZFlag, GSFocalFlag FocalFlag,
+		uint32_t channel, uint32_t streamfmt )
+		:IPCameraBase(deviceID, name,ipaddress, port, username,
+		password, ver, PTZFlag, FocalFlag, channel, streamfmt )
+{
+	this->m_camera_hwnd = -1;
+	this->m_playhandle = -1;
+	this->m_AlarmChan = -1;
+	this->m_isFirstAudio = true;
+	this->m_AudioEncType = -1;
+	this->m_pDecHandle = (void*)-1;
+
+	this->m_lVoiceComHandle = -1;
+
+	//setBufferTime(0);
+
+//	memset( &m_sptr, 0, sizeof(m_sptr) );
+//	memset( &m_frame, 0, sizeof(m_frame) );
+
+	m_timeMakeKeyFrame = timeGetTime()-60000;
+}
+
+GsCamera::~GsCamera(void)
+{
+	//LOGMSG("~GsCamera\r\n");
+	m_demux.Close();
+}
+
+void GsCamera::PreinitBufCheck()
+{
+	m_demux.PreinitBufCheck();
+	this->GetStreamObj()->GetRTMPSendObj()->get_fullbuf_video_cache_buffer();
+}
+
+bool GsCamera::TestConnect( std::string &strErr )
+{
+	LOGMSG( "Cam:TestConnect(%s,%s:%d)\r\n", m_name.c_str()?m_name.c_str():"", (char *)this->m_ipaddress.c_str(), this->m_port );
+
+	char chbuf[256] = {0};
+
+	strErr = "";
+
+//	defNS_HIK::NET_DVR_DEVICEINFO_V30 DeviceInfo;
+//	memset( &DeviceInfo, 0, sizeof(DeviceInfo) );
+//	long lLogin = defNS_HIK::NET_DVR_Login_V30( (char *)this->m_ipaddress.c_str(), this->m_port,
+//		(char *)this->m_username.c_str(), (char *)this->m_password.c_str(), &DeviceInfo );
+//	if(lLogin<0)
+//	{
+//		int nErr = defNS_HIK::NET_DVR_GetLastError();
+//		LOGMSGEX( defLOGNAME, defLOG_ERROR, "Cam:TestConnect(%s,%s:%d) Failed! err=%d\r\n", m_name.c_str()?m_name.c_str():"", (char *)this->m_ipaddress.c_str(), this->m_port, nErr );
+//
+//		if(nErr == NET_DVR_PASSWORD_ERROR)
+//		{
+//			strErr = "�û����������!";
+//			return false;
+//		}
+//
+//		sprintf_s( chbuf, sizeof(chbuf), "%s:%d ����ʧ�ܣ�", (char *)this->m_ipaddress.c_str(), this->m_port );
+//		strErr = chbuf;
+//		return false;
+//	}
+
+	return true;
+}
+
+defGSReturn GsCamera::SetCamTime( const struGSTime &newtime )
+{
+	this->Login( false );
+
+	return SetCamTime_ForLoginID( newtime, m_name, m_camera_hwnd, this->ConnUse_ip(), this->ConnUse_port() );
+}
+
+defGSReturn GsCamera::Login( bool playback )
+{
+	if( m_camera_hwnd < 0 )
+	{
+//		defNS_HIK::NET_DVR_DEVICEINFO_V30 DeviceInfo;
+//		memset( &DeviceInfo, 0, sizeof(DeviceInfo) );
+//
+//		long lLogin = defNS_HIK::NET_DVR_Login_V30((char *)this->ConnUse_ip(playback).c_str(),this->ConnUse_port(playback),
+//			(char *)this->ConnUse_username(playback).c_str(), (char *)this->ConnUse_password(playback).c_str(),&DeviceInfo);
+//
+//		if(lLogin<0)
+//		{
+//			int nErr = defNS_HIK::NET_DVR_GetLastError();
+//
+//			LOGMSGEX( defLOGNAME, defLOG_ERROR, "Cam:Login(%s,%s:%d) Failed! err=%d\r\n", m_name.c_str()?m_name.c_str():"", (char *)this->ConnUse_ip(playback).c_str(), this->ConnUse_port(playback), nErr );
+//
+//			return hikErr2GSErr( nErr );
+//		}
+//
+//		this->m_camera_hwnd = lLogin;
+	}
+
+	ConnectAlarmGuard();
+
+	return defGSReturn_Success;
+}
+
+// ���ӽ����澯ͨ��
+void GsCamera::ConnectAlarmGuard()
+{
+	if( m_AlarmChan < 0 )
+	{
+		if( m_AGRunState
+			&& m_AdvAttr.get_AdvAttr( defCamAdvAttr_SupportAlarm )
+			)
+		{
+			//m_AlarmChan = defNS_HIK::NET_DVR_SetupAlarmChan_V30( m_camera_hwnd );
+
+			//LOGMSG( "Cam:ConnectAlarmGuard(%s,%s:%d) h=%d\r\n", m_name.c_str()?m_name.c_str():"", (char *)this->ConnUse_ip().c_str(), this->ConnUse_port(), m_AlarmChan );
+		}
+	}
+}
+
+// ���ӽ����澯ͨ��
+void GsCamera::DisconnectAlarmGuard()
+{
+	if( m_AlarmChan>=0 )
+	{
+		LOGMSG( "Cam:DisconnectAlarmGuard(%s,%s:%d) h=%d\r\n", m_name.c_str()?m_name.c_str():"", (char *)this->ConnUse_ip().c_str(), this->ConnUse_port(), m_AlarmChan );
+
+		//defNS_HIK::NET_DVR_CloseAlarmChan_V30( m_AlarmChan );
+	}
+
+	m_AlarmChan = -1;
+}
+
+void GsCamera::Logout()
+{
+	DisconnectAlarmGuard();
+
+	if( m_playhandle>=0 )
+	{
+//		if( m_isPlayBack )
+//		{
+//			defNS_HIK::NET_DVR_StopPlayBack( this->m_playhandle );
+//		}
+//		else
+//		{
+//			defNS_HIK::NET_DVR_SetRealDataCallBack(this->m_playhandle, NULL, 0);
+//			defNS_HIK::NET_DVR_StopRealPlay(this->m_playhandle);
+//		}
+	}
+
+	if( m_camera_hwnd>=0 )
+	{
+//		defNS_HIK::NET_DVR_Logout(this->m_camera_hwnd);
+	}
+
+	this->m_camera_hwnd = -1;
+	this->m_playhandle = -1;
+	this->m_AlarmChan = -1;
+}
+
+defGSReturn GsCamera::Connect( bool reconnectAudio, void* RealPlayWnd, bool playback, const struGSTime *pdtBegin, const struGSTime *pdtEnd )
+{
+	ConnectBefore();
+
+	this->m_isFirstAudio = true;
+
+	LOGMSG( "Cam:Connect(%s,%s:%d)\r\n", m_name.c_str()?m_name.c_str():"", (char *)this->ConnUse_ip(playback).c_str(), this->ConnUse_port(playback) );
+
+	if( this->IsConnect() )
+	{
+		this->OnDisconnct();
+	}
+
+	this->m_state.Reset();
+	this->m_state.startTime = timeGetTime();
+
+	defGSReturn ret = this->Login( playback );
+	if( macGSFailed(ret) )
+	{
+		ConnectAfter();
+		return ret;
+	}
+
+	LOGMSG( "Cam:Connect(%s,%s:%d) Success. LoginID=%d\r\n", m_name.c_str()?m_name.c_str():"", (char *)this->ConnUse_ip(playback).c_str(), this->ConnUse_port(playback), this->m_camera_hwnd );
+
+	//defNS_HIK::NET_DVR_SetupAlarmChan(lLogin);
+#if 1
+	m_isPlayBack = playback;
+
+	if( m_isPlayBack )
+	{
+		return PlayBack( RealPlayWnd, pdtBegin, pdtEnd );
+	}
+#endif
+
+	InitAudioEncType();
+
+	ret = this->SetChannelStream(m_channel, reconnectAudio, RealPlayWnd);
+
+	ConnectAfter();
+	return ret;
+}
+
+bool GsCamera::isSupportAudioEncType( int AudioEncType )
+{
+	switch(AudioEncType)
+	{
+//	case AUDIOTALKTYPE_G711_MU:
+//	case AUDIOTALKTYPE_G711_A:
+//		return true;
+//
+//	case AUDIOTALKTYPE_G722:
+//		return true;
+//
+//	case AUDIOTALKTYPE_G726:
+//		return true;
+
+	default:
+		break;
+	}
+
+	return false;
+}
+
+bool GsCamera::InitAudioEncType()
+{
+	this->m_AudioEncType = -1;
+
+	{
+		LOGMSG( "Cam(%s)(%s) InitAudioEncType...", m_name.c_str()?m_name.c_str():"", CAudioCfg::getstr_AudioSource(this->GetAudioCfg().get_Audio_Source(),false).c_str() );
+
+//		defNS_HIK::NET_DVR_COMPRESSION_AUDIO struCodeType;
+//		memset( &struCodeType, 0, sizeof(defNS_HIK::NET_DVR_COMPRESSION_AUDIO) );
+//		if( defNS_HIK::NET_DVR_GetCurrentAudioCompress( this->m_camera_hwnd, &struCodeType ) )
+//		{
+//			m_AudioEncType = struCodeType.byAudioEncType;
+//			LOGMSG( "Cam(%s) AudioEncType=%d", m_name.c_str()?m_name.c_str():"", m_AudioEncType );
+//		}
+//		else
+//		{
+//			LOGMSG( "Cam(%s) get AudioEncType failed!", m_name.c_str()?m_name.c_str():"" );
+//		}
+	}
+	//else
+	//{
+	//	return false;
+	//}
+
+	// ����ͷ��Ƶ
+	if( defAudioSource_Camera == this->GetAudioCfg().get_Audio_Source() && defAudioParamDef_Analyse==this->GetAudioCfg().get_Audio_ParamDef() )
+	{
+		CAudioCfg::struAudioParam ap;
+		ap.Audio_FmtType = defAudioFmtType_Unknown;
+		ap.Audio_Channels = 1;
+		ap.Audio_bitSize = 16;
+		ap.Audio_ByteRate = 2048;
+
+		switch(m_AudioEncType)
+		{
+//		case AUDIOTALKTYPE_G711_MU:
+//			ap.Audio_FmtType = defAudioFmtType_PCM_MULAW;
+//			ap.Audio_SampleRate = 8000;
+//			break;
+//
+//		case AUDIOTALKTYPE_G711_A:
+//			ap.Audio_FmtType = defAudioFmtType_PCM_ALAW;
+//			ap.Audio_SampleRate = 8000;
+//			break;
+//
+//		default:
+//			break;
+		}
+
+
+		LOGMSG( "Cam(%s) analyze set AudioFmtType=%d", m_name.c_str()?m_name.c_str():"", ap.Audio_FmtType );
+		this->GetAudioCfg().set_Audio_FmtType( ap.Audio_FmtType );
+		this->GetAudioCfg().set_AudioParam_Analyse( ap );
+		this->UpdateAudioCfg();
+		return true;
+	}
+
+	// ����ͷ��Ƶת��
+	if( defAudioSource_CamReEnc != this->GetAudioCfg().get_Audio_Source() )
+		return false;
+
+	if( this->GetStreamObj()->GetRTMPSendObj()->GetIPlayBack() )
+		return false;
+
+	if( !IsRUNCODEEnable(defCodeIndex_SYS_CamReEnc) )
+		return false;
+
+	if( !isSupportAudioEncType( m_AudioEncType ) )
+	{
+		LOGMSG( "Cam(%s) AudioEncType=%d no support!\r\n", m_name.c_str()?m_name.c_str():"", m_AudioEncType );
+		return false;
+	}
+
+	CAudioCfg::struAudioParam ap;
+	ap.Audio_FmtType = defAudioFmtType_AAC;
+	ap.Audio_Channels = 1;
+	ap.Audio_bitSize = 16;
+	ap.Audio_ByteRate = 2048;
+
+	switch(m_AudioEncType)
+	{
+//	case AUDIOTALKTYPE_G711_MU:
+//	case AUDIOTALKTYPE_G711_A:
+//		ap.Audio_SampleRate = 8000;
+//		break;
+//
+//	case AUDIOTALKTYPE_G722:
+//		{
+//			ap.Audio_SampleRate = 16000;
+//			m_pDecHandle = defNS_HIK::NET_DVR_InitG722Decoder();
+//			LOGMSG( "Cam(%s) NET_DVR_InitG722Decoder(%X)\r\n", m_name.c_str()?m_name.c_str():"", m_pDecHandle );
+//			if( -1 == (int)m_pDecHandle )
+//			{
+//				return false;
+//			}
+//		}
+//		break;
+//
+//	case AUDIOTALKTYPE_G726:
+//		{
+//			ap.Audio_SampleRate = 8000;
+//			void *pDecHandleM = NULL;
+//			m_pDecHandle = defNS_HIK::NET_DVR_InitG726Decoder(&pDecHandleM);
+//			LOGMSG( "Cam(%s) NET_DVR_InitG726Decoder(%X) Module=%X\r\n", m_name.c_str()?m_name.c_str():"", m_pDecHandle, pDecHandleM );
+//			if( -1 == (int)m_pDecHandle )
+//			{
+//				return false;
+//			}
+//
+//			if( (int)pDecHandleM != (int)m_pDecHandle )
+//			{
+//				LOGMSG( "Cam(%s) NET_DVR_InitG726Decoder(%X) Module=%X is diff failed\r\n", m_name.c_str()?m_name.c_str():"", m_pDecHandle, pDecHandleM );
+//				return false;
+//			}
+//		}
+//		break;
+
+	default:
+		{
+			// not support
+			return false;
+		}
+		break;
+	}
+
+	//if( defAudioParamDef_Analyse == this->GetAudioCfg().get_Audio_ParamDef() )
+	{
+		this->GetAudioCfg().set_AudioParam_Analyse( ap );
+		this->UpdateAudioCfg();
+	}
+
+	if( !m_accen.OpenAudio( this->GetAudioCfg() ) )
+	{
+		LOGMSG( "Cam(%s) accen OpenAudio failed\r\n", m_name.c_str()?m_name.c_str():"" );
+		return false;
+	}
+
+	LOGMSG( "Cam(%s) InitAudioEncType success.\r\n", m_name.c_str()?m_name.c_str():"" );
+	return true;
+}
+
+defGSReturn GsCamera::SetChannelStream(int channel, bool reconnectAudio, void* RealPlayWnd)
+{
+//	defNS_HIK::NET_DVR_PREVIEWINFO ClientInfo = {0};
+//	memset( &ClientInfo, 0, sizeof(ClientInfo) );
+//	ClientInfo.lChannel = channel;//ͨ����
+//	ClientInfo.dwStreamType = m_streamfmt;
+//	ClientInfo.dwLinkMode = 0;// 0��TCP��ʽ,1��UDP��ʽ,2���ಥ��ʽ,3 - RTP��ʽ��-RTP/RTSP,5-RSTP/HTTP
+//	ClientInfo.hPlayWnd =  (HWND)RealPlayWnd;//���Ŵ��ڵľ��,ΪNULL��ʾ������ͼ��
+//	ClientInfo.bBlocked = 0;  //0-������ȡ��, 1-����ȡ��, �������SDK�ڲ�connectʧ�ܽ�����5s�ĳ�ʱ���ܹ�����,���ʺ�����ѯȡ������.
+//	ClientInfo.bPassbackRecord = 0; //0-������¼��ش�,1����¼��ش�
+//	ClientInfo.byPreviewMode = 0;//Ԥ��ģʽ��0-��Ԥ����1-�ӳ�Ԥ��
+//
+//	this->m_playhandle = defNS_HIK::NET_DVR_RealPlay_V40( this->m_camera_hwnd, &ClientInfo, RealPlayWnd?NULL:DataCallBack, RealPlayWnd?0:this );
+//
+//	if(this->m_playhandle <0 )
+//	{
+//		long nErr = defNS_HIK::NET_DVR_GetLastError();
+//
+//		LOGMSGEX( defLOGNAME, defLOG_ERROR, "Cam:Play Failed! LoginID=%d, ch=%d, streamfmt=%d, err=%d\r\n", this->m_camera_hwnd, channel, m_streamfmt, nErr );
+//
+//		return hikErr2GSErr( nErr );
+//	}else{
+//		//defNS_HIK::NET_DVR_SetStandardDataCallBack( this->m_camera_hwnd, DataCallBack, (DWORD)this );
+//		//defNS_HIK::NET_DVR_SetRealDataCallBack(this->m_playhandle, DataCallBack, (long)this);
+//
+//		//MakeKeyFrame();
+//	}
+//
+//	if( reconnectAudio )
+//		StartLocalCapAudio();
+//
+//	LOGMSG( "Cam:Play Success. LoginID=%d, ch=%d, lLinkMode=%d\r\n", this->m_camera_hwnd, channel, m_streamfmt );
+
+	return defGSReturn_Success;
+}
+
+defGSReturn GsCamera::PlayBack( void* RealPlayWnd, const struGSTime *pdtBegin, const struGSTime *pdtEnd )
+{
+	if( !pdtBegin || !pdtEnd )
+		return defGSReturn_ErrParam;
+
+//	const HWND hwnd = (HWND)RealPlayWnd;
+//	const bool isPlayBackReverse = false;
+//
+//	this->GetStreamObj()->GetRTMPSendObj()->SetIPlayBack( this );
+//
+//	//---------------------------------------
+//	//��ʱ��ط�
+//	defNS_HIK::NET_DVR_TIME BeginTime={0};
+//	memset( &BeginTime, 0, sizeof(BeginTime) );
+//	BeginTime.dwYear   = pdtBegin->Year;
+//	BeginTime.dwMonth  = pdtBegin->Month;
+//	BeginTime.dwDay    = pdtBegin->Day;
+//	BeginTime.dwHour   = pdtBegin->Hour;
+//	BeginTime.dwMinute = pdtBegin->Minute;
+//	BeginTime.dwSecond = pdtBegin->Second;
+//
+//	defNS_HIK::NET_DVR_TIME EndTime={0};
+//	memset( &EndTime, 0, sizeof(EndTime) );
+//	EndTime.dwYear    = pdtEnd->Year;
+//	EndTime.dwMonth   = pdtEnd->Month;
+//	EndTime.dwDay     = pdtEnd->Day;
+//	EndTime.dwHour    = pdtEnd->Hour;
+//	EndTime.dwMinute  = pdtEnd->Minute;
+//	EndTime.dwSecond  = pdtEnd->Second;
+//
+//	if( isPlayBackReverse )
+//	{
+//		defNS_HIK::NET_DVR_PLAYCOND struPlayCon = {0};
+//		memset( &struPlayCon, 0, sizeof(struPlayCon) );
+//		struPlayCon.byDrawFrame = 0;
+//		struPlayCon.dwChannel = this->ConnUse_channel(true);
+//		struPlayCon.struStartTime = BeginTime;
+//		struPlayCon.struStopTime = EndTime;
+//
+//		this->m_playhandle = defNS_HIK::NET_DVR_PlayBackReverseByTime_V40( this->m_camera_hwnd, hwnd, &struPlayCon );
+//	}
+//	else
+//	{
+//		defNS_HIK::NET_DVR_VOD_PARA struVodPara={0};
+//		memset( &struVodPara, 0, sizeof(struVodPara) );
+//		struVodPara.dwSize=sizeof(struVodPara);
+//		struVodPara.struIDInfo.dwSize = sizeof(struVodPara.struIDInfo);
+//		struVodPara.struIDInfo.dwChannel= this->ConnUse_channel(true);
+//		struVodPara.hWnd = hwnd;
+//		//struVodPara.hWnd=NULL;
+//		//struVodPara.hWnd=::GetActiveWindow();
+//		struVodPara.struBeginTime = BeginTime;
+//		struVodPara.struEndTime = EndTime;
+//
+//		this->m_playhandle = defNS_HIK::NET_DVR_PlayBackByTime_V40(this->m_camera_hwnd, &struVodPara);
+//	}
+//
+//	if(m_playhandle < 0)
+//	{
+//		const DWORD nErr = defNS_HIK::NET_DVR_GetLastError();
+//
+//		LOGMSG( "hik cam(%s) PlayBack nErr=%d", this->m_name.c_str(), nErr );
+//
+//		return hikErr2GSErr( nErr );
+//	}
+//
+//	if( !hwnd )
+//	{
+//		defNS_HIK::NET_DVR_SetPlayDataCallBack_V40( m_playhandle, PlayDataCallBack_V40, this );
+//	}
+//
+//	//---------------------------------------
+//	//��ʼ
+//	if(!defNS_HIK::NET_DVR_PlayBackControl_V40(m_playhandle, NET_DVR_PLAYSTART,NULL, 0, NULL,NULL))
+//	{
+//		return hikErr2GSErr( defNS_HIK::NET_DVR_GetLastError() );
+//	}
+
+	return defGSReturn_Success;
+}
+
+defGSReturn GsCamera::QuickSearchPlayback(const struGSTime *pdtBegin,
+		const struGSTime *pdtEnd) {
+	if (!pdtBegin || !pdtEnd)
+		return defGSReturn_Err;
+
+	const bool playback = true;
+	const uint32_t curtime = timeGetTime();
+
+//	defNS_HIK::NET_DVR_DEVICEINFO_V30 DeviceInfo;
+//	memset( &DeviceInfo, 0, sizeof(DeviceInfo) );
+//
+//	const long lLogin = defNS_HIK::NET_DVR_Login_V30(
+//		(char*)this->ConnUse_ip(playback).c_str(),
+//		this->ConnUse_port(playback),
+//		(char*)this->ConnUse_username(playback).c_str(),
+//		(char*)this->ConnUse_password(playback).c_str(),
+//		&DeviceInfo
+//		);
+//
+//	if( lLogin < 0 )
+//	{
+//		const int nErr = defNS_HIK::NET_DVR_GetLastError();
+//
+//		LOGMSG( "Cam:QuickSearchPlayback(%s,%s:%d) Login Failed! err=%d\r\n", m_name.c_str()?m_name.c_str():"", (char*)this->ConnUse_ip(playback).c_str(), this->ConnUse_port(playback), nErr );
+//
+//		return defGSReturn_ConnectObjErr;
+//	}
+//
+//	defNS_HIK::NET_DVR_FILECOND_V40 struFileCond;
+//	memset( &struFileCond, 0, sizeof(struFileCond) );
+//
+//	struFileCond.lChannel = this->ConnUse_channel(playback);
+//	struFileCond.dwFileType = 0xff; // ȫ��
+//	struFileCond.dwIsLocked = 0xff; // ȫ��
+//
+//	struFileCond.dwUseCardNo = 0;
+//	//struFileCond.sCardNumber[CARDNUM_LEN];
+//
+//	struFileCond.struStartTime.dwYear   = pdtBegin->Year;
+//	struFileCond.struStartTime.dwMonth  = pdtBegin->Month;
+//	struFileCond.struStartTime.dwDay    = pdtBegin->Day;
+//	struFileCond.struStartTime.dwHour   = pdtBegin->Hour;
+//	struFileCond.struStartTime.dwMinute = pdtBegin->Minute;
+//	struFileCond.struStartTime.dwSecond = pdtBegin->Second;
+//
+//	struFileCond.struStopTime.dwYear    = pdtEnd->Year;
+//	struFileCond.struStopTime.dwMonth   = pdtEnd->Month;
+//	struFileCond.struStopTime.dwDay     = pdtEnd->Day;
+//	struFileCond.struStopTime.dwHour    = pdtEnd->Hour;
+//	struFileCond.struStopTime.dwMinute  = pdtEnd->Minute;
+//	struFileCond.struStopTime.dwSecond  = pdtEnd->Second;
+//
+//	struFileCond.byDrawFrame = 0; //0:����֡��1����֡
+//	struFileCond.byFindType = 0; //0:��ѯ��ͨ�?1����ѯ�浵��
+//	struFileCond.byQuickSearch = 1; //0:��ͨ��ѯ��1�����٣������ѯ *****
+//	//struFileCond.dwVolumeNum;  //�浵���
+//	//struFileCond.byWorkingDeviceGUID[GUID_LEN];    //������GUID��ͨ���ȡN+1�õ�
+//
+//	defGSReturn ret = defGSReturn_Err;
+//
+//	const LONG lFileHandle = defNS_HIK::NET_DVR_FindFile_V40( lLogin, &struFileCond );
+//	if( lFileHandle < 0 )
+//	{
+//		ret = defGSReturn_CreateObjErr;
+//
+//		const int nErr = defNS_HIK::NET_DVR_GetLastError();
+//
+//		LOGMSG( "Cam:QuickSearchPlayback(%s,%s:%d) FindFile Failed! err=%d\r\n", m_name.c_str()?m_name.c_str():"", (char*)this->ConnUse_ip(playback).c_str(), this->ConnUse_port(playback), nErr );
+//
+//		goto label_QuickSearchPlayback_End;
+//	}
+//
+//	defNS_HIK::NET_DVR_FINDDATA_V40 struFileInfo;
+//	memset( &struFileInfo, 0, sizeof(struFileInfo) );
+//
+//	ret = defGSReturn_TimeOut;
+//	while( timeGetTime()-curtime < 10000 )
+//	{
+//		const LONG lFindRet = defNS_HIK::NET_DVR_FindNextFile_V40( lFileHandle, &struFileInfo );
+//		if( NET_DVR_FILE_SUCCESS == lFindRet )
+//		{
+//			ret = defGSReturn_Success;
+//			break;
+//		}
+//		else
+//		{
+//			if( NET_DVR_ISFINDING == lFindRet )
+//			{
+//				Sleep(5);
+//				continue;
+//			}
+//
+//			if( (NET_DVR_NOMOREFILE == lFindRet) || (NET_DVR_FILE_NOFIND == lFindRet) )
+//			{
+//				ret = defGSReturn_NotFoundContent;
+//				break;
+//			}
+//			else
+//			{
+//				ret = defGSReturn_Null;
+//				break;
+//			}
+//		}
+}
+
+label_QuickSearchPlayback_End:
+
+	if( lFileHandle >= 0 )
+	{
+		//defNS_HIK::NET_DVR_FindClose_V30( lFileHandle );
+	}
+
+	if( lLogin >= 0 )
+	{
+		//defNS_HIK::NET_DVR_Logout( lLogin );
+	}
+
+	LOGMSG( "Cam:QuickSearchPlayback(%s,%s:%d) usetime=%ums, ret=%d:%s\r\n", m_name.c_str()?m_name.c_str():"", (char*)this->ConnUse_ip(playback).c_str(), this->ConnUse_port(playback), timeGetTime()-curtime, ret, g_Trans_GSReturn(ret).c_str() );
+
+	return ret;
+}
+
+int GsCamera::PlayBackControl( GSPlayBackCode_ ControlCode, void *pInBuffer, uint32_t InLen, void *pOutBuffer, uint32_t *pOutLen )
+{
+	//LOGMSG( "GsCamera::PlayBackControl(%d)", ControlCode );
+
+	gloox::util::MutexGuard mutexguard( m_mutex );
+
+	switch( ControlCode )
+	{
+	case GSPlayBackCode_PlaySetTime:
+		{
+			struGSTime *pdtBegin = (struGSTime*)pInBuffer;
+//			defNS_HIK::NET_DVR_TIME struTime;
+//			memset( &struTime, 0, sizeof(struTime) );
+//			struTime.dwYear = pdtBegin->Year;
+//			struTime.dwMonth = pdtBegin->Month;
+//			struTime.dwDay = pdtBegin->Day;
+//			struTime.dwHour = pdtBegin->Hour;
+//			struTime.dwMinute = pdtBegin->Minute;
+//			struTime.dwSecond = pdtBegin->Second;
+//
+//			if( defNS_HIK::NET_DVR_PlayBackControl_V40(m_playhandle, NET_DVR_PLAYSETTIME, &struTime, sizeof(struTime), NULL, 0) )
+//			{
+//				return 1;
+//			}
+//			else
+//			{
+//				return -1;
+//			}
+			return -1; //jyc20170511 debug
+		}
+		break;
+
+	case GSPlayBackCode_PLAYPAUSE:
+		{
+			if( defNS_HIK::NET_DVR_PlayBackControl_V40(m_playhandle, NET_DVR_PLAYPAUSE) )
+			{
+				return 1;
+			}
+			else
+			{
+				return -1;
+			}
+		}
+		break;
+
+	case GSPlayBackCode_PLAYRESTART:
+		{
+			if( defNS_HIK::NET_DVR_PlayBackControl_V40(m_playhandle, NET_DVR_PLAYRESTART) )
+			{
+				return 1;
+			}
+			else
+			{
+				return -1;
+			}
+		}
+		break;
+
+	case GSPlayBackCode_PLAYNORMAL:
+		{
+			if( defNS_HIK::NET_DVR_PlayBackControl_V40(m_playhandle, NET_DVR_PLAYNORMAL) )
+			{
+				return 1;
+			}
+			else
+			{
+				return -1;
+			}
+		}
+		break;
+
+	case GSPlayBackCode_PLAYFAST:
+		{
+			if( defNS_HIK::NET_DVR_PlayBackControl_V40(m_playhandle, NET_DVR_PLAYFAST) )
+			{
+				return 1;
+			}
+			else
+			{
+				return -1;
+			}
+		}
+		break;
+
+	case GSPlayBackCode_PLAYSETPOS:
+		{
+			if( defNS_HIK::NET_DVR_PlayBackControl(m_playhandle, NET_DVR_PLAYSETPOS, (int)pInBuffer, NULL) )
+			{
+				return 1;
+			}
+			else
+			{
+				return -1;
+			}
+		}
+		break;
+
+	case GSPlayBackCode_PLAYGETPOS:
+		{
+			if( defNS_HIK::NET_DVR_PlayBackControl(m_playhandle, NET_DVR_PLAYGETPOS, 0, (DWORD*)pOutBuffer ) )
+			{
+				return 1;
+			}
+			else
+			{
+				return -1;
+			}
+		}
+		break;
+
+	case GSPlayBackCode_SETSPEED:
+		{
+			// �ٶȵ�λ��kbps
+			int speed = (int)pInBuffer;
+			if( defNS_HIK::NET_DVR_PlayBackControl_V40( m_playhandle, NET_DVR_SETSPEED, &speed, sizeof(int) ) )
+			{
+				return 1;
+			}
+			else
+			{
+				return -1;
+			}
+		}
+		break;
+
+	default:
+		{
+			LOGMSGEX( defLOGNAME, defLOG_ERROR, "GsCamera::PlayBackControl unsupport ControlCode=%d\r\n", ControlCode );
+		}
+		break;
+	}
+
+	return -1;
+}
+
+void GsCamera::OnDisconnct()
+{
+	StopLocalCapAudio();
+
+	//defNS_HIK::NET_DVR_DelRealDataCallBack(m_iPlayhandle, RealDataCallBack, (long)this);
+
+	this->OnTalkSend( defTalkSendCmd_Close, NULL, 0 );
+
+	if( (int)m_pDecHandle >= 0 )
+	{
+		switch(m_AudioEncType)
+		{
+		case AUDIOTALKTYPE_G722:
+			{
+				defNS_HIK::NET_DVR_ReleaseG722Decoder( m_pDecHandle );
+			}
+			break;
+
+		case AUDIOTALKTYPE_G726:
+			{
+				defNS_HIK::NET_DVR_ReleaseG726Decoder( m_pDecHandle );
+			}
+			break;
+		}
+	}
+	m_AudioEncType = -1;
+	m_pDecHandle = (void*)-1;
+	m_accen_bufMerge.ResetDataBuf();
+	m_accen.CloseAudio();
+
+	this->Logout();
+
+	this->ResetBuf();
+}
+
+bool GsCamera::IsConnect()
+{
+	if( m_camera_hwnd>=0 && m_playhandle>=0 )
+	{
+		return true;
+	}
+
+	return false;
+}
+
+void GsCamera::ResetBuf()
+{
+	m_demux.ReadReset();
+	m_demux.Close();
+	memset( &m_sptr, 0, sizeof(m_sptr) );
+	memset( &m_frame, 0, sizeof(m_frame) );
+
+	m_bufMerge.ResetDataBuf();
+}
+
+void GsCamera::SearchInit(ICameraHandler *handler)
+{
+}
+
+void GsCamera::SearchStart()
+{
+}
+
+void GsCamera::SearchStop()
+{
+}
+
+bool GsCamera::DealwithAlarm(char* pBuf , unsigned long dwLen)
+{
+	return true;
+}
+
+// speed : 1-7
+bool GsCamera::SendPTZ( GSPTZ_CtrlCmd command, int param1, int param2, int speed, const char *callinfo )
+{
+	long lPTZCommand = TILT_UP;
+	bool bStop = false;
+
+	this->Login( false );
+
+	bool direction = (GSPtzFlag_negative_direction==this->getPTZFlag())?false:true; // ����
+
+	long lSpeed = 4; //default
+	if( speed>0 )
+	{
+		lSpeed = speed;
+	}
+
+	switch( command )
+	{
+	case GSPTZ_STOPAll:
+		lPTZCommand = TILT_UP;
+		bStop = true;
+		break;
+
+	case GSPTZ_UP:
+		lPTZCommand = direction ? TILT_UP : TILT_DOWN;
+		break;
+
+	case GSPTZ_DOWN:
+		lPTZCommand = direction ? TILT_DOWN : TILT_UP;
+		break;
+
+	case GSPTZ_LEFT:
+		lPTZCommand = direction ? PAN_LEFT : PAN_RIGHT;
+		break;
+
+	case GSPTZ_RIGHT:
+		lPTZCommand = direction ? PAN_RIGHT : PAN_LEFT;
+		break;
+
+	case GSPTZ_RIGHT_UP:	// ��̨����
+		lPTZCommand = direction ? UP_RIGHT: DOWN_LEFT;
+		break;
+
+	case GSPTZ_RIGHT_DOWN:	// ��̨����
+		lPTZCommand = direction ? DOWN_RIGHT : UP_LEFT;
+		break;
+
+	case GSPTZ_LEFT_UP:		// ��̨����
+		lPTZCommand = direction ? UP_LEFT : DOWN_RIGHT;
+		break;
+
+	case GSPTZ_LEFT_DOWN:	// ��̨����
+		lPTZCommand = direction ? DOWN_LEFT : UP_RIGHT;
+		break;
+
+	case GSPTZ_AUTO:
+		lPTZCommand = PAN_AUTO;
+		break;
+
+	case GSPTZ_ZOOM_IN:		// ������(���ʱ��) 
+		lPTZCommand = ZOOM_IN;
+		break;
+
+	case GSPTZ_ZOOM_OUT:	// �����С(���ʱ�С) 
+		lPTZCommand = ZOOM_OUT;
+		break;
+
+	case GSPTZ_FOCUS_NEAR:	// ����ǰ��
+		lPTZCommand = FOCUS_NEAR;
+		break;
+
+	case GSPTZ_FOCUS_FAR:	// ������
+		lPTZCommand = FOCUS_FAR;
+		break;
+
+	case GSPTZ_IRIS_OPEN:	// ��Ȧ����
+		lPTZCommand = IRIS_OPEN;
+		break;
+
+	case GSPTZ_IRIS_CLOSE:	// ��Ȧ��С
+		lPTZCommand = IRIS_CLOSE;
+		break;
+
+	case GSPTZ_MOTION_TRACK_Enable:
+		{
+			return Set_motion_track( true );
+		}
+		break;
+
+	case GSPTZ_MOTION_TRACK_Disable:
+		{
+			return Set_motion_track( false );
+		}
+		break;
+
+	case GSPTZ_MANUALTRACE:
+		{
+			if( !m_AdvAttr.get_AdvAttr( defCamAdvAttr_manual_trace ) )
+			{
+				LOGMSG( "hik cam(%s) defCamAdvAttr_manual_trace=false", this->m_name.c_str() );
+				return false;
+			}
+
+			defNS_HIK::NET_DVR_PTZ_MANUALTRACE struTrack = {0};
+			memset( &struTrack, 0, sizeof(struTrack) );
+			struTrack.dwSize = sizeof(defNS_HIK::NET_DVR_PTZ_MANUALTRACE);
+
+			struTrack.struPoint.fX = param1 / 10000;
+			struTrack.struPoint.fX /= 10000;
+
+			struTrack.struPoint.fY = param1 % 10000;
+			struTrack.struPoint.fY /= 10000;
+
+			//LOGMSG( "ptz x=%f, y=%f", struTrack.struPoint.fX, struTrack.struPoint.fY );
+
+			struTrack.byTrackType = 0;
+			struTrack.dwChannel = m_channel;
+			DWORD iRet = 0;
+			if (!defNS_HIK::NET_DVR_RemoteControl( this->m_camera_hwnd, NET_DVR_CONTROL_PTZ_MANUALTRACE, &struTrack, sizeof(struTrack)))
+			{
+				LOGMSG( "hik cam(%s) NET_DVR_RemoteControl NET_DVR_CONTROL_PTZ_MANUALTRACE Failed!err=%d", this->m_name.c_str(), defNS_HIK::NET_DVR_GetLastError() );
+				return false;
+			}
+
+			LOGMSG( "hik cam(%s) set MANUALTRACE x=%d, y=%d\r\n", this->m_name.c_str(), struTrack.struPoint.fX, struTrack.struPoint.fY );
+			return true;
+		}
+		break;
+
+	case GSPTZ_MANUALPTZSel:
+		{
+			if( !m_AdvAttr.get_AdvAttr( defCamAdvAttr_manual_ptzsel ) )
+			{
+				LOGMSG( "hik cam(%s) defCamAdvAttr_manual_ptzsel=false", this->m_name.c_str() );
+				return false;
+			}
+
+			defNS_HIK::NET_DVR_POINT_FRAME ptFrame;
+			memset( &ptFrame, 0, sizeof(ptFrame) );
+
+			//divides the width and height to 255 proportion
+			ptFrame.xTop = param1 / 10000;
+			ptFrame.xTop *= 255;
+			ptFrame.xTop /= 10000;
+
+			ptFrame.yTop = param1 % 10000;
+			ptFrame.yTop *= 255;
+			ptFrame.yTop /= 10000;
+
+			ptFrame.xBottom = ptFrame.xTop + 1;
+			ptFrame.yBottom = ptFrame.yTop + 1;
+			ptFrame.bCounter = 0;
+
+			//if (!defNS_HIK::NET_DVR_PTZSelZoomIn( this->m_playhandle, &ptFrame ) )
+			if (!defNS_HIK::NET_DVR_PTZSelZoomIn_EX( this->m_camera_hwnd, this->m_channel, &ptFrame ) )
+			{
+				LOGMSG( "hik cam(%s) MANUALPTZSel NET_DVR_PTZSelZoomIn_EX Failed! err=%d", this->m_name.c_str(), defNS_HIK::NET_DVR_GetLastError() );
+				return false;
+			}
+
+			LOGMSG( "hik cam(%s) set MANUALPTZSel x=%d, y=%d\r\n", this->m_name.c_str(), ptFrame.xTop, ptFrame.yTop );
+			return true;
+		}
+		break;
+		
+	case GSPTZ_MANUALZoomRng:
+		{
+			if( !m_AdvAttr.get_AdvAttr( defCamAdvAttr_manual_zoomrng ) )
+			{
+				LOGMSG( "hik cam(%s) defCamAdvAttr_manual_zoomrng=false", this->m_name.c_str() );
+				return false;
+			}
+
+			defNS_HIK::NET_DVR_POINT_FRAME ptFrame;
+			memset( &ptFrame, 0, sizeof(ptFrame) );
+
+			//divides the width and height to 255 proportion
+			ptFrame.xTop = param1 / 10000;
+			ptFrame.xTop *= 255;
+			ptFrame.xTop /= 10000;
+
+			ptFrame.yTop = param1 % 10000;
+			ptFrame.yTop *= 255;
+			ptFrame.yTop /= 10000;
+
+			ptFrame.xBottom = param2 / 10000;
+			ptFrame.xBottom *= 255;
+			ptFrame.xBottom /= 10000;
+
+			ptFrame.yBottom = param2 % 10000;
+			ptFrame.yBottom *= 255;
+			ptFrame.yBottom /= 10000;
+
+			ptFrame.bCounter = 0;
+
+			const int abslittle = 2;
+			const int xabs = abs(ptFrame.xBottom-ptFrame.xTop);
+			const int yabs = abs(ptFrame.yBottom-ptFrame.yTop);
+			if( xabs<=abslittle || yabs<=abslittle )
+			{
+				ptFrame.xBottom = ptFrame.xTop + 1;
+				ptFrame.yBottom = ptFrame.yTop + 1;
+				//LOGMSG( "hik cam(%s) MANUALZoomRng abs<=%d little Failed! abs(%d,%d)", this->m_name.c_str(), abslittle, xabs, yabs );
+				//return false;
+			}
+
+			//if (!defNS_HIK::NET_DVR_PTZSelZoomIn( this->m_playhandle, &ptFrame ) )
+			if (!defNS_HIK::NET_DVR_PTZSelZoomIn_EX( this->m_camera_hwnd, this->m_channel, &ptFrame ) )
+			{
+				LOGMSG( "hik cam(%s) MANUALZoomRng NET_DVR_PTZSelZoomIn_EX Failed! err=%d", this->m_name.c_str(), defNS_HIK::NET_DVR_GetLastError() );
+				return false;
+			}
+
+			LOGMSG( "hik cam(%s) set MANUALZoomRng abs(%d,%d) rc(%d,%d,%d,%d)\r\n", this->m_name.c_str(), xabs, yabs, ptFrame.xTop, ptFrame.yTop, ptFrame.xBottom, ptFrame.yBottom );
+			return true;
+		}
+		break;
+
+	case GSPTZ_PTZ_ParkAction_Enable:	// ������ ��
+		return Set_PTZ_ParkAction(true);
+		break;
+
+	case GSPTZ_PTZ_ParkAction_Disable:	// ������ �ر�
+		return Set_PTZ_ParkAction(false);
+		break;
+		
+	case GSPTZ_Add_Preset:		// ����Ԥ�õ�
+	case GSPTZ_SetNew_Preset:
+		return PresetControl( SET_PRESET, param1, callinfo?(std::string(callinfo)+" Add_Preset"):"Add_Preset" );
+
+	case GSPTZ_Del_Preset:		// ���Ԥ�õ�
+		return PresetControl( CLE_PRESET, param1, callinfo?(std::string(callinfo)+" Del_Preset"):"Del_Preset" );
+
+	case GSPTZ_Goto_Preset:		// ת��Ԥ�õ�
+		return PresetControl( GOTO_PRESET, param1, callinfo?(std::string(callinfo)+" Goto_Preset"):"Goto_Preset" );
+
+	case GSPTZ_Rename_Preset:
+		return true;
+
+	case GSPTZ_CameraReboot:	// ����
+		{
+			if( !defNS_HIK::NET_DVR_RebootDVR( this->m_camera_hwnd ) )
+			{
+				LOGMSG( "hik cam(%s) GSPTZ_CameraReboot Failed!", this->m_name.c_str() );
+				return false;
+			}
+
+			LOGMSG( "hik cam(%s) GSPTZ_CameraReboot success.", this->m_name.c_str() );
+			return true;
+		}
+		break;
+
+	default:
+		return false;
+	}
+
+	// �Զ���ɿ��Ʊ�־
+
+	uint32_t sleeptime = 0;
+	if( command > GSPTZ_STOPAll && command <= GSPTZ_ZOOM_OUT && 0!=param1 )
+	{
+		const uint32_t Cam_PtzAutoMax = RUNCODE_Get(defCodeIndex_Cam_PtzAutoMax);
+		const uint32_t Cam_PtzAutoNorm_udlr = RUNCODE_Get(defCodeIndex_Cam_PtzAutoNorm,defRunCodeValIndex_1);
+		const uint32_t Cam_PtzAutoNorm_zoom = RUNCODE_Get(defCodeIndex_Cam_PtzAutoNorm,defRunCodeValIndex_2);
+		const uint32_t Cam_PtzAutoFast_udlr = RUNCODE_Get(defCodeIndex_Cam_PtzAutoFast,defRunCodeValIndex_1);
+		const uint32_t Cam_PtzAutoFast_zoom = RUNCODE_Get(defCodeIndex_Cam_PtzAutoFast,defRunCodeValIndex_2);
+
+		const int autoflag = param1;
+		switch( autoflag )
+		{
+		case -2:
+			{
+				speed = 7;
+				if( GSPTZ_ZOOM_IN == command || GSPTZ_ZOOM_OUT==command )
+					sleeptime = Cam_PtzAutoFast_zoom;
+				else
+					sleeptime = Cam_PtzAutoFast_udlr;
+			}
+			break;
+
+		case -1:
+			{
+				if( GSPTZ_ZOOM_IN == command || GSPTZ_ZOOM_OUT==command )
+					sleeptime = Cam_PtzAutoNorm_zoom;
+				else
+					sleeptime = Cam_PtzAutoNorm_udlr;
+			}
+			break;
+
+		case 0:
+			break;
+
+		default:
+			{
+				if( param1>0 && param1<Cam_PtzAutoMax )
+					sleeptime = param1;
+				else
+					sleeptime = 0;
+			}
+			break;
+		}
+	}
+
+	const BOOL ret = defNS_HIK::NET_DVR_PTZControlWithSpeed_Other( this->m_camera_hwnd, this->m_channel, lPTZCommand, bStop?1:0, speed );
+
+	LOGMSG( "hik cam(%s) gscmd=%d speed=%d %s. sleeptime=%d", this->m_name.c_str(), command, speed, ret?"success":"failed", sleeptime );
+	
+	if( !ret )
+	{
+		return false;
+	}
+
+	if( sleeptime )
+	{
+		if( sleeptime<0 || sleeptime>5000 )
+		{
+			sleeptime = 255;
+		}
+
+		Sleep( sleeptime );
+
+		if( GSPTZ_STOPAll != command )
+		{
+			this->SendPTZ( GSPTZ_STOPAll, 0, 0 );
+		}
+	}
+
+	return true;
+}
+
+int GsCamera::GetPTZState(GSPTZ_CtrlCmd command, bool refresh_device)
+{
+	if( refresh_device )
+	{
+		switch( command )
+		{
+		case GSPTZ_MOTION_TRACK_Enable:
+			{
+				if( !m_AdvAttr.get_AdvAttr( defCamAdvAttr_motion_track ) )
+				{
+					break;
+				}
+
+				DWORD dwReturn=0;
+				defNS_HIK::NET_DVR_MOTION_TRACK_CFG strMotionTtackCfg = {0};
+				memset(&strMotionTtackCfg, 0, sizeof(strMotionTtackCfg));
+				//strMotionTtackCfg.dwSize = sizeof(strMotionTtackCfg);
+
+				this->Login( false );
+
+				if( defNS_HIK::NET_DVR_GetDVRConfig( this->m_camera_hwnd, NET_DVR_GET_MOTION_TRACK_CFG, m_channel, &strMotionTtackCfg, sizeof(strMotionTtackCfg), &dwReturn ) )
+				{
+					m_EnableTrack = strMotionTtackCfg.byEnableTrack;
+					LOGMSG( "hik cam(%s) UserID(%d) NET_DVR_GetDVRConfig Success MOTION_TRACK_CFG=%d", this->m_name.c_str(), this->m_camera_hwnd, m_EnableTrack );
+				}
+				else
+				{
+					LOGMSG( "hik cam(%s) UserID(%d) NET_DVR_GetDVRConfig MOTION_TRACK_CFG Failed! ret=%d", this->m_name.c_str(), this->m_camera_hwnd, dwReturn );
+				}
+			}
+			break;
+
+		case GSPTZ_PTZ_ParkAction_Enable:
+			{
+				if( !m_AdvAttr.get_AdvAttr( defCamAdvAttr_PTZ_ParkAction ) )
+				{
+					break;
+				}
+
+				this->Login( false );
+
+#if defined(defUseParkAction_TimeTask)
+				DWORD dwReturn=0;
+				defNS_HIK::NET_DVR_TIME_TASK struTimeTask;
+				memset(&struTimeTask, 0, sizeof(struTimeTask));
+				struTimeTask.dwSize = sizeof(struTimeTask);
+
+				if( defNS_HIK::NET_DVR_GetDVRConfig( this->m_camera_hwnd, NET_DVR_GET_SCH_TASK, m_channel, &struTimeTask, sizeof(struTimeTask), &dwReturn ) )
+				{
+					m_PTZ_ParkAction = struTimeTask.byTaskEnable;
+					LOGMSG( "hik cam(%s) UserID(%d) NET_DVR_GetDVRConfig Success ParkAction-TimeTask=%d", this->m_name.c_str(), this->m_camera_hwnd, m_PTZ_ParkAction );
+				}
+				else
+				{
+					LOGMSG( "hik cam(%s) UserID(%d) NET_DVR_GetDVRConfig ParkAction-TimeTask Failed! ret=%d", this->m_name.c_str(), this->m_camera_hwnd, dwReturn );
+				}
+#else
+				DWORD dwReturn=0;
+				defNS_HIK::NET_DVR_PTZ_PARKACTION_CFG strPTZ_PARKACTION_CFG = {0};
+				memset(&strPTZ_PARKACTION_CFG, 0, sizeof(strPTZ_PARKACTION_CFG));
+				strPTZ_PARKACTION_CFG.dwSize = sizeof(strPTZ_PARKACTION_CFG);
+
+				if( defNS_HIK::NET_DVR_GetDVRConfig( this->m_camera_hwnd, NET_DVR_GET_PTZ_PARKACTION_CFG, m_channel, &strPTZ_PARKACTION_CFG, sizeof(strPTZ_PARKACTION_CFG), &dwReturn ) )
+				{
+					m_PTZ_ParkAction = strPTZ_PARKACTION_CFG.byEnable;
+					LOGMSG( "hik cam(%s) UserID(%d) NET_DVR_GetDVRConfig Success PTZ_PARKACTION_CFG=%d", this->m_name.c_str(), this->m_camera_hwnd, m_PTZ_ParkAction );
+				}
+				else
+				{
+					LOGMSG( "hik cam(%s) UserID(%d) NET_DVR_GetDVRConfig PTZ_PARKACTION_CFG Failed! ret=%d", this->m_name.c_str(), this->m_camera_hwnd, dwReturn );
+				}
+#endif
+			}
+			break;
+		}
+	}
+
+	switch( command )
+	{
+	case GSPTZ_MOTION_TRACK_Enable:
+		{
+			return m_EnableTrack;
+		}
+		break;
+
+	case GSPTZ_PTZ_ParkAction_Enable:
+		{
+			return m_PTZ_ParkAction;
+		}
+		break;
+	}
+
+	return 0;
+}
+
+bool GsCamera::Set_motion_track( const bool enable, const bool srccall )
+{
+	if( !m_AdvAttr.get_AdvAttr( defCamAdvAttr_motion_track ) )
+	{
+		LOGMSG( "hik cam(%s) defCamAdvAttr_motion_track=false", this->m_name.c_str() );
+		return false;
+	}
+
+	defNS_HIK::NET_DVR_MOTION_TRACK_CFG strMotionTtackCfg = {0};
+	memset(&strMotionTtackCfg, 0, sizeof(strMotionTtackCfg));
+	strMotionTtackCfg.dwSize = sizeof(strMotionTtackCfg);
+	strMotionTtackCfg.byEnableTrack = enable ? 1:0;
+
+	if( !defNS_HIK::NET_DVR_SetDVRConfig( this->m_camera_hwnd, NET_DVR_SET_MOTION_TRACK_CFG, m_channel, &strMotionTtackCfg, sizeof(strMotionTtackCfg)) )
+	{
+		LOGMSG( "hik cam(%s) NET_DVR_SetDVRConfig MOTION_TRACK_CFG Failed!err=%d", this->m_name.c_str(), defNS_HIK::NET_DVR_GetLastError() );
+		return false;
+	}
+
+	m_EnableTrack = strMotionTtackCfg.byEnableTrack;
+	LOGMSG( "hik cam(%s) set MOTION_TRACK=%d", this->m_name.c_str(), m_EnableTrack );
+
+#if 1
+	// �����ܴ�ʱ��ʱ�رձ����ͻ�������ܹر�ʱ���keep�Ƿ񱣳�����
+	const bool keep = m_AdvAttr.get_AdvAttr( defCamAdvAttr_PTZ_ParkActionKeep ); // ��������
+	if( srccall && (enable||keep) && IsRUNCODEEnable(defCodeIndex_SYS_MotionTrack2ParkAction) )
+	{
+		Set_PTZ_ParkAction( !enable, false );
+	}
+#else
+	if( enable && IsRUNCODEEnable(defCodeIndex_SYS_MotionTrack2ParkAction) )
+	{
+		Set_PTZ_ParkAction( false );
+	}
+#endif
+
+	return true;
+}
+
+bool GsCamera::Set_PTZ_ParkAction( const bool enable, const bool srccall )
+{
+	if( !m_AdvAttr.get_AdvAttr( defCamAdvAttr_PTZ_ParkAction ) )
+	{
+		LOGMSG( "hik cam(%s) defCamAdvAttr_PTZ_ParkAction=false", this->m_name.c_str() );
+		return false;
+	}
+
+#if defined(defUseParkAction_TimeTask)
+	// ��ʱ��������ģʽ
+	DWORD dwReturn=0;
+	defNS_HIK::NET_DVR_TIME_TASK struTimeTask = {0};
+	memset(&struTimeTask, 0, sizeof(struTimeTask));
+	struTimeTask.dwSize = sizeof(struTimeTask);
+
+	if( !defNS_HIK::NET_DVR_GetDVRConfig( this->m_camera_hwnd, NET_DVR_GET_SCH_TASK, m_channel, &struTimeTask, sizeof(struTimeTask), &dwReturn ) )
+	{
+		LOGMSG( "hik cam(%s) UserID(%d) NET_DVR_GetDVRConfig ParkAction-TimeTask Failed! ret=%d", this->m_name.c_str(), this->m_camera_hwnd, dwReturn );
+	}
+
+	struTimeTask.dwSize = sizeof(struTimeTask);
+	struTimeTask.byTaskEnable = enable ? 1:0;
+
+	if( !defNS_HIK::NET_DVR_SetDVRConfig( this->m_camera_hwnd, NET_DVR_SET_SCH_TASK, m_channel, &struTimeTask, sizeof(struTimeTask)) )
+	{
+		LOGMSG( "hik cam(%s) UserID(%d) NET_DVR_SetDVRConfig ParkAction-TimeTask Failed!err=%d", this->m_name.c_str(), this->m_camera_hwnd, defNS_HIK::NET_DVR_GetLastError() );
+		return false;
+	}
+
+	m_PTZ_ParkAction = struTimeTask.byTaskEnable;
+
+#else
+	// hik����ģʽ
+	DWORD dwReturn=0;
+	defNS_HIK::NET_DVR_PTZ_PARKACTION_CFG strPTZ_PARKACTION_CFG = {0};
+	memset(&strPTZ_PARKACTION_CFG, 0, sizeof(strPTZ_PARKACTION_CFG));
+	strPTZ_PARKACTION_CFG.dwSize = sizeof(strPTZ_PARKACTION_CFG);
+	 
+	if( !defNS_HIK::NET_DVR_GetDVRConfig( this->m_camera_hwnd, NET_DVR_GET_PTZ_PARKACTION_CFG, m_channel, &strPTZ_PARKACTION_CFG, sizeof(strPTZ_PARKACTION_CFG), &dwReturn ) )
+	{
+		LOGMSG( "hik cam(%s) UserID(%d) NET_DVR_GetDVRConfig PTZ_PARKACTION_CFG Failed! ret=%d", this->m_name.c_str(), this->m_camera_hwnd, dwReturn );
+	}
+
+	strPTZ_PARKACTION_CFG.dwSize = sizeof(strPTZ_PARKACTION_CFG);
+	strPTZ_PARKACTION_CFG.byEnable = enable ? 1:0;
+
+	if( !defNS_HIK::NET_DVR_SetDVRConfig( this->m_camera_hwnd, NET_DVR_SET_PTZ_PARKACTION_CFG, m_channel, &strPTZ_PARKACTION_CFG, sizeof(strPTZ_PARKACTION_CFG)) )
+	{
+		LOGMSG( "hik cam(%s) UserID(%d) NET_DVR_SetDVRConfig PTZ_PARKACTION_CFG Failed!err=%d", this->m_name.c_str(), this->m_camera_hwnd, defNS_HIK::NET_DVR_GetLastError() );
+		return false;
+	}
+
+	m_PTZ_ParkAction = strPTZ_PARKACTION_CFG.byEnable;
+
+#endif
+
+	LOGMSG( "hik cam(%s) set PTZ_PARKACTION=%d", this->m_name.c_str(), m_PTZ_ParkAction );
+
+#if 1
+	if( srccall && enable && IsRUNCODEEnable(defCodeIndex_SYS_MotionTrack2ParkAction) )
+	{
+		Set_motion_track( !enable, false );
+	}
+#else
+	if( enable && IsRUNCODEEnable(defCodeIndex_SYS_MotionTrack2ParkAction) )
+	{
+		Set_motion_track( false );
+	}
+#endif
+
+	return true;
+}
+
+bool GsCamera::PresetControl( DWORD dwPTZPresetCmd, DWORD dwPresetIndex, const std::string &callinfo )
+{
+	if( !m_AdvAttr.get_AdvAttr( defCamAdvAttr_PTZ_Preset ) )
+	{
+		LOGMSG( "hik cam(%s) defCamAdvAttr_PTZ_Preset=false", this->m_name.c_str() );
+		return false;
+	}
+
+	// ����ʱ�����ƣ���������
+	if( GOTO_PRESET!=dwPTZPresetCmd && (dwPresetIndex<defGSPresetIndex_Min || dwPresetIndex>defGSPresetIndex_Max) )
+	{
+		LOGMSG( "hik cam(%s) PresetControl %s err! index=%d over range", this->m_name.c_str(), callinfo.c_str(), dwPresetIndex );
+		return false;
+	}
+
+	if( !defNS_HIK::NET_DVR_PTZPreset_Other( this->m_camera_hwnd, m_channel, dwPTZPresetCmd, dwPresetIndex ) )
+	{
+		LOGMSG( "hik cam(%s) NET_DVR_PTZPreset_Other %s index=%d Failed! err=%d", this->m_name.c_str(), callinfo.c_str(), dwPresetIndex, defNS_HIK::NET_DVR_GetLastError() );
+		return false;
+	}
+
+	LOGMSG( "hik cam(%s) PresetControl %s index=%d\r\n", this->m_name.c_str(), callinfo.c_str(), dwPresetIndex );
+	return true;
+}
+
+void GsCamera::OnPublishStart()
+{  
+	//MakeKeyFrame();
+}
+
+void GsCamera::MakeKeyFrame( bool forcenow )
+{
+	if( !IsConnect() )
+	{
+		return;
+	}
+
+	if( !forcenow )
+	{
+		const uint32_t lastt = timeGetTime()-m_timeMakeKeyFrame;
+		const uint32_t Cam_MakeKeyFrameInterval = RUNCODE_Get( defCodeIndex_Cam_MakeKeyFrameInterval );
+		
+		if( lastt < Cam_MakeKeyFrameInterval )
+		{
+			LOGMSG( "MakeKeyFrame(%s) so fast %d<%dms & not do\r\n", this->GetName().c_str(), lastt, Cam_MakeKeyFrameInterval );
+
+			return;
+		}
+	}
+
+	LOGMSG( "MakeKeyFrame(%s)\r\n", this->GetName().c_str() );
+
+	if( m_streamfmt )
+	{
+		defNS_HIK::NET_DVR_MakeKeyFrameSub( this->m_camera_hwnd, m_channel );
+	}
+	else
+	{
+		defNS_HIK::NET_DVR_MakeKeyFrame( this->m_camera_hwnd, m_channel );
+	}
+
+	m_timeMakeKeyFrame = timeGetTime();
+}
+
+void GsCamera::OnData(LONG lRealHandle, DWORD dwDataType, BYTE *pBuffer, DWORD dwBufSize )
+{
+	m_demux.PreinitBufCheck();
+
+	const uint32_t newFrameTS = ::timeGetTime();
+
+	if( this->GetStreamObj()->GetRTMPSendObj()->GetIPlayBack() )
+	{
+		GSPlayBackCode_ PlayBackCode = stream->CheckPlayBackDoState();
+		if( GSPlayBackCode_NULL != PlayBackCode )
+		{
+			if( GSPlayBackCode_PLAYRESTART == PlayBackCode )
+			{
+				this->PlayBackControl( GSPlayBackCode_PLAYRESTART );
+			}
+			else if( GSPlayBackCode_PLAYPAUSE == PlayBackCode )
+			{
+				this->PlayBackControl( GSPlayBackCode_PLAYPAUSE );
+			}
+		}
+	}
+
+	if( dwBufSize <= 0 )
+	{
+		return ;
+	}
+
+	if( 2!=dwDataType )
+	{
+		char buf[256] = {0};
+		sprintf_s( buf, sizeof(buf), "hik DataCallBack, src ch=%d, lRealHandle=%d, t=%lu, size=%d, type=%d %s", this->GetChannel(), lRealHandle, newFrameTS, dwBufSize, dwDataType, NET_DVR_STREAMDATA!=dwDataType?"*****":"" );
+		g_PrintfByte( pBuffer, dwBufSize>64?64:dwBufSize, buf );
+	}
+	//return ;
+
+#ifdef defSaveTest_src
+	static FILE *fstreamsrc;
+	if( NET_DVR_SYSHEAD == dwDataType )
+	{
+		fstreamsrc = fopen("d:\\file_hik_src.mpeg","wb+");
+	}
+
+	if (dwBufSize > 0 )
+	{
+		fwrite(pBuffer, 1, dwBufSize, fstreamsrc);
+	}
+	//return ;
+#endif
+
+#ifdef defSaveTest_dec
+	static FILE *fstream_dec;
+	if( NET_DVR_SYSHEAD == dwDataType )
+	{
+		fstream_dec = fopen("d:\\file_hik_dec.mpeg","wb+");
+	}
+#endif
+
+	bool keyframe = false;
+	if( NET_DVR_SYSHEAD == dwDataType )
+		return ;
+	
+	//if( NET_DVR_STREAMDATA != dwDataType )
+	//	return ;
+
+	m_demux.PushBuffer( pBuffer, dwBufSize );
+
+	if( this->GetStreamObj()->GetRTMPSendObj()->GetIPlayBack() )
+	{
+		if( !m_demux.IsInitReadInfo() )
+		{
+			if(!m_demux.ReadH264VideoInfo(&m_sptr, false))
+			{
+				return ;
+			}
+
+			m_demux.ReadReset();
+		}
+	}
+	else
+	{
+		if( m_sptr.w==0 || m_sptr.h==0 )
+		{
+			if(!m_demux.ReadH264VideoInfo(&m_sptr))
+			{
+				return ;
+			}
+
+			stream->SetVideoMetaData(m_sptr.w,m_sptr.h,defDefault_hik_rate);
+			m_demux.ReadReset();
+		}
+	}
+
+	m_bufMerge.SetDataTS( newFrameTS ); 
+
+	while( m_demux.ReadFrame(&m_frame) )
+	{
+		unsigned char *buffer = m_frame.PES_Buffer;
+		int size = m_frame.PES_Buffer_size;
+		uint32_t sendFrameTS = ::timeGetTime();
+
+#if 0
+		//if( this->GetStreamObj()->GetRTMPSendObj()->GetIPlayBack() )
+		{
+			char buf[256] = {0};
+			sprintf_s( buf, sizeof(buf), "hik ReadFrame(%s) ts=%u, type=%d, size=%d", this->m_name.c_str(), m_frame.ts/100, m_frame.type, size );
+			//g_PrintfByte( buffer, size>64?64:size, buf );
+			LOGMSG( buf );
+		}
+#endif
+
+		if( m_frame.type == AUDIO )
+		{
+			if( defAudioSource_CamReEnc == this->GetAudioCfg().get_Audio_Source() )
+			{
+				doAudioSource_CameraReEnc( buffer, size, sendFrameTS );
+			}
+			else if( defAudioSource_Camera == this->GetAudioCfg().get_Audio_Source() )
+			{
+				if( this->GetStreamObj()->GetRTMPSendObj()->GetIPlayBack() )
+				{
+					this->PushVideo( false, defDefault_hik_rate, (char*)buffer, size, m_frame.ts/100, true, true );
+				}
+				else
+				{
+					this->PushVideo( false, defDefault_hik_rate, (char*)buffer, size, sendFrameTS, true, true );
+				}
+			}
+
+#if defined(defSaveTestWav)
+			static FILE *fstream_A_hik_src = NULL;
+			if( !fstream_A_hik_src )
+			{
+				char out_buffer[1024];
+				int out_len = 0;
+				char *pout_buffer = out_buffer;
+
+				WAVEFORMATEX wavepak;
+				memset( &wavepak, 0, sizeof(wavepak) );
+
+				WAVEFORMATEX *wave = &wavepak;
+				wave->wFormatTag = 7;			// 6=WAVE_FORMAT_ALAW, 7=WAVE_FORMAT_MULAW, WAVE_FORMAT_PCM;WAVE_FORMAT_4M16
+				wave->nSamplesPerSec = 8000;	// KHZ
+				wave->nChannels = 1;
+				wave->wBitsPerSample = 8;		// Bit
+
+				wave->nBlockAlign = wave->nChannels * (wave->wBitsPerSample/8);
+				wave->nAvgBytesPerSec = wave->nSamplesPerSec * wave->nBlockAlign;
+				wave->cbSize=0;
+
+				write_wav_head( wave, NULL, 0, pout_buffer, &out_len );
+				if( out_len > 0 )
+				{
+					fstream_A_hik_src = fopen("d:\\file_hik_src.wav","wb+");
+
+					if( fstream_A_hik_src )
+						fwrite( pout_buffer, 1, out_len, fstream_A_hik_src );
+				}
+			}
+
+			if( fstream_A_hik_src )
+				fwrite( buffer, 1, size, fstream_A_hik_src );
+#endif
+
+			this->m_isFirstAudio = false;
+			continue;
+		}
+
+		if( size > 0 )
+		{
+#ifdef defSaveTest_dec
+			fwrite(buffer, 1, size, fstream_dec );
+#endif
+		}
+		else
+		{
+			LOGMSGEX( defLOGNAME, defLOG_ERROR, "m_demux.ReadFrame size=%d err!\r\n", size );
+			break;
+		}
+
+		// ����ϲ������ǻ���һ֡���м���ܳ��ֵ�ǰ����֡�ĺ����ֽ�������Ҫ�ϲ���ȥ��
+		// ֱ���õ���һ֡����һ֡������õ���
+		bool doPushBuf = false;
+		bool new_buffer_keyframe = false;
+		bool new_buffer_NAL = false;
+#if defined(defHIK_WaitFullFrameFinsh)
+		bool new_buffer_FrameFinsh = false;
+#endif
+		if( h264_is_start_code(buffer) )
+		{
+			int prefixNum = 0;
+			int preindex = g_GetH264PreFix( buffer, size>32?32:size, prefixNum );
+
+			uint8_t unit_type = h264_nal_unit_type(buffer);
+			if ( unit_type == H264_NAL_TYPE_IDR_SLICE ) 
+			{
+				new_buffer_keyframe = true;
+			}
+			else if( unit_type == H264_NAL_TYPE_SEQ_PARAM || unit_type == H264_NAL_TYPE_PIC_PARAM )
+			{
+				new_buffer_NAL = true;
+
+				if( m_sptr.w==0 || m_sptr.h==0 )
+				{
+					h264_decode_t dec;
+					if (h264_read_seq_info(buffer, size, &dec) >= 0)
+					{
+						m_sptr.video_profile = dec.profile;
+						m_sptr.video_level = dec.level;
+						m_sptr.w = dec.pic_width;
+						m_sptr.h = dec.pic_height;
+
+						stream->SetVideoMetaData(m_sptr.w,m_sptr.h,defDefault_hik_rate);
+					}
+				}
+			}
+
+#if defined(defHIK_WaitFullFrameFinsh)
+			if( 0x67!=buffer[preindex]
+			&& 0x68!=buffer[preindex] )
+			{
+				new_buffer_FrameFinsh = true;
+			}
+#if defined(defHIK_WaitFullFrameFinsh_IfHaveData)
+			else if( m_bufMerge.IsNAL() )
+			{
+				// ��Ϊ67��68ʱ�����֮ǰ�Ѿ�����ݣ�Ҳ��Ϊ�����
+				new_buffer_FrameFinsh = true;
+			}
+#endif
+			else
+			{
+				new_buffer_FrameFinsh = false;
+			}
+#endif
+
+			if( !stream->HasNAL()
+				&& preindex>0
+				&& ( 0x67==buffer[preindex]||0x68==buffer[preindex] )
+				)
+			{
+				char buf[256] = {0};
+				sprintf_s( buf, sizeof(buf), "hik DataCallBack, noHasNAL lRealHandle=%d, size=%d, type=%d %s", lRealHandle, size, dwDataType, NET_DVR_STREAMDATA!=dwDataType?"*****":"" );
+				g_PrintfByte( buffer, size>64?64:size, buf );
+
+				x264_nal_t nal[2];
+				unsigned char *bufnext = g_Get_x264_nal_t( buffer, size, nal[0] );
+				if( bufnext )
+				{
+					stream->SetVideoNal( &nal[0], 1 );
+
+					if( g_Get_x264_nal_t( bufnext, size-(nal[0].i_payload+prefixNum), nal[1] ) )
+					{
+						stream->SetVideoNal( &nal[1], 1 );
+					}
+				}
+				Delete_x264_nal_t( nal[0] );
+				Delete_x264_nal_t( nal[1] );
+
+				//return ;
+			}
+
+			if( m_bufMerge.GetDataSize() > 0 
+#if defined(defHIK_WaitFullFrameFinsh)
+				&& m_bufMerge.IsDataFinish()
+#endif
+				)
+			{
+				// ����һ֡����
+				buffer = m_bufMerge.GetDataP();
+				size = m_bufMerge.GetDataSize();
+				keyframe = m_bufMerge.IsKeyframe();
+				sendFrameTS = m_bufMerge.GetDataTS();
+
+				m_bufMerge.ResetDataBuf();
+
+				// �»���
+				doPushBuf = true;
+			}
+			else
+			{
+				m_bufMerge.PushBuf( m_frame.PES_Buffer, m_frame.PES_Buffer_size, newFrameTS );
+
+				if( new_buffer_keyframe )
+				{
+					m_bufMerge.SetKeyframe();
+				}
+
+				if( new_buffer_NAL )
+				{
+					m_bufMerge.SetNAL();
+				}
+
+#if defined(defHIK_WaitFullFrameFinsh)
+				if( new_buffer_FrameFinsh )
+				{
+					m_bufMerge.SetDataFinish();
+				}
+#endif
+				return;
+			}
+		}
+		else // û��֡ͷ
+		{
+			// ֮ǰ�ѻ������֡ͷ
+			if( m_bufMerge.GetDataSize() > 0 )
+			{
+				m_bufMerge.PushBuf( m_frame.PES_Buffer, m_frame.PES_Buffer_size, newFrameTS );
+				return;
+			}
+			else
+			{
+				LOGMSGEX( defLOGNAME, defLOG_ERROR, "m_bufMerge failed! prev and cur all no head!\r\n" );
+				return;
+			}
+		}
+		
+		int prefixNum = 0;
+		int preindex = g_GetH264PreFix( buffer, size>32?32:size, prefixNum );
+
+		// h264 no head err
+		if( 0==prefixNum || 0 == preindex  )
+		{
+			char chbuf[256] = {0};
+			sprintf_s( chbuf, sizeof(chbuf), "GsCamera::OnData(%s)::PushVideo(index=%d) prefixNum=0 err! size=%d", this->m_name.c_str(), size );
+
+			g_PrintfByte( (unsigned char*)buffer, size>32?32:size, chbuf );
+		}
+
+#if 0
+		//if( preindex>0 )
+		//{
+		//	if( 0x65==buffer[preindex] )
+		//	{
+		//		keyframe = true;
+		//	}
+		//}
+#else
+		//if ( h264_nal_unit_type(buffer) == H264_NAL_TYPE_IDR_SLICE ) 
+		//{
+		//	keyframe = true;
+		//}
+#endif
+
+#if 0
+		if( !stream->HasNAL()
+			&& preindex>0
+			&& ( 0x67==buffer[preindex]||0x68==buffer[preindex] )
+			)
+		{
+			char buf[256] = {0};
+			sprintf_s( buf, sizeof(buf), "hik DataCallBack, noHasNAL lRealHandle=%d, size=%d, type=%d %s", lRealHandle, size, dwDataType, NET_DVR_STREAMDATA!=dwDataType?"*****":"" );
+			g_PrintfByte( buffer, size>64?64:size, buf );
+
+			x264_nal_t nal[2];
+			unsigned char *bufnext = g_Get_x264_nal_t( buffer, size, nal[0] );
+			if( bufnext )
+			{
+				stream->SetVideoNal( &nal[0], 1 );
+
+				if( g_Get_x264_nal_t( bufnext, size-(nal[0].i_payload+prefixNum), nal[1] ) )
+				{
+					stream->SetVideoNal( &nal[1], 1 );
+				}
+			}
+			Delete_x264_nal_t( nal[0] );
+			Delete_x264_nal_t( nal[1] );
+
+			//return ;
+		}
+#endif
+
+#if defined(defHIK_ThrowMoreSPS)
+		bool doPushVideo = true;
+		if( 0x67==buffer[preindex]||0x68==buffer[preindex] )
+		{
+			doPushVideo = false;
+		}
+#endif
+
+#if 0
+		if( this->GetStreamObj()->GetRTMPSendObj()->GetIPlayBack() )
+		{
+		char buf[256] = {0};
+		sprintf_s( buf, sizeof(buf), "hik(un) DataCallBack, src ch=%d, lRealHandle=%d, size=%d, type=%d %s", this->GetChannel(), lRealHandle, size, dwDataType, NET_DVR_STREAMDATA!=dwDataType?"*****":"" );
+		g_PrintfByte( buffer, size>64?64:size, buf );
+		}
+#endif
+
+#if defined(defHIK_ThrowMoreSPS)
+		if( doPushVideo )
+#endif
+		{
+
+			if( this->GetStreamObj()->GetRTMPSendObj()->GetIPlayBack() )
+			{
+				if ( h264_nal_unit_type(buffer) != H264_NAL_TYPE_ACCESS_UNIT ) 
+				{
+					//size = g_h264_remove_all_start_code( (uint8_t*)buffer, size );
+					this->PushVideo( keyframe, defDefault_hik_rate, (char*)buffer, size, m_frame.ts/100, true );
+				}
+			}
+			else
+			{
+				//size = g_h264_remove_all_start_code( (uint8_t*)buffer, size );
+				this->PushVideo( keyframe, defDefault_hik_rate, (char*)buffer, size, sendFrameTS, true );
+				//this->PushVideo( keyframe, defDefault_hik_rate, (char*)buffer, size, 0, false );
+			}
+		}
+
+		if( doPushBuf )
+		{
+			// ���������PushBuf������Ὣ�ϲ������ڵ���ݸ���
+			m_bufMerge.PushBuf( m_frame.PES_Buffer, m_frame.PES_Buffer_size, newFrameTS );
+
+			if( new_buffer_keyframe )
+			{
+				m_bufMerge.SetKeyframe();
+			}
+
+			if( new_buffer_NAL )
+			{
+				m_bufMerge.SetNAL();
+			}
+
+#if defined(defHIK_WaitFullFrameFinsh)
+			if( new_buffer_FrameFinsh )
+			{
+				m_bufMerge.SetDataFinish();
+			}
+#endif
+		}
+	}
+}
+
+void GsCamera::doAudioSource_CameraReEnc( unsigned char *buffer, int size, const uint32_t sendFrameTS )
+{
+	if( !IsRUNCODEEnable(defCodeIndex_SYS_CamReEnc) )
+		return;
+
+	if( !isSupportAudioEncType( m_AudioEncType ) )
+		return;
+
+	if( m_accen.IsOpen() )
+	{
+		int Audio_Channels = 0;
+		int Audio_bitSize = 0;
+		int Audio_SampleRate = 0;
+		int Audio_ByteRate = 0;
+		this->GetAudioCfg().get_param_use( Audio_Channels, Audio_bitSize, Audio_SampleRate, Audio_ByteRate );
+
+		BYTE wavbuf[8192] = {0};
+		BYTE *pwavbuf = wavbuf;
+		int AEncBuffsize = 0;
+		int AEncBloksize = 0;
+
+		switch(m_AudioEncType)
+		{
+		case AUDIOTALKTYPE_G711_MU:
+		case AUDIOTALKTYPE_G711_A:
+			{
+				if( 320 != size )
+				{
+					//LOGMSGEX( defLOGNAME, defLOG_ERROR, "wav2aac G711 320 != size=%d*****", size );
+					return;
+				}
+
+				AEncBuffsize = Audio_ByteRate;
+				AEncBloksize = Audio_ByteRate;
+
+				bool isDecSuccess = true;
+				for( int i=0; i<2; ++i )
+				{
+					if( !defNS_HIK::NET_DVR_DecodeG711Frame( AUDIOTALKTYPE_G711_MU==m_AudioEncType?0:1, buffer, pwavbuf ) )
+					{
+						isDecSuccess = false;
+						break;
+					}
+
+					buffer += 160;
+					pwavbuf += 320;
+				}
+
+				if( isDecSuccess )
+					m_accen_bufMerge.PushBuf( wavbuf, 640, 0 );
+			}
+			break;
+
+		case AUDIOTALKTYPE_G722:
+			{
+				if( 80 != size )
+				{
+					//LOGMSGEX( defLOGNAME, defLOG_ERROR, "wav2aac G722 80 != size=%d*****", size );
+					return;
+				}
+
+				AEncBuffsize = Audio_ByteRate;
+				AEncBloksize = Audio_ByteRate;
+
+				if( m_pDecHandle )
+				{
+					if( defNS_HIK::NET_DVR_DecodeG722Frame( m_pDecHandle, buffer, pwavbuf ) )
+					{
+						m_accen_bufMerge.PushBuf( wavbuf, 1280, 0 );
+					}
+				}
+			}
+			break;
+
+		case AUDIOTALKTYPE_G726:
+			{
+				if( 80 != size )
+				{
+					//LOGMSGEX( defLOGNAME, defLOG_ERROR, "wav2aac G726 80 != size=%d*****", size );
+					return;
+				}
+
+				AEncBuffsize = Audio_ByteRate;
+				AEncBloksize = Audio_ByteRate;
+
+				if( m_pDecHandle )
+				{
+					if( defNS_HIK::NET_DVR_DecodeG726Frame( m_pDecHandle, buffer, pwavbuf, this->m_isFirstAudio?1:0 ) )
+					{
+						m_accen_bufMerge.PushBuf( wavbuf, 640, 0 );
+					}
+				}
+			}
+			break;
+
+		default:
+			{
+				// not support
+				return ;
+			}
+			break;
+		}
+
+		if( AEncBuffsize > 0 
+			&& AEncBloksize > 0 
+			&& m_accen_bufMerge.GetDataSize() >= AEncBuffsize )
+		{
+			unsigned char *pCurBuffer = m_accen_bufMerge.GetDataP();
+			const uint32_t CurDataSize = m_accen_bufMerge.GetDataSize();
+			m_accen_bufMerge.ResetDataBuf();
+
+			long OutBufferLen = 0;
+			unsigned char *pOutBuffer = m_accen.OnAudioBufferCB( pCurBuffer, AEncBloksize, OutBufferLen );
+
+			//LOGMSG( "wav2aac in=%d, out=%d", size, OutBufferLen );
+
+			if( CurDataSize-AEncBloksize > 0 )
+			{
+				m_accen_bufMerge.PushBuf( pCurBuffer+AEncBloksize, CurDataSize-AEncBloksize, 0 );
+			}
+
+			if( pOutBuffer && OutBufferLen>0 )
+			{
+				this->PushVideo( false, defDefault_hik_rate, (char*)pOutBuffer, OutBufferLen, sendFrameTS, true, true );
+			}
+		}
+	}
+}
+
+bool GsCamera::isTalkSupport() const
+{
+	switch(m_AudioEncType)
+	{
+	case AUDIOTALKTYPE_G711_MU:
+	case AUDIOTALKTYPE_G711_A:
+		return true;
+
+	default:
+		break;
+	}
+
+	return false;
+}
+
+bool GsCamera::OnTalkSend( defTalkSendCmd_ TalkSendCmd, unsigned char *pdata, uint32_t data_size )
+{
+	switch( TalkSendCmd )
+	{
+	case defTalkSendCmd_Open:
+		{
+			m_lVoiceComHandle = defNS_HIK::NET_DVR_StartVoiceCom_MR_V30( this->m_camera_hwnd, 1, NULL, NULL );
+			if( -1 == m_lVoiceComHandle )
+			{
+				LOGMSG( "GsCamera::OnTalkSend(%s) : Open failed! err=%d\r\n", this->m_name.c_str(), defNS_HIK::NET_DVR_GetLastError() );
+				return false;
+			}
+
+			LOGMSG( "GsCamera::OnTalkSend(%s) : Open success\r\n", this->m_name.c_str() );
+			return true;
+		}
+
+	case defTalkSendCmd_Close:
+		{
+			if( m_lVoiceComHandle >= 0 )
+			{
+				defNS_HIK::NET_DVR_StopVoiceCom(m_lVoiceComHandle);
+				LOGMSG( "GsCamera::OnTalkSend(%s) : Close\r\n", this->m_name.c_str() );
+			}
+			m_lVoiceComHandle = -1;
+			return true;
+		}
+
+	case defTalkSendCmd_Play:
+		break;
+
+	default:
+		return false;
+	}
+
+	// defTalkSendCmd_Play
+
+	if( m_lVoiceComHandle < 0 )
+		return false;
+
+	if( !pdata || data_size<=0 )
+		return false;
+
+	switch(m_AudioEncType)
+	{
+	case AUDIOTALKTYPE_G711_MU:
+	case AUDIOTALKTYPE_G711_A:
+		break;
+
+	default:
+		return false;
+	}
+
+	m_talkde_bufMerge.PushBuf( (unsigned char*)pdata, data_size, 0 );
+
+	if( m_talkde_bufMerge.GetDataSize() >= (HIK_G711_AUDDECSIZE*2) )
+	{
+		const int sblock = 320;
+
+		unsigned char *pCurBuffer = m_talkde_bufMerge.GetDataP();
+		const uint32_t CurDataSize = m_talkde_bufMerge.GetDataSize();
+		m_talkde_bufMerge.ResetDataBuf();
+
+		BYTE G711EncBuf[HIK_G711_AUDDECSIZE] = {0};
+		UINT16 wVoiceBuf1[HIK_G711_AUDDECSIZE] = {0};
+
+		unsigned char *pdata_temp = (unsigned char*)pCurBuffer;
+		unsigned char *pdata_End = pdata_temp+CurDataSize;
+
+		bool isAllSuccess = true;
+		for( int i=1; pdata_temp+sblock<=pdata_End; pdata_temp+=sblock, ++i )
+		{
+			//if( i > 1 ) Sleep(1);
+
+			memcpy( wVoiceBuf1, pdata_temp, HIK_G711_AUDDECSIZE*2 );
+			if( !defNS_HIK::NET_DVR_EncodeG711Frame( AUDIOTALKTYPE_G711_MU==m_AudioEncType?0:1, (BYTE*)wVoiceBuf1, G711EncBuf ) )
+			{
+				isAllSuccess = false;
+				continue;
+			}
+
+			if( !defNS_HIK::NET_DVR_VoiceComSendData( m_lVoiceComHandle, (char*)G711EncBuf, HIK_G711_AUDDECSIZE ) )
+			{
+				isAllSuccess = false;
+				//LOGMSG( "GsCamera::OnTalkSend : NET_DVR_VoiceComSendData(%d) failed\r\n", i );
+			}
+			else
+			{
+				//LOGMSG( "GsCamera::OnTalkSend : NET_DVR_VoiceComSendData(%d)", i );
+			}
+
+			if( 0==(i%2) ) Sleep(1);
+		}
+
+		if( !isAllSuccess )
+		{
+			LOGMSG( "GsCamera::OnTalkSend(%s) : NET_DVR_VoiceComSendData, size=%d, %s", this->m_name.c_str(), data_size, isAllSuccess?"success":"failed" );
+		}
+
+		if( pdata_End-pdata_temp > 0 )
+		{
+			m_talkde_bufMerge.PushBuf( pdata_temp, pdata_End-pdata_temp, 0 );
+		}
+
+		return isAllSuccess;
+	}
+
+	return true;
+}
+
+void GsCamera::check_NetUseable( bool *isChanged )
+{
+	this->Login( false );
+
+	if( m_camera_hwnd>=0 )
+	{
+		DWORD dwReturned = 0;
+		defNS_HIK::NET_DVR_DEVICECFG_V40 StruDevCfg;
+		memset( &StruDevCfg, 0, sizeof(StruDevCfg) );
+		StruDevCfg.dwSize = sizeof(StruDevCfg);
+		//if (!NET_DVR_GetDVRConfig(lUserID,NET_DVR_GET_DEVICECFG_V40,0,pStruDevCfg,sizeof(NET_DVR_DEVICECFG_V40),&dwReturned))
+		if( defNS_HIK::NET_DVR_GetDVRConfig( m_camera_hwnd, NET_DVR_GET_DEVICECFG_V40, 0, &StruDevCfg, sizeof(StruDevCfg), &dwReturned ) )
+		{
+			GetCamCompressCfg( NULL, NULL );
+
+			// ���IPͨ��״̬
+			if( StruDevCfg.byIPChanNum > 0 )
+			{
+				defNS_HIK::NET_DVR_IPPARACFG_V40 struIPPARACFG;
+				memset( &struIPPARACFG, 0, sizeof(struIPPARACFG) );
+				struIPPARACFG.dwSize = sizeof(struIPPARACFG);
+				if( defNS_HIK::NET_DVR_GetDVRConfig( m_camera_hwnd, NET_DVR_GET_IPPARACFG_V40, 0, &struIPPARACFG, sizeof(struIPPARACFG), &dwReturned ) )
+				{
+					const int indexDCh = m_channel-struIPPARACFG.dwStartDChan;
+					if( indexDCh>=0 && indexDCh<MAX_IP_DEVICE_V40 )
+					{
+						if( !struIPPARACFG.struStreamMode[indexDCh].uGetStream.struChanInfo.byEnable
+							|| !struIPPARACFG.struIPDevInfo[indexDCh].byEnable
+							)
+						{
+							set_NetUseable( defUseable_ErrNoData, isChanged );
+							return;
+						}
+						else
+						{
+							set_NetUseable( defUseable_OK, isChanged );
+							return;
+						}
+					}
+				}
+				else
+				{
+					const long nErr = defNS_HIK::NET_DVR_GetLastError();
+					LOGMSG( "Cam(%s,%s:%d):GET_IPPARACFG_V40 Failed! ch=%d, streamfmt=%d, err=%d\r\n", m_name.c_str()?m_name.c_str():"", (char *)this->ConnUse_ip().c_str(), this->ConnUse_port(), this->m_channel, m_streamfmt, nErr );
+				}
+			}
+
+			if( defUseable_ErrNoData != this->get_NetUseable() ) //this->get_all_useable_state() ) // recheck ErrNoData
+			{
+				set_NetUseable( defUseable_OK, isChanged );
+			}
+			
+			return;
+		}
+		else
+		{
+			const long nErr = defNS_HIK::NET_DVR_GetLastError();
+			LOGMSG( "Cam(%s,%s:%d):GET_DEVICECFG_V40 Failed! ch=%d, streamfmt=%d, err=%d\r\n", m_name.c_str()?m_name.c_str():"", (char *)this->ConnUse_ip().c_str(), this->ConnUse_port(), this->m_channel, m_streamfmt, nErr );
+
+			Logout();
+		}
+
+		set_NetUseable( defUseable_Err, isChanged );
+		return;
+	}
+
+	set_NetUseable( defUseable_ErrNet, isChanged );
+}
+
+defGSReturn GsCamera::GetCamShowInfo( int &showtime, int &showname, std::string &name )
+{
+	this->Login( false );
+
+	if( m_camera_hwnd>=0 )
+	{
+		DWORD dwReturned = 0;
+		defNS_HIK::NET_DVR_PICCFG_V40 StruPicCfg;
+		memset( &StruPicCfg, 0, sizeof(StruPicCfg) );
+		StruPicCfg.dwSize = sizeof(StruPicCfg);
+		if( defNS_HIK::NET_DVR_GetDVRConfig( m_camera_hwnd, NET_DVR_GET_PICCFG_V40, m_channel, &StruPicCfg, sizeof(StruPicCfg), &dwReturned ) )
+		{
+			showtime = StruPicCfg.dwShowOsd;
+			showname = StruPicCfg.dwShowChanName;
+			name = (char*)StruPicCfg.sChanName;
+			return defGSReturn_Success;
+		}
+
+		LOGMSG( "hik cam(%s) NET_DVR_GetDVRConfig PICCFG_V40 Failed!err=%d", this->m_name.c_str(), defNS_HIK::NET_DVR_GetLastError() );
+	}
+
+	return defGSReturn_Err;
+}
+
+defGSReturn GsCamera::SetCamShowInfo( const int showtime, const int showname, const char *pname )
+{
+	this->Login( false );
+
+	if( m_camera_hwnd>=0 )
+	{
+		DWORD dwReturned = 0;
+		defNS_HIK::NET_DVR_PICCFG_V40 StruPicCfg;
+		memset( &StruPicCfg, 0, sizeof(StruPicCfg) );
+		StruPicCfg.dwSize = sizeof(StruPicCfg);
+		if( defNS_HIK::NET_DVR_GetDVRConfig( m_camera_hwnd, NET_DVR_GET_PICCFG_V40, m_channel, &StruPicCfg, sizeof(StruPicCfg), &dwReturned ) )
+		{
+			StruPicCfg.dwShowOsd = showtime;
+			StruPicCfg.dwShowChanName = showname;
+
+			if( pname )
+			{
+				strncpy_s( (char*)StruPicCfg.sChanName, sizeof(StruPicCfg.sChanName), pname, NAME_LEN-1 ); 
+			}
+			
+			if( !defNS_HIK::NET_DVR_SetDVRConfig( this->m_camera_hwnd, NET_DVR_SET_PICCFG_V40, m_channel, &StruPicCfg, sizeof(StruPicCfg)) )
+			{
+				LOGMSG( "hik cam(%s) NET_DVR_SetDVRConfig PICCFG_V40 Failed!err=%d", this->m_name.c_str(), defNS_HIK::NET_DVR_GetLastError() );
+				return defGSReturn_Err;
+			}
+
+			return defGSReturn_Success;
+		}
+	}
+
+	return defGSReturn_Err;
+}
+
+defGSReturn GsCamera::GetCamCompressCfg( std::string *cfginfo, struCamParamBuf *getCamParamBuf )
+{
+	this->Login( false );
+
+	if( m_camera_hwnd<0 )
+	{
+		return defGSReturn_Err;
+	}
+
+	DWORD dwReturned = 0;
+	defNS_HIK::NET_DVR_COMPRESSIONCFG_V30 StruCfg;
+	memset( &StruCfg, 0, sizeof( StruCfg ) );
+	StruCfg.dwSize = sizeof( StruCfg );
+	if( !defNS_HIK::NET_DVR_GetDVRConfig( m_camera_hwnd, NET_DVR_GET_COMPRESSCFG_V30, m_channel, &StruCfg, sizeof( StruCfg ), &dwReturned ) )
+	{
+		LOGMSG( "hik cam(%s) NET_DVR_GetDVRConfig COMPRESSCFG_V30 Failed!err=%d", this->m_name.c_str(), defNS_HIK::NET_DVR_GetLastError() );
+		return defGSReturn_Err;
+	}
+
+	const defNS_HIK::NET_DVR_COMPRESSION_INFO_V30 &pm = m_streamfmt ? StruCfg.struNetPara : StruCfg.struNormHighRecordPara;
+	this->m_curVideoBitrate = hikTransVideoBitrate( pm.dwVideoBitrate );
+
+	if( getCamParamBuf )
+	{
+		getCamParamBuf->SetBuf( this->GetCameraType(), NET_DVR_GET_COMPRESSCFG_V30, sizeof( StruCfg ), (uint8_t*)&StruCfg );
+	}
+
+	if( cfginfo )
+	{
+		bool isWarning = false;
+		char chbuf[256] ={0};
+		//sprintf_s( chbuf, sizeof( chbuf ), "%d, %s, %dK, L%d, stream=%d", pm.byResolution, 19==pm.byResolution ? "720P":(27==pm.byResolution ? "1080P":"����"), pm.dwVideoBitrate, pm.byPicQuality, pm.byStreamType );
+		//*cfginfo = chbuf;
+
+		if( !cfginfo->empty() ) *cfginfo += ", ";
+		
+		if( 0==pm.byResolution )
+			*cfginfo += "528x384";
+		else if( 1==pm.byResolution )
+			*cfginfo += "352x288";
+		else if( 2==pm.byResolution )
+			*cfginfo += "176x144";
+		else if( 3==pm.byResolution )
+			*cfginfo += "704x576";
+		else if( 4==pm.byResolution )
+			*cfginfo += "704x288";
+		else if( 6==pm.byResolution )
+			*cfginfo += "320x240";
+		else if( 12==pm.byResolution )
+			*cfginfo += "384x288";
+		else if( 16==pm.byResolution )
+			*cfginfo += "640*480";
+		else if( 19==pm.byResolution )
+			*cfginfo += "720P";
+		else if( 20==pm.byResolution )
+			*cfginfo += "1280*960";
+		else if( 21==pm.byResolution )
+			*cfginfo += "1600*900";
+		else if( 27==pm.byResolution )
+			*cfginfo += "1080P";
+		else if( 28==pm.byResolution )
+			*cfginfo += "2560*1920";
+		else if( 30==pm.byResolution )
+			*cfginfo += "2048*1536";
+		else if( 37==pm.byResolution )
+			*cfginfo += "1080i";
+		else if( 39==pm.byResolution )
+			*cfginfo += "HD_F";
+		else if( 55==pm.byResolution )
+			*cfginfo += "3072*2048";
+		else
+		{
+			sprintf_s( chbuf, sizeof( chbuf ), "����ֱ���=%d", pm.byResolution );
+			*cfginfo += chbuf;
+		}
+		
+		if( !cfginfo->empty() ) *cfginfo += ", ";
+		if( 5==pm.byPicQuality )
+			*cfginfo += "��";
+		else if( 4==pm.byPicQuality )
+			*cfginfo += "����";
+		else if( 3==pm.byPicQuality )
+			*cfginfo += "�Ϻ�";
+		else if( 2==pm.byPicQuality )
+			*cfginfo += "��";
+		else if( 1==pm.byPicQuality )
+			*cfginfo += "�ܺ�";
+		else if( 0==pm.byPicQuality )
+			*cfginfo += "���";
+		else
+			*cfginfo += "������";
+
+		if( !cfginfo->empty() ) *cfginfo += ", ";
+		if( 0==pm.byBitrateType )
+			*cfginfo += "������";
+		else if( 1==pm.byBitrateType )
+			*cfginfo += "������";
+
+		*cfginfo += " ";
+
+		if( 15==pm.dwVideoBitrate )
+			*cfginfo += "512K";
+		else if( 16==pm.dwVideoBitrate )
+			*cfginfo += "640K";
+		else if( 17==pm.dwVideoBitrate )
+			*cfginfo += "768K";
+		else if( 19==pm.dwVideoBitrate )
+			*cfginfo += "1024K";
+		else if( 21==pm.dwVideoBitrate )
+			*cfginfo += "1536K";
+		else if( 23==pm.dwVideoBitrate )
+			*cfginfo += "2048K";
+		else if( 24==pm.dwVideoBitrate )
+			*cfginfo += "3072K";
+		else if( 25==pm.dwVideoBitrate )
+			*cfginfo += "4096K";
+		else if( 26==pm.dwVideoBitrate )
+			*cfginfo += "8192K";
+		else
+		{
+			*cfginfo += "����=����";
+
+			if( m_curVideoBitrate > 0 )
+			{
+				sprintf_s( chbuf, sizeof( chbuf ), "%d%s", m_curVideoBitrate>1024?m_curVideoBitrate/1024:m_curVideoBitrate, m_curVideoBitrate>1024?"K":"" );
+				*cfginfo += chbuf;
+			}
+		}
+
+		if( m_curVideoBitrate>1536000 )
+		{
+			*cfginfo += "!!!";
+		}
+
+		if( InvalidVideoBitrate() || (pm.dwVideoBitrate>23 && pm.dwVideoBitrate<999999) )
+		{
+			isWarning = true;
+			*cfginfo = g_getstr_Useable(defUseable_ErrConfig) + "! " + *cfginfo;
+		}
+
+		if( !cfginfo->empty() ) *cfginfo += ", ";
+		if( 0==pm.dwVideoFrameRate )
+			*cfginfo += "ȫ֡��";
+		else if( 1==pm.dwVideoFrameRate )
+			*cfginfo += "֡��=1/16";
+		else if( 2==pm.dwVideoFrameRate )
+			*cfginfo += "֡��=1/8";
+		else if( 3==pm.dwVideoFrameRate )
+			*cfginfo += "֡��1/4";
+		else if( 5==pm.dwVideoFrameRate )
+			*cfginfo += "1fps";
+		else if( 6==pm.dwVideoFrameRate )
+			*cfginfo += "2fps";
+		else if( 7==pm.dwVideoFrameRate )
+			*cfginfo += "4fps";
+		else if( 8==pm.dwVideoFrameRate )
+			*cfginfo += "6fps";
+		else if( 9==pm.dwVideoFrameRate )
+			*cfginfo += "8fps";
+		else if( 10==pm.dwVideoFrameRate )
+			*cfginfo += "10fps";
+		else if( 11==pm.dwVideoFrameRate )
+			*cfginfo += "12fps";
+		else if( 12==pm.dwVideoFrameRate )
+			*cfginfo += "16fps";
+		else if( 13==pm.dwVideoFrameRate )
+			*cfginfo += "20fps";
+		else if( 14==pm.dwVideoFrameRate )
+			*cfginfo += "15fps";
+		else if( 15==pm.dwVideoFrameRate )
+			*cfginfo += "18fps";
+		else if( 16==pm.dwVideoFrameRate )
+			*cfginfo += "22fps";
+		else if( 17==pm.dwVideoFrameRate )
+			*cfginfo += "25fps";
+		else if( 18==pm.dwVideoFrameRate )
+			*cfginfo += "30fps";
+		else if( 19==pm.dwVideoFrameRate )
+			*cfginfo += "35fps";
+		else if( 20==pm.dwVideoFrameRate )
+			*cfginfo += "40fps";
+		else if( 21==pm.dwVideoFrameRate )
+			*cfginfo += "45fps";
+		else if( 22==pm.dwVideoFrameRate )
+			*cfginfo += "50fps";
+		else if( 23==pm.dwVideoFrameRate )
+			*cfginfo += "55fps";
+		else if( 24==pm.dwVideoFrameRate )
+			*cfginfo += "60fps";
+		else if( 0xfffffffe==pm.dwVideoFrameRate )
+			*cfginfo += "�Զ�fps";
+		else
+			*cfginfo += "����fps";
+
+		if( !cfginfo->empty() ) *cfginfo += ", ";
+		if( 0==pm.byVideoEncType )
+			*cfginfo += "˽��264";
+		else if( 1==pm.byVideoEncType )
+			*cfginfo += "��׼h264";
+		else if( 2==pm.byVideoEncType )
+			*cfginfo += "��׼mpeg4";
+		else if( 7==pm.byVideoEncType )
+			*cfginfo += "M-JPEG";
+		else if( 8==pm.byVideoEncType )
+			*cfginfo += "MPEG2";
+		else if( 0xfe==pm.byVideoEncType )
+			*cfginfo += "�Զ���Ƶ����";
+		else
+			*cfginfo += "������Ƶ����";
+
+		if( 1!=pm.byVideoEncType )
+		{
+			isWarning = true;
+			*cfginfo += "!!!";
+		}
+
+		if( !cfginfo->empty() ) *cfginfo += ", ";
+		if( 0==pm.byStreamType )
+			*cfginfo += "��Ƶ��";
+		else if( 1==pm.byStreamType )
+			*cfginfo += "������";
+
+		if( 0xff != pm.byAudioEncType && 0!=pm.byStreamType )
+		{
+			if( !cfginfo->empty() ) *cfginfo += ", ";
+			if( 0==pm.byAudioEncType )
+				*cfginfo += "��Ƶ=G722";
+			else if( 1==pm.byAudioEncType )
+				*cfginfo += "��Ƶ=G711_U";
+			else if( 2==pm.byAudioEncType )
+				*cfginfo += "��Ƶ=G711_A";
+			else if( 5==pm.byAudioEncType )
+				*cfginfo += "��Ƶ=MP2L2";
+			else if( 6==pm.byAudioEncType )
+				*cfginfo += "��Ƶ=G276";
+			else if( 7==pm.byAudioEncType )
+				*cfginfo += "��Ƶ=AAC";
+			else
+				*cfginfo += "������Ƶ����";
+
+			if( 1!=pm.byAudioEncType && 2!=pm.byAudioEncType )
+			{
+				isWarning = true;
+				*cfginfo += "!!!";
+			}
+		}
+
+		if( !cfginfo->empty() ) *cfginfo += ", ";
+		if( 0xfffe==pm.wIntervalFrameI )
+			*cfginfo += "I֡����Զ�";
+		else
+		{
+			sprintf_s( chbuf, sizeof( chbuf ), "I֡���=%d", pm.wIntervalFrameI );
+			*cfginfo += chbuf;
+		}
+	}
+
+	return defGSReturn_Success;
+}
+
+// setuseCamParamBuf��ֵʱ��ʹ�ô˸�������ṹ��������
+defGSReturn GsCamera::SetCamCompressCfg( const defCamCompress CamCompress, const struCamParamBuf *setuseCamParamBuf )
+{
+	this->Login( false );
+
+	defNS_HIK::NET_DVR_COMPRESSIONCFG_V30 StruCfg;
+	memset( &StruCfg, 0, sizeof( StruCfg ) );
+	StruCfg.dwSize = sizeof( StruCfg );
+
+	if( setuseCamParamBuf )
+	{
+		if( !setuseCamParamBuf->GetBuf( this->GetCameraType(), NET_DVR_GET_COMPRESSCFG_V30, sizeof( StruCfg ), (uint8_t*)&StruCfg ) )
+		{
+			return defGSReturn_ErrParam;
+		}
+	}
+	else
+	{
+		if( m_camera_hwnd<0 )
+		{
+			return defGSReturn_Err;
+		}
+
+		DWORD dwReturned = 0;
+		if( !defNS_HIK::NET_DVR_GetDVRConfig( m_camera_hwnd, NET_DVR_GET_COMPRESSCFG_V30, m_channel, &StruCfg, sizeof( StruCfg ), &dwReturned ) )
+		{
+			LOGMSG( "hik cam(%s) NET_DVR_GetDVRConfig COMPRESSCFG_V30 Failed!err=%d", this->m_name.c_str(), defNS_HIK::NET_DVR_GetLastError() );
+			return defGSReturn_Err;
+		}
+
+		//StruCfg.struNormHighRecordPara.byStreamType = videostream;	// ������
+		StruCfg.struNormHighRecordPara.byPicQuality = 5;		// ���
+		StruCfg.struNormHighRecordPara.byResolution = 19;		// 720P
+		StruCfg.struNormHighRecordPara.byBitrateType = 0;		// ������
+		StruCfg.struNormHighRecordPara.dwVideoBitrate = 19;		// 1024k
+		StruCfg.struNormHighRecordPara.dwVideoFrameRate = 11;	// =12FPS
+		StruCfg.struNormHighRecordPara.wIntervalFrameI = 25;	// I֡��� 24/50
+		StruCfg.struNormHighRecordPara.byVideoEncType = 1;		// ��Ƶ�������� 1-��׼h264
+		StruCfg.struNormHighRecordPara.byAudioEncType=1;		// ��Ƶ�������� 1-G711_U
+
+		switch( CamCompress )
+		{
+		case defCamCompress_720PLow:
+			{
+				StruCfg.struNormHighRecordPara.byPicQuality = 5;
+			}
+			break;
+	
+		case defCamCompress_720PNorm:
+			{
+				StruCfg.struNormHighRecordPara.byPicQuality = 4;
+			}
+			break;
+			
+		case defCamCompress_720PRelaHigh:
+			{
+				StruCfg.struNormHighRecordPara.byPicQuality = 3;
+			}
+			break;
+
+		case defCamCompress_720PHigh:
+			{
+				StruCfg.struNormHighRecordPara.byPicQuality = 2;
+			}
+			break;
+	
+		case defCamCompress_1080PLow:
+			{
+				StruCfg.struNormHighRecordPara.byPicQuality = 5;
+				StruCfg.struNormHighRecordPara.byResolution = 27; // 1080P
+			}
+			break;
+
+		case defCamCompress_1080PNorm:
+			{
+				StruCfg.struNormHighRecordPara.byPicQuality = 4;
+				StruCfg.struNormHighRecordPara.byResolution = 27; // 1080P
+			}
+			break;
+
+		default:
+			break;
+		}
+	}
+
+	if( !defNS_HIK::NET_DVR_SetDVRConfig( this->m_camera_hwnd, NET_DVR_SET_COMPRESSCFG_V30, m_channel, &StruCfg, sizeof( StruCfg ) ) )
+	{
+		LOGMSG( "hik cam(%s) NET_DVR_SetDVRConfig COMPRESSCFG_V30 Failed!err=%d", this->m_name.c_str(), defNS_HIK::NET_DVR_GetLastError() );
+		return defGSReturn_Err;
+	}
+
+	return defGSReturn_Success;
+}
+
+bool GsCamera::CapturePic( char *buf, DWORD bufsize, DWORD &outsize, DWORD PicSize )
+{
+	this->Login( false );
+
+	if( this->m_camera_hwnd < 0 )
+		return false;
+
+	defNS_HIK::NET_DVR_JPEGPARA JpegPara;
+	JpegPara.wPicSize = PicSize;
+	JpegPara.wPicQuality = 2; // ͼƬ����ϵ�� 0���, 1�Ϻ�, 2һ��
+	
+	uint32_t dw = timeGetTime();
+	BOOL bl = defNS_HIK::NET_DVR_CaptureJPEGPicture_NEW( this->m_camera_hwnd, this->m_channel, &JpegPara, buf, bufsize, &outsize );
+	LOGMSG( "hik cam(%s) CaptureJPEGPicture %s, usetime=%dms, size=%d", this->m_name.c_str(), bl?"success":"failed", timeGetTime()-dw, outsize );
+
+	return bl?true:false;
+}
+
+

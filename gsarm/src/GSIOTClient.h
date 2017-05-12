@@ -232,9 +232,9 @@ using namespace gloox;
 std::string g_IOTGetVersion();
 std::string g_IOTGetBuildInfo();
 
-
+//jyc20170510 add public ITalkNotify, public ICameraAlarmRecv
 class GSIOTClient: public IGSClientExFunc, public IDeviceHandler, IqHandler, SubscriptionHandler, ConnectionListener,
-	MessageHandler, ITimerHandler, public TagHandler 
+	MessageHandler, ITimerHandler, public TagHandler //,public ITalkNotify, public ICameraAlarmRecv
 {
 private:
 	GSIOTConfig *m_cfg;

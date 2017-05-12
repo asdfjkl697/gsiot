@@ -4,13 +4,13 @@
 //#define NO_CRYPTO 1
 //#include "rtmp.h"
 #include <queue>
-//#include <process.h>   //jyc20170322 modify pthread.h
-#include <pthread.h>  
+//#include <process.h>
+//#include <pthread.h>
 #include "IPublishHandler.h"
 #include "gloox/mutexguard.h"
 #include "common.h"
 #include "AudioCfg.h"
-//#include "AudioCap_File.h" //jyc20170322 remove 
+#include "AudioCap_File.h"
 
 typedef void *defRTMPConnectHandle;
 
@@ -19,12 +19,12 @@ typedef void *defRTMPConnectHandle;
 
 struct H264VideoPackge
 {
-	uint32_t index; // °üÐòÁÐºÅ£¬Ñ­»·µÝÔö
-	int bufLimit;	// »º´æ×î´ó¿ÉÓÃ¿Õ¼ä´óÐ¡
+	uint32_t index; // ï¿½ï¿½ï¿½ï¿½ï¿½ÐºÅ£ï¿½Ñ­ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+	int bufLimit;	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ã¿Õ¼ï¿½ï¿½Ð¡
     char* buf;
 	bool keyframe;
     uint32_t timeStamp;
-    int size;		// µ±Ç°»º´æÊý¾ÝÄÚÈÝ´óÐ¡
+    int size;		// ï¿½ï¿½Ç°ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ý´ï¿½Ð¡
 	bool isAudio;
 };
 
@@ -41,7 +41,7 @@ private:
 	static std::string s_RTMPSendglobalID;
 
 	uint32_t m_packet_index;
-	//CAudioCfg m_AudioCfg;
+	CAudioCfg m_AudioCfg;
 	IPlayBackControl *m_playback;
 	int m_playback_sound;
 	IPublishHandler *m_handler;
@@ -66,7 +66,6 @@ private:
 	std::string m_P2PUrl;
 	uint32_t m_RTMFPSessionCount;
 	gloox::util::Mutex m_queue_mutex;
-	//bool m_queue_lock;
 	std::string m_name;
 	bool wait_frist_key_frame;
 
@@ -76,14 +75,14 @@ private:
 
 	char *m_fullbuf_video_cache_buffer;
 
-	//AudioCap_File m_AFS;
+	AudioCap_File m_AFS;
 
 	GSPlayBackCode_ m_PlayBackCtrl_Code;
 	uint32_t m_PlayBackCtrl_ts;
-	uint32_t m_doSkipTime_timems; // GSPlayBackCode_SkipTimeÊ±ÓÐÐ§
-	int m_PlayBackCtrl_speedlevel; // GSPlayBackCode_PLAYFAST/GSPlayBackCode_PLAYSLOWÊ±ÓÐÐ§
-	uint32_t m_PlayBackCtrl_ThrowFrame; // GSPlayBackCode_PLAYFASTÊ±ÓÐÐ§
-	GSPlayBackCode_ m_PlayBackCtrl_pause_oldcode; // GSPlayBackCode_PLAYPAUSEÊ±ÓÐÐ§
+	uint32_t m_doSkipTime_timems; // GSPlayBackCode_SkipTimeÊ±ï¿½ï¿½Ð§
+	int m_PlayBackCtrl_speedlevel; // GSPlayBackCode_PLAYFAST/GSPlayBackCode_PLAYSLOWÊ±ï¿½ï¿½Ð§
+	uint32_t m_PlayBackCtrl_ThrowFrame; // GSPlayBackCode_PLAYFASTÊ±ï¿½ï¿½Ð§
+	GSPlayBackCode_ m_PlayBackCtrl_pause_oldcode; // GSPlayBackCode_PLAYPAUSEÊ±ï¿½ï¿½Ð§
 	uint32_t m_lastThrowIndex;
 	
 	defRTMPConnectHandle m_RTMPHandle;
@@ -96,7 +95,7 @@ public:
 	static void Init( const std::string &globalID );
 	static defRTMPConnectHandle CreateRTMPInstance( const std::vector<std::string> &vecurl, std::string &useUrl, const char *pname=NULL );
 	static void deleteRTMPHandle( defRTMPConnectHandle handle );
-	/*
+	
 	CAudioCfg& GetAudioCfg()
 	{
 		return m_AudioCfg;
@@ -106,18 +105,18 @@ public:
 	{
 		m_AudioCfg = AudioCfg;
 	};
-	*/
+
 	char* get_fullbuf_video_cache_buffer();
 
 	uint32_t GetStartTime() const
 	{
 		return startTime;
 	}
-	/*
+
 	AudioCap_File& GetAFS()
 	{
 		return m_AFS;
-	}*/
+	}
 
 	uint32_t GetQueMaxSize() const;
 	uint32_t GetReuseQueMaxSize() const;

@@ -13,18 +13,19 @@
 		<item value="false" key="casesensitive"/>
 		<item value="false" key="incremental"/>
 		<item value="false" key="wholeword"/>
-		<item value="CheckCreateDB" key="selection"/>
+		<item value="RTMP" key="selection"/>
 		<list key="findhistory">
-			<item value="checkcreatedb"/>
-			<item value="fabs"/>
-			<item value="abs"/>
-			<item value="SYS_VChgRng_HCHO"/>
-			<item value="PM2.5"/>
-			<item value="jyc20170422"/>
-			<item value="20170422"/>
-			<item value="onDisconnect"/>
+			<item value="rtmp"/>
+			<item value="pthread_t"/>
+			<item value="pthread_create"/>
+			<item value="Connect"/>
+			<item value="RTMPSend"/>
+			<item value="RTMPPushThread"/>
+			<item value="g_rtmp_sendnal"/>
+			<item value="defUseRTMFP"/>
 		</list>
 		<list key="replacehistory">
+			<item value="//LOGMSGEX"/>
 		</list>
 	</section>
 </section>

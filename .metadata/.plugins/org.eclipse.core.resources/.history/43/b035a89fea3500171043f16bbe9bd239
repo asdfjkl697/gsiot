@@ -1,0 +1,7 @@
+#include "GSIOTClient.h"
+
+
+void GsCamera::InitSDK( ICameraHandler *handler )
+{
+
+}

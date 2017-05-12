@@ -72,9 +72,12 @@ IPCameraManager::IPCameraManager(void)
 			//AudioCfg.set_Audio_cap_src((std::string)query.getColumn(col)); //jyc20170406 remove
 		} col++;
 		if( !query.isColumnNull(col) ) { 
-			//AudioCfg.set_Audio_cap_param((std::string)query.getColumn(col)); 
+			//AudioCfg.set_Audio_cap_param((std::string)query.getColumn(col)); //jyc20170511 remove
 		} col++;
 		IPCameraBase *camBase = NULL;
+		camBase = new GsCamera(device_id,name,ipaddress.c_str(),port,
+						username,password,ver,PTZFlag,FocalFlag,
+						channel, streamfmt );
 		
 		/* jyc20170406 remove
 		if(module_type == TI368){

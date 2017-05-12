@@ -1,12 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <section name="Workbench">
-	<item value="stdc++" key="org.eclipse.cdt.utils.ui.controls.FileListControl"/>
+	<item value="rtmp" key="org.eclipse.cdt.utils.ui.controls.FileListControl"/>
 	<section name="completion_proposal_size">
 	</section>
 	<section name="PDOMSearchPage">
 		<item value="227191" key="searchFlags"/>
-		<item value="false" key="caseSensitive"/>
+		<item value="true" key="caseSensitive"/>
 		<list key="previousPatterns">
+			<item value="RTMP_ConnectStream"/>
+			<item value="macGSFailed"/>
+			<item value="Column"/>
+			<item value="LoadDB_code"/>
+			<item value="m_PreInitState"/>
+			<item value="sqlite3"/>
+			<item value="doMessage"/>
+			<item value="GetModuleIndex"/>
+			<item value="SQLiteHelper"/>
+			<item value="SQLiteHelper::db"/>
+			<item value="cfgpath"/>
+			<item value="gscfg"/>
+			<item value="SQLite_DBDataSave"/>
 			<item value="CDataStoreMgr"/>
 			<item value="CheckCreateDB"/>
 			<item value="strlog"/>
@@ -49,9 +62,24 @@
 			<item value="datapacket"/>
 		</list>
 	</section>
+	<section name="org.eclipse.cdt.internal.ui.text.QuickOutline">
+		<item value="591" key="org.eclipse.cdt.internal.ui.text.COutlineInformationControlDIALOG_X_ORIGIN"/>
+		<item value="334" key="org.eclipse.cdt.internal.ui.text.COutlineInformationControlDIALOG_HEIGHT"/>
+		<item value="293" key="org.eclipse.cdt.internal.ui.text.COutlineInformationControlDIALOG_Y_ORIGIN"/>
+		<item value="true" key="org.eclipse.cdt.internal.ui.text.COutlineInformationControlDIALOG_USE_PERSISTED_SIZE"/>
+		<item value="394" key="org.eclipse.cdt.internal.ui.text.COutlineInformationControlDIALOG_WIDTH"/>
+		<item value="true" key="org.eclipse.cdt.internal.ui.text.COutlineInformationControlDIALOG_USE_PERSISTED_LOCATION"/>
+	</section>
 	<section name="org.eclipse.cdt.ui.text.hover.CMacroExpansionExploration.internal">
 		<item value="442" key="size.width"/>
 		<item value="162" key="size.height"/>
+	</section>
+	<section name="org.eclipse.cdt.ui.OPEN_ACTION_SELECTION_DIALOG_SECTION">
+		<item value="444" key="DIALOG_WIDTH"/>
+		<item value="62" key="DIALOG_Y_ORIGIN"/>
+		<item value="428" key="DIALOG_X_ORIGIN"/>
+		<item value="487" key="DIALOG_HEIGHT"/>
+		<item value="1|Ubuntu|11.0|0|GTK|1|" key="DIALOG_FONT_NAME"/>
 	</section>
 	<section name="org.eclipse.cdt.ui.text.hover.CMacroExpansionExploration">
 	</section>

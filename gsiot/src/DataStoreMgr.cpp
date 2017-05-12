@@ -2289,7 +2289,7 @@ void CDataStoreMgr::CheckCreateDB( const time_t utctime )
 
 	AutoRelease_getDBDataSave autodb( this );
 	SQLite_DBDataSave *pDBSave = autodb.get( dt, true, "CheckCreateDB", false ); 
-	RemoveDB(dt);
+	RemoveDB(dt); //jyc20170425 add
 }
 
 // ��ȡָ�����ڵ���ݿ�ʵ��

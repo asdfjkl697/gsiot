@@ -5,9 +5,9 @@
 	</section>
 	<section name="DialogBounds_SearchDialog">
 		<item value="973" key="DIALOG_WIDTH"/>
-		<item value="335" key="DIALOG_Y_ORIGIN"/>
+		<item value="231" key="DIALOG_Y_ORIGIN"/>
+		<item value="513" key="DIALOG_HEIGHT"/>
 		<item value="184" key="DIALOG_X_ORIGIN"/>
-		<item value="329" key="DIALOG_HEIGHT"/>
 		<item value="1|Ubuntu|11.0|0|GTK|1|" key="DIALOG_FONT_NAME"/>
 	</section>
 	<section name="Search">
@@ -32,14 +32,14 @@
 			<item value="org.eclipse.pde.internal.ui.search.SearchPage"/>
 		</list>
 	</section>
-	<section name="SearchDialog">
-		<item value="org.eclipse.cdt.ui.pdomSearchPage" key="PREVIOUS_PAGE"/>
+	<section name="org.eclipse.search.text.FileSearchResultPage">
+		<item value="1000" key="org.eclipse.search.resultpage.limit"/>
 	</section>
 	<section name="org.eclipse.cdt.ui.pdomSearchViewPage">
 		<item value="true" key="showEnclosingDefinitions"/>
 	</section>
-	<section name="org.eclipse.search.text.FileSearchResultPage">
-		<item value="1000" key="org.eclipse.search.resultpage.limit"/>
+	<section name="SearchDialog">
+		<item value="org.eclipse.cdt.ui.pdomSearchPage" key="PREVIOUS_PAGE"/>
 	</section>
 	<section name="TextSearchPage">
 		<item value="false" key="CASE_SENSITIVE"/>

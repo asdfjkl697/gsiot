@@ -6,8 +6,8 @@ src/CameraControl.o: ../src/CameraControl.cpp ../src/CameraControl.h \
  ../src/Statement.h ../src/Transaction.h ../src/IPCameraBase.h \
  ../src/RTMPSession.h ../src/MediaStream.h ../src/H264MediaFile.h \
  ../src/RTMPSend.h ../src/IPublishHandler.h ../src/AudioCfg.h \
- ../src/AudioCapBase.h ../src/PresetManager.h ../src/GSIOTObjBase.h \
- ../src/GSIOTUser.h
+ ../src/AudioCap_File.h ../src/AudioCap.h ../src/AudioCapBase.h \
+ ../src/PresetManager.h ../src/GSIOTObjBase.h ../src/GSIOTUser.h
 
 ../src/CameraControl.h:
 
@@ -54,6 +54,10 @@ src/CameraControl.o: ../src/CameraControl.cpp ../src/CameraControl.h \
 ../src/IPublishHandler.h:
 
 ../src/AudioCfg.h:
+
+../src/AudioCap_File.h:
+
+../src/AudioCap.h:
 
 ../src/AudioCapBase.h:
 

@@ -177,20 +177,15 @@ void *PlayMgrProc_Thread(LPVOID lpPara)
 	//CoInitialize(NULL);
 
 	GSIOTClient *client = (GSIOTClient*)lpPara;
-
 	uint32_t tick = 0;
-
 	CHeartbeatGuard hbGuard( "PlayMgr" );
-
 	while( client->is_running() )
 	{
 		hbGuard.alive();
-
 		if( !client->PlayMgrCmd_OnProc() )
 		{
 			const bool CheckNow = client->PlayMgrCmd_IsCheckNow();
-			if( CheckNow
-				|| timeGetTime()-tick > 15000 )
+			if( CheckNow || timeGetTime()-tick > 15000 )
 			{
 				client->PlayMgrCmd_SetCheckNow( false );
 				client->GetIPCameraConnection()->CheckRTMPSession( CheckNow );
@@ -208,7 +203,6 @@ void *PlayMgrProc_Thread(LPVOID lpPara)
 	//LOGMSGEX( defLOGNAME, defLOG_SYS, "PlayMgrProcThread exit." );
 	client->OnPlayMgrThreadExit();
 	
-	//CoUninitialize();
 	return 0;
 }
 
@@ -218,34 +212,26 @@ void *DataProc_Thread(LPVOID lpPara)
 {
 	GSIOTClient *client = (GSIOTClient*)lpPara;
 	//LOGMSGEX( defLOGNAME, defLOG_SYS, "DataProcThread Running..." );
-	
 	client->GetDataStoreMgr( true );
-
 	CHeartbeatGuard hbGuard( "DataProc" );
-
 	DWORD dwCheckStat = ::timeGetTime();
-
 	while( client->is_running() )
 	{
 		hbGuard.alive();
-
 		client->DataSave();
 		client->DataProc();
-		
 		DWORD dwStart = ::timeGetTime();
 		while( client->is_running() && ::timeGetTime()-dwStart < 5*1000 )
 		{
 			usleep(1000);
 			client->DataSave();
 		}
-
 		if( ::timeGetTime()-dwCheckStat > 60*1000 )
 		{
 			client->DataStatCheck();
 			dwCheckStat = ::timeGetTime();
 		}
 	}
-
 	//LOGMSGEX( defLOGNAME, defLOG_SYS, "DataProcThread exit." );
 	client->OnDataProcThreadExit();
 	//return 0;
@@ -256,10 +242,8 @@ void *AlarmProc_Thread(LPVOID lpPara)
 {
 	GSIOTClient *client = (GSIOTClient*)lpPara;
 	//LOGMSGEX( defLOGNAME, defLOG_SYS, "AlarmProcThread Running..." );
-
 	CHeartbeatGuard hbGuard( "AlarmProc" );
 	DWORD dwStart = ::timeGetTime();
-
 	while( client->is_running() )
 	{
 		if( ::timeGetTime()-dwStart > 10000 )
@@ -268,15 +252,12 @@ void *AlarmProc_Thread(LPVOID lpPara)
 			hbGuard.alive();
 			dwStart = ::timeGetTime();
 		}
-
 		const bool isdo = client->AlarmProc();
-
 		if( !isdo && client->is_running() )
 		{
 			usleep(50000);
 		}
 	}
-
 	//LOGMSGEX( defLOGNAME, defLOG_SYS, "AlarmProcThread exit." );
 	client->OnAlarmProcThreadExit();
 	//return 0;
@@ -303,8 +284,8 @@ bool struPlaybackSession::check() const
 
 	if( timeGetTime()-ts > (1000*overtime) )
 	{
-		LOGMSG( "Playback Session overtime=%ds, devid=%d, devname=%s, url=%s, from=%s", overtime, dev->getId(), dev->getName().c_str(), url.c_str(), from_jid.c_str() );
-
+		LOGMSG( "Playback Session overtime=%ds, devid=%d, devname=%s, url=%s, from=%s",
+				overtime, dev->getId(), dev->getName().c_str(), url.c_str(), from_jid.c_str() );
 		return false;
 	}
 
@@ -2573,14 +2554,14 @@ bool GSIOTClient::handleIq( const IQ& iq )
 												}
 
 												if( device->GetEnable() ){
-													//jyc20170331 remove
-													//this->PlayMgrCmd_push( defPlayMgrCmd_Start, curAuth, iq, device->getId(), url_use, url_backup_use );
+													//jyc20170511 resume
+													this->PlayMgrCmd_push( defPlayMgrCmd_Start, curAuth, iq, device->getId(), url_use, url_backup_use );
 												}
 											}else{
 												if( device->GetEnable() )
 												{
-													//jyc20170331 remove
-													//this->PlayMgrCmd_push( defPlayMgrCmd_Stop, curAuth, iq, device->getId(), "", cam_ctl->get_url_backup()  );
+													//jyc20170511 resume
+													this->PlayMgrCmd_push( defPlayMgrCmd_Stop, curAuth, iq, device->getId(), "", cam_ctl->get_url_backup()  );
 												}
 											}
 										}
@@ -4595,15 +4576,8 @@ void GSIOTClient::PlayMgrCmd_ThreadCreate()
 {
 	m_isPlayMgrThreadExit = false;
 
-	//LOGMSGEX( defLOGNAME, defLOG_SYS, "PlayMgrProcThread Running..." );
-	//HANDLE   hth1;
-	//unsigned  uiThread1ID;
-	//hth1 = (HANDLE)_beginthreadex( NULL, 0, PlayMgrProcThread, this, 0, &uiThread1ID );
-	//CloseHandle(hth1);
 	pthread_t id_1;  
-    int i,ret;  
-
-    ret=pthread_create(&id_1, NULL, PlayMgrProc_Thread, this );  
+    int ret=pthread_create(&id_1, NULL, PlayMgrProc_Thread, this );
     if(ret!=0)  
     {  
         printf("Create PlayMgrProcThread error!\n");   
@@ -5180,19 +5154,19 @@ std::string GSIOTClient::GetConnectStateStr() const
 {
 	if( !xmppClient )
 	{
-		return std::string("Î´×¢²á·þÎñ");
+		return std::string("Î´×¢ï¿½ï¿½ï¿½ï¿½ï¿½");
 	}
 
 	switch( xmppClient->state() )
 	{
 	case StateDisconnected:
-		return std::string("Á¬½ÓÖÐ¶Ï");
+		return std::string("ï¿½ï¿½ï¿½ï¿½ï¿½Ð¶ï¿½");
 
 	case StateConnecting:
-		return std::string("Á¬½ÓÖÐ");
+		return std::string("ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½");
 
 	case StateConnected:
-		return std::string("Õý³£");
+		return std::string("ï¿½ï¿½");
 
 	default:
 		break;
@@ -5206,10 +5180,16 @@ void GSIOTClient::Run() //jyc20160826
 	printf( "GSIOTClient::Run()\r\n" );
 
 	LoadConfig();
+	RTMPSend::Init( m_cfg->getSerialNumber() );
 
 	//init devices
 	deviceClient = new DeviceConnection(this);
 	deviceClient->Run(m_cfg->getSerialPort());
+
+	//init cameras  //jyc20170510 resume
+	//ipcamClient = new IPCamConnection(this,this);
+	ipcamClient = new IPCamConnection(this); //jyc20170511 modify
+	ipcamClient->Connect();
 
 	defDBSavePresetQueue PresetQueue;
 	deviceClient->GetDeviceManager()->LoadDB_Preset( PresetQueue );
@@ -5240,9 +5220,9 @@ void GSIOTClient::Connect()
 	/*push stream timer*/
 	timer = new TimerManager();
 	timer->registerTimer(this,1,30);
-	timer->registerTimer(this,2,2);		// Í¨Öª¼ì²â
-	timer->registerTimer(this,3,15);	// »Ø·Å¼ì²â
-	timer->registerTimer(this,4,60);	// ¼ä¸ô·¢ping
+	timer->registerTimer(this,2,2);		// Í¨Öªï¿½ï¿½ï¿½
+	timer->registerTimer(this,3,15);	// ï¿½Ø·Å¼ï¿½ï¿½
+	timer->registerTimer(this,4,60);	// ï¿½ï¿½ï¿½ï¿½ï¿½ping
 	timer->registerTimer(this,5,300);	// check system
 	
 	JID jid(m_cfg->getJid());
@@ -5369,7 +5349,7 @@ void GSIOTClient::Connect()
 			printf( "xmppClient->recv() return %d, m_xmppReconnect=%s\n", ce, m_xmppReconnect?"true":"false" );
 		}
 #else
-	    xmppClient->connect(); // ×èÈûÊ½Á¬½Ó
+	    xmppClient->connect(); // ï¿½ï¿½ï¿½ï¿½Ê½ï¿½ï¿½ï¿½ï¿½
 #endif
 
 		uint32_t waittime= RUNCODE_Get(defCodeIndex_xmpp_ConnectInterval);
@@ -5910,14 +5890,8 @@ void GSIOTClient::Playback_ThreadCreate()
 
 	m_isPlayBackThreadExit = false;
 
-	//LOGMSGEX( defLOGNAME, defLOG_SYS, "PlaybackProcThread Running(count=%d)...", m_PlaybackThreadCreateCount );
-	//HANDLE   hth1;
-	//unsigned  uiThread1ID;
-	//hth1 = (HANDLE)_beginthreadex( NULL, 0, PlaybackProcThread, this, 0, &uiThread1ID );
-	//CloseHandle(hth1);
 	pthread_t id_1;  
-    int i,ret;  
-    ret=pthread_create(&id_1, NULL, PlaybackProc_Thread, this );  
+    int ret=pthread_create(&id_1, NULL, PlaybackProc_Thread, this );
     if(ret!=0)  
     {  
         printf("Create PlaybackProc_Thread error!\n");   
@@ -6696,19 +6670,11 @@ void GSIOTClient::DataProc_ThreadCreate()
 
 	m_isDataProcThreadExit = false;
 
-	//HANDLE   hth1;
-	//unsigned  uiThread1ID;
-	//hth1 = (HANDLE)_beginthreadex( NULL, 0, DataProcThread, this, 0, &uiThread1ID );
-	//CloseHandle(hth1);
-
 	pthread_t id_1;  
-    int i,ret;  
-
-    ret=pthread_create(&id_1, NULL, DataProc_Thread, this );  
+    int ret=pthread_create(&id_1, NULL, DataProc_Thread, this );
     if(ret!=0)  
     {  
-        printf("Create DataProcThread error!\n");  
-		//return -1;  
+        printf("Create DataProcThread error!\n");
 		return; 
     } 
 }
@@ -6985,13 +6951,10 @@ void GSIOTClient::AlarmProc_ThreadCreate()
 	//hth1 = (HANDLE)_beginthreadex( NULL, 0, AlarmProcThread, this, 0, &uiThread1ID );
 	//CloseHandle(hth1);
 	pthread_t id_1;  
-    int i,ret;  
-
-    ret=pthread_create(&id_1, NULL, AlarmProc_Thread, this );  
+    int ret=pthread_create(&id_1, NULL, AlarmProc_Thread, this );
     if(ret!=0)  
     {  
-        printf("Create DataProcThread error!\n");  
-		//return -1;  
+        printf("Create DataProcThread error!\n");
 		return; 
     } 
 }

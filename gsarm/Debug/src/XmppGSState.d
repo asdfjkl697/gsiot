@@ -22,13 +22,14 @@ src/XmppGSState.o: ../src/XmppGSState.cpp ../src/XmppGSState.h \
  ../src/CameraControl.h ../src/CameraPTZ.h ../src/CameraFocal.h \
  ../src/IPCameraBase.h ../src/RTMPSession.h ../src/MediaStream.h \
  ../src/H264MediaFile.h ../src/RTMPSend.h ../src/IPublishHandler.h \
- ../src/AudioCfg.h ../src/AudioCapBase.h ../src/ICameraHandler.h \
- ../src/IPCameraManager.h ../src/HikCamera.h ../src/Audio_WAV2AAC.h \
- ../src/TimerManager.h ../src/ControlMessage.h ../src/XmppGSAuth.h \
- ../src/XmppGSManager.h ../src/XmppGSEvent.h ../src/XmppGSTalk.h \
- ../src/XmppGSPlayback.h ../src/XmppGSRelation.h ../src/XmppGSPreset.h \
- ../src/XmppGSVObj.h ../src/XmppGSReport.h ../src/DataStoreMgr.h \
- ../src/XmppGSUpdate.h ../src/GSRemoteTalkMgr.h ../src/HttpRequest.h
+ ../src/AudioCfg.h ../src/AudioCap_File.h ../src/AudioCap.h \
+ ../src/AudioCapBase.h ../src/ICameraHandler.h ../src/IPCameraManager.h \
+ ../src/GsCamera.h ../src/Audio_WAV2AAC.h ../src/TimerManager.h \
+ ../src/ControlMessage.h ../src/XmppGSAuth.h ../src/XmppGSManager.h \
+ ../src/XmppGSEvent.h ../src/XmppGSTalk.h ../src/XmppGSPlayback.h \
+ ../src/XmppGSRelation.h ../src/XmppGSPreset.h ../src/XmppGSVObj.h \
+ ../src/XmppGSReport.h ../src/DataStoreMgr.h ../src/XmppGSUpdate.h \
+ ../src/GSRemoteTalkMgr.h ../src/HttpRequest.h
 
 ../src/XmppGSState.h:
 
@@ -162,13 +163,17 @@ src/XmppGSState.o: ../src/XmppGSState.cpp ../src/XmppGSState.h \
 
 ../src/AudioCfg.h:
 
+../src/AudioCap_File.h:
+
+../src/AudioCap.h:
+
 ../src/AudioCapBase.h:
 
 ../src/ICameraHandler.h:
 
 ../src/IPCameraManager.h:
 
-../src/HikCamera.h:
+../src/GsCamera.h:
 
 ../src/Audio_WAV2AAC.h:
 

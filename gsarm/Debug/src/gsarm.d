@@ -1,4 +1,4 @@
-src/gsarm.o: ../src/gsarm.cc ../src/GSIOTClient.h ../src/GSIOTConfig.h \
+src/gsarm.o: ../src/gsarm.cpp ../src/GSIOTClient.h ../src/GSIOTConfig.h \
  ../src/common.h ../src/memmacro.h ../src/typedef.h ../src/RunCode.h \
  ../src/SQLiteHelper.h ../src/SQLiteC++.h ../src/Exception.h \
  ../src/Database.h ../src/Column.h ../src/Statement.h \
@@ -21,14 +21,14 @@ src/gsarm.o: ../src/gsarm.cc ../src/GSIOTClient.h ../src/GSIOTConfig.h \
  ../src/CameraControl.h ../src/CameraPTZ.h ../src/CameraFocal.h \
  ../src/IPCameraBase.h ../src/RTMPSession.h ../src/MediaStream.h \
  ../src/H264MediaFile.h ../src/RTMPSend.h ../src/IPublishHandler.h \
- ../src/AudioCfg.h ../src/AudioCapBase.h ../src/ICameraHandler.h \
- ../src/IPCameraManager.h ../src/HikCamera.h ../src/Audio_WAV2AAC.h \
- ../src/TimerManager.h ../src/ControlMessage.h ../src/XmppGSAuth.h \
- ../src/XmppGSManager.h ../src/XmppGSEvent.h ../src/XmppGSState.h \
- ../src/XmppGSTalk.h ../src/XmppGSPlayback.h ../src/XmppGSRelation.h \
- ../src/XmppGSPreset.h ../src/XmppGSVObj.h ../src/XmppGSReport.h \
- ../src/DataStoreMgr.h ../src/XmppGSUpdate.h ../src/GSRemoteTalkMgr.h \
- ../src/HttpRequest.h
+ ../src/AudioCfg.h ../src/AudioCap_File.h ../src/AudioCap.h \
+ ../src/AudioCapBase.h ../src/ICameraHandler.h ../src/IPCameraManager.h \
+ ../src/GsCamera.h ../src/Audio_WAV2AAC.h ../src/TimerManager.h \
+ ../src/ControlMessage.h ../src/XmppGSAuth.h ../src/XmppGSManager.h \
+ ../src/XmppGSEvent.h ../src/XmppGSState.h ../src/XmppGSTalk.h \
+ ../src/XmppGSPlayback.h ../src/XmppGSRelation.h ../src/XmppGSPreset.h \
+ ../src/XmppGSVObj.h ../src/XmppGSReport.h ../src/DataStoreMgr.h \
+ ../src/XmppGSUpdate.h ../src/GSRemoteTalkMgr.h ../src/HttpRequest.h
 
 ../src/GSIOTClient.h:
 
@@ -160,13 +160,17 @@ src/gsarm.o: ../src/gsarm.cc ../src/GSIOTClient.h ../src/GSIOTConfig.h \
 
 ../src/AudioCfg.h:
 
+../src/AudioCap_File.h:
+
+../src/AudioCap.h:
+
 ../src/AudioCapBase.h:
 
 ../src/ICameraHandler.h:
 
 ../src/IPCameraManager.h:
 
-../src/HikCamera.h:
+../src/GsCamera.h:
 
 ../src/Audio_WAV2AAC.h:
 
