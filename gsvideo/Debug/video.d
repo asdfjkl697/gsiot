@@ -1,0 +1,1 @@
+video.o: ../video.cpp

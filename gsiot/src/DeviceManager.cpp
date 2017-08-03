@@ -817,7 +817,8 @@ bool DeviceManager::LoadDB_rfsignal()
 
 		signal.signal_type = (defRFSignalType)query.getColumn(col++).getInt();
 		signal.freq = (defFreq)query.getColumn(col++).getInt();
-#ifdef OS_UBUNTU_FLAG
+//#ifdef OS_UBUNTU_FLAG  //jyc20170508 modify
+#ifndef OS_OPENWRT
 		signal.code = query.getColumn(col++).getInt();
 		signal.codeValidLen = query.getColumn(col++).getInt();		
 		signal.one_high_time =  query.getColumn(col++).getInt();

@@ -1,6 +1,6 @@
-15:58:48 **** Incremental Build of configuration Debug for project gsiot ****
+14:23:50 **** Incremental Build of configuration Debug for project gsiot ****
 make all 
 make: Nothing to be done for `all'.
 
-15:58:48 Build Finished (took 62ms)
+14:23:50 Build Finished (took 62ms)
 

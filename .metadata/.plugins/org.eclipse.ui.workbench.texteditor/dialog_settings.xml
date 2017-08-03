@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <section name="Workbench">
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog_dialogBounds">
-		<item value="318" key="DIALOG_WIDTH"/>
-		<item value="212" key="DIALOG_Y_ORIGIN"/>
-		<item value="434" key="DIALOG_HEIGHT"/>
-		<item value="858" key="DIALOG_X_ORIGIN"/>
+		<item value="324" key="DIALOG_WIDTH"/>
+		<item value="98" key="DIALOG_Y_ORIGIN"/>
+		<item value="435" key="DIALOG_HEIGHT"/>
+		<item value="903" key="DIALOG_X_ORIGIN"/>
 		<item value="1|Ubuntu|11.0|0|GTK|1|" key="DIALOG_FONT_NAME"/>
 	</section>
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
@@ -13,19 +13,26 @@
 		<item value="false" key="casesensitive"/>
 		<item value="false" key="incremental"/>
 		<item value="false" key="wholeword"/>
-		<item value="RTMP" key="selection"/>
+		<item value="VIDEOH264_FLAG" key="selection"/>
 		<list key="findhistory">
-			<item value="rtmp"/>
-			<item value="pthread_t"/>
-			<item value="pthread_create"/>
-			<item value="Connect"/>
-			<item value="RTMPSend"/>
-			<item value="RTMPPushThread"/>
+			<item value="VIDEOH264_FLAG"/>
 			<item value="g_rtmp_sendnal"/>
-			<item value="defUseRTMFP"/>
+			<item value="ipk"/>
+			<item value="nbufs"/>
+			<item value="ThreadExit"/>
+			<item value="videoh264_flag"/>
+			<item value="videoh264"/>
+			<item value="Copy_x264_nal_t"/>
 		</list>
 		<list key="replacehistory">
-			<item value="//LOGMSGEX"/>
+			<item value=""/>
+			<item value="true"/>
+			<item value="false"/>
+			<item value="//RTMP_Log(RTMP_LOGDEBUG"/>
+			<item value="m_freamebuf_aac"/>
+			<item value="adtsbuf"/>
+			<item value="adtsheader"/>
+			<item value="buflv"/>
 		</list>
 	</section>
 </section>

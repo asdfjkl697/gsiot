@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Delete 5 resources" deleteContents="false" description="Delete 5 resources" element1="/gsh264/ RGB2YUV.cpp~" element2="/gsh264/ RGB2YUV.h~" element3="/gsh264/ rgbyuv.cpp~" element4="/gsh264/Makefile~" element5="/gsh264/video.cpp~" flags="7" id="org.eclipse.ltk.core.refactoring.delete.resources" resources="5" stamp="1501038716722"/>
+</session>

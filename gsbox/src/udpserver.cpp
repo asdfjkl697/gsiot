@@ -21,7 +21,7 @@
 #define SN_FILE "/root/sn.xml"
 
 
-// 通用参数
+// 通锟矫诧拷锟斤拷
 #define defParamNm_cmd		"cmd"
 #define defParamNm_id		"id"
 #define defParamNm_name		"name"

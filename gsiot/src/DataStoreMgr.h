@@ -261,7 +261,7 @@ class CDataStoreMgr;
 class SQLite_DBDataSave
 {
 public:
-	friend CDataStoreMgr;
+	friend class CDataStoreMgr; //jyc20170505 add class
 	SQLite_DBDataSave( bool isReadOnly, const std::string &dbname, const struGSTime &dt, bool DoAutoCreate );
 	~SQLite_DBDataSave(void);
 

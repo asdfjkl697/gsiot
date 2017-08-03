@@ -815,13 +815,13 @@ uint16_t crc16_verify( uint8_t *buf, uint16_t len )
 		uchCRCLo = uchCRCHi ^ auchCRCHi[uIndex];
 		uchCRCHi = auchCRCLo[uIndex] ; 
 	} 
-//jyc20170224 bigend or smallend UBUNTU DIFF OPENWRT
-//if(OS_UBUNTU_FLAG)
-#ifdef OS_UBUNTU_FLAG
+#ifndef OS_OPENWRT //jyc20170505 modify  ARMLINUX UBUNTU SMALLEND   MIPS BIGEND
 	return ( (uchCRCHi << 8)| uchCRCLo );
 #else
 	return ( (uchCRCLo << 8)| uchCRCHi );
 #endif
+
+
 }
 
 uint32_t g_StringToBuffer( const std::string &str, uint8_t *buf, uint32_t len, bool hasspace )
@@ -2141,7 +2141,7 @@ std::string g_GetUnitBaseForType( const IOTDeviceType type )
 		return "℃"; //return "��";
 
 	case IOT_DEVICE_Humidity:
-		return "%%RH";
+		return "%RH";
 
 	case IOT_DEVICE_Wind:
 		return "m/s";

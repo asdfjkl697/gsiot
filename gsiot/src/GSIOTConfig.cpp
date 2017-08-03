@@ -72,7 +72,7 @@ void GSIOTConfig::LoadDB_cfg() {
 
 bool GSIOTConfig::PreInit( const std::string &RunParam )
 {
-	LoadDB_cfg(); //jyc20170425 add
+	LoadDB_cfg();
 
 	if (!db) {
 		return false;

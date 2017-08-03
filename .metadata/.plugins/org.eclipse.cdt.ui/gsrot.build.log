@@ -1,0 +1,10 @@
+11:00:34 **** Build of configuration Debug for project gsrot ****
+make all 
+Building target: gsrot
+Invoking: GCC C++ Linker
+g++ -L/usr/lib -L/usr/local/lib -o "gsrot"  ./src/\ RGB2YUV.o ./src/video.o   -luuid -lstdc++ -lopencv_highgui -lx264 -lavformat -lavcodec -lavutil -lswresample -lsqlite3 -lpthread -lgloox
+Finished building target: gsrot
+ 
+
+11:00:34 Build Finished (took 207ms)
+

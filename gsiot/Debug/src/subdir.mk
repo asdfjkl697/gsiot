@@ -3,78 +3,6 @@
 ################################################################################
 
 # Add inputs and outputs from these tool invocations to the build variables 
-O_SRCS += \
-../src/AddressManager.o \
-../src/AutoCallEvent.o \
-../src/AutoControlEvent.o \
-../src/AutoEventthing.o \
-../src/AutoNoticeEvent.o \
-../src/AutoSendSMSEvent.o \
-../src/CANDeviceControl.o \
-../src/Column.o \
-../src/CommLink.o \
-../src/CommLinkManager.o \
-../src/ControlEvent.o \
-../src/ControlMessage.o \
-../src/DBUpdate.o \
-../src/DataStoreMgr.o \
-../src/Database.o \
-../src/DeviceAddress.o \
-../src/DeviceConnection.o \
-../src/DeviceManager.o \
-../src/EditAttrMgr.o \
-../src/GSIOTClient.o \
-../src/GSIOTConfig.o \
-../src/GSIOTControl.o \
-../src/GSIOTDevice.o \
-../src/GSIOTDeviceInfo.o \
-../src/GSIOTEvent.o \
-../src/GSIOTHeartbeat.o \
-../src/GSIOTInfo.o \
-../src/GSIOTUser.o \
-../src/GSIOTUserMgr.o \
-../src/HeartbeatMon.o \
-../src/HttpRequest.o \
-../src/IGSMessageHandler.o \
-../src/ModbusProc.o \
-../src/NetBaseClient.o \
-../src/NetMan.o \
-../src/NetModule.o \
-../src/NetTcpClient.o \
-../src/NetUdpClient.o \
-../src/PresetManager.o \
-../src/RFDevice.o \
-../src/RFDeviceControl.o \
-../src/RFRemoteControl.o \
-../src/RFSignalDefine.o \
-../src/RS485DevControl.o \
-../src/RemoteButtonClass.o \
-../src/RemoteButtonManager.o \
-../src/RunCode.o \
-../src/SQLiteHelper.o \
-../src/SerialDataBuffer.o \
-../src/SerialMessage.o \
-../src/Statement.o \
-../src/TimerManager.o \
-../src/Transaction.o \
-../src/TriggerControl.o \
-../src/VObjClass.o \
-../src/XmppGSAuth.o \
-../src/XmppGSChange.o \
-../src/XmppGSEvent.o \
-../src/XmppGSManager.o \
-../src/XmppGSMessage.o \
-../src/XmppGSRelation.o \
-../src/XmppGSReport.o \
-../src/XmppGSResult.o \
-../src/XmppGSState.o \
-../src/XmppGSUpdate.o \
-../src/XmppGSVObj.o \
-../src/XmppRegister.o \
-../src/common.o \
-../src/gsiot.o \
-../src/rs232.o 
-
 CPP_SRCS += \
 ../src/AddressManager.cpp \
 ../src/AutoCallEvent.cpp \
@@ -136,14 +64,18 @@ CPP_SRCS += \
 ../src/XmppGSEvent.cpp \
 ../src/XmppGSManager.cpp \
 ../src/XmppGSMessage.cpp \
+../src/XmppGSPlayback.cpp \
+../src/XmppGSPreset.cpp \
 ../src/XmppGSRelation.cpp \
 ../src/XmppGSReport.cpp \
 ../src/XmppGSResult.cpp \
 ../src/XmppGSState.cpp \
+../src/XmppGSTalk.cpp \
 ../src/XmppGSUpdate.cpp \
 ../src/XmppGSVObj.cpp \
 ../src/XmppRegister.cpp \
 ../src/common.cpp \
+../src/gsiot.cpp \
 ../src/rs232.cpp 
 
 CC_SRCS += \
@@ -210,10 +142,13 @@ OBJS += \
 ./src/XmppGSEvent.o \
 ./src/XmppGSManager.o \
 ./src/XmppGSMessage.o \
+./src/XmppGSPlayback.o \
+./src/XmppGSPreset.o \
 ./src/XmppGSRelation.o \
 ./src/XmppGSReport.o \
 ./src/XmppGSResult.o \
 ./src/XmppGSState.o \
+./src/XmppGSTalk.o \
 ./src/XmppGSUpdate.o \
 ./src/XmppGSVObj.o \
 ./src/XmppRegister.o \
@@ -285,14 +220,18 @@ CPP_DEPS += \
 ./src/XmppGSEvent.d \
 ./src/XmppGSManager.d \
 ./src/XmppGSMessage.d \
+./src/XmppGSPlayback.d \
+./src/XmppGSPreset.d \
 ./src/XmppGSRelation.d \
 ./src/XmppGSReport.d \
 ./src/XmppGSResult.d \
 ./src/XmppGSState.d \
+./src/XmppGSTalk.d \
 ./src/XmppGSUpdate.d \
 ./src/XmppGSVObj.d \
 ./src/XmppRegister.d \
 ./src/common.d \
+./src/gsiot.d \
 ./src/rs232.d 
 
 
